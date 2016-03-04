@@ -1912,11 +1912,12 @@ FF_ENABLE_DEPRECATION_WARNINGS
         if (avctx->rc_buffer_size) {
             RateControlContext *rcc = &s->rc_context;
             int max_size = FFMAX(rcc->buffer_index * avctx->rc_max_available_vbv_use, rcc->buffer_index - 500);
+            int frame_size = put_bits_count(&s->pb);
             int hq = (s->avctx->mb_decision == FF_MB_DECISION_RD || s->avctx->trellis);
             int min_step = hq ? 1 : (1<<(FF_LAMBDA_SHIFT + 7))/139;
+            min_step = FFMAX (min_step, (int) (500 * sqrtf (frame_size / (float) max_size)));
 
-            if (put_bits_count(&s->pb) > max_size &&
-                s->lambda < s->lmax) {
+            if (frame_size > max_size && s->lambda < s->lmax) {
                 s->next_lambda = FFMAX(s->lambda + min_step, s->lambda *
                                        (s->qscale + 1) / s->qscale);
                 if (s->adaptive_quant) {
