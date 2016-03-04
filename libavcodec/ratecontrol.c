@@ -927,6 +927,8 @@ float ff_rate_estimate_qscale(MpegEncContext *s, int dry_run)
     br_compensation = (a->bit_rate_tolerance - diff) / a->bit_rate_tolerance;
     if (br_compensation <= 0.0)
         br_compensation = 0.001;
+    else if (br_compensation > 1.0)
+        br_compensation = 1.0;
 
     var = pict_type == AV_PICTURE_TYPE_I ? s->mb_var_sum : s->mc_mb_var_sum;
 
