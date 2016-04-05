@@ -44,6 +44,7 @@ typedef struct H261Context {
     int current_mv_y;
     int gob_number;
     int gob_start_code_skipped; // 1 if gob start code is already read before gob header is read
+    int mb_intra_count;
 } H261Context;
 
 #define MB_TYPE_H261_FIL 0x800000
