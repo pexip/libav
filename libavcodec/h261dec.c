@@ -435,6 +435,7 @@ static int h261_decode_mb(H261Context *h)
 
     if (s->mb_intra) {
         s->current_picture.mb_type[xy] = MB_TYPE_INTRA;
+        h->mb_intra_count++;
         goto intra;
     }
 
@@ -596,6 +597,7 @@ static int h261_decode_frame(AVCodecContext *avctx, void *data,
     ff_dlog(avctx, "bytes=%x %x %x %x\n", buf[0], buf[1], buf[2], buf[3]);
 
     h->gob_start_code_skipped = 0;
+    h->mb_intra_count = 0;
 
 retry:
     init_get_bits(&s->gb, buf, buf_size * 8);
@@ -654,6 +656,10 @@ retry:
         h261_decode_gob(h);
     }
     ff_mpv_frame_end(s);
+
+    /* H.261 has no I-frames, but if all macroblocks are coded with intra mode
+     * we can consider this a key frame. */
+    s->current_picture_ptr->f->key_frame = h->mb_intra_count == s->mb_num;
 
     av_assert0(s->current_picture.f->pict_type == s->current_picture_ptr->f->pict_type);
     av_assert0(s->current_picture.f->pict_type == s->pict_type);
