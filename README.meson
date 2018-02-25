@@ -1,0 +1,34 @@
+# Building with meson:
+
+Get meson from master:
+
+```
+git clone https://github.com/mesonbuild/meson.git
+cd meson
+python3 -m pip install . --user
+```
+
+Get ninja from a package manager (dnf, pacman, brew, ..) on Linux
+and MacOS, or with the installer on Windows, then in FFmpeg:
+
+```
+meson build && ninja -C build
+```
+
+Known to build on Debian, Arch Linux and MacOS High Sierra
+
+Builds on Windows, but only with -Ddefault_library=static:
+
+```
+meson -Ddefault_library=static build && ninja -C build
+```
+
+<!---
+FIXME: address that last point
+-->
+
+# Running the tests:
+
+```
+meson test -C build
+```
