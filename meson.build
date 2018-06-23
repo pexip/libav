@@ -80,9 +80,7 @@ cc = meson.get_compiler('c')
 project_c_args = [
   '-D_ISOC99_SOURCE',
   '-D_GNU_SOURCE',
-  '-U__STRICT_ANSI__',
-  '-D_XOPEN_SOURCE=600',
-  '-D_POSIX_C_SOURCE=200112',
+  '-D_LARGEFILE_SOURCE',
   '-DPIC',
   '-Wno-parentheses',
   '-Wno-pointer-sign',
@@ -98,13 +96,7 @@ project_c_args = [
   '-Wno-address',
 ]
 
-if host_machine.system() == 'darwin'
-  project_c_args += ['-D_DARWIN_C_SOURCE']
-endif
-
 project_c_args = cc.get_supported_arguments(project_c_args)
-
-add_project_arguments(project_c_args, language: 'c')
 
 thread_dep = dependency('threads')
 
@@ -617,6 +609,107 @@ library_gplv3_list = [
 
 all_checks = []
 
+cpp_cond = '''
+#include <@0@>
+
+#if !(@1@)
+#error "unsatisfied condition: @1@"
+#endif
+
+int main(void) {
+  return 0;
+}
+'''
+
+check_winapi_family = '''
+#ifdef WINAPI_FAMILY
+#include <winapifamily.h>
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#error not desktop
+#endif
+#endif
+
+int main(void) {
+  return 0;
+}
+'''
+
+libc_type = ''
+
+if cc.links(cpp_cond.format('features.h', 'defined __UCLIBC__'))
+  libc_type = 'uclibc'
+  project_c_args += ['-D_POSIX_C_SOURCE=200112', '-D_XOPEN_SOURCE=600']
+elif cc.links(cpp_cond.format('features.h', 'defined __GLIBC__'))
+  libc_type = 'glibc'
+  project_c_args += ['-D_POSIX_C_SOURCE=200112', '-D_XOPEN_SOURCE=600']
+elif cc.links(cpp_cond.format('newlib.h', 'defined _NEWLIB_VERSION'))
+  libc_type = 'newlib'
+  project_c_args += ['-U__STRICT_ANSI__', '-D_XOPEN_SOURCE=600']
+elif cc.links(cpp_cond.format('_mingw.h', 'defined __MINGW64_VERSION_MAJOR'))
+  libc_type = 'mingw64'
+  if cc.links(cpp_cond.format('_mingw.h', '__MINGW64_VERSION_MAJOR < 3'))
+    # FIXME compat
+  endif
+  project_c_args += ['-U__STRICT_ANSI__', '-D__USE_MINGW_ANSI_STDIO=1']
+  if cc.get_id() == 'gcc'
+    project_c_args += ['-D__printf__=__gnu_printf__']
+  endif
+  if cc.links(cpp_cond.format('windows.h', '!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600'))
+    project_c_args += ['-D_WIN32_WINNT=0x0600']
+  endif
+elif (cc.links(cpp_cond.format('_mingw.h', 'defined __MINGW_VERSION')) or
+    cc.links(cpp_cond.format('_mingw.h', 'defined __MINGW32_VERSION')))
+  libc_type = 'mingw32'
+  if cc.links(cpp_cond.format('_mingw.h', '__MINGW32_MAJOR_VERSION > 3 || (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION >= 15'))
+    error('MinGW32 runtime version must be >= 3.15')
+  endif
+  project_c_args += ['-U__STRICT_ANSI__', '-D__USE_MINGW_ANSI_STDIO=1']
+  if cc.links(cpp_cond.format('_mingw.h', '__MSVCRT_VERSION__ < 0x0700'))
+    project_c_args += ['-D__MSVCRT_VERSION__=0x0700']
+  endif
+  if cc.links(cpp_cond.format('windows.h', '!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600'))
+    project_c_args += ['-D_WIN32_WINNT=0x0600']
+  endif
+  if cc.get_id() == 'gcc'
+    project_c_args += ['-D__printf__=__gnu_printf__']
+  endif
+elif cc.links(cpp_cond.format('crtversion.h', 'defined _VC_CRT_MAJOR_VERSION'))
+  libc_type = 'msvcrt'
+  if cc.links(cpp_cond.format('crtversion.h', '_VC_CRT_MAJOR_VERSION < 14'))
+    # FIXME compat
+  endif
+  project_c_args += ['-D_USE_MATH_DEFINES', '-D_CRT_SECURE_NO_WARNINGS', '-D_CRT_NONSTDC_NO_WARNINGS']
+  if (cc.links(cpp_cond.format('stdlib.h', 'defined(_WIN32_WINNT)')) or
+      cc.links(check_winapi_family))
+    project_c_args += ['-D_WIN32_WINNT=0x0600']
+  endif
+  if not cc.has_function('strtoll')
+    project_c_args += ['-Dstrtoll=_strtoi64']
+  endif
+  if not cc.has_function('strtoull')
+    project_c_args += ['-Dstrtoull=_strtoui64']
+  endif
+elif cc.links(cpp_cond.format('stddef.h', 'defined __KLIBC__'))
+  libc_type = 'klibc'
+elif cc.links(cpp_cond.format('stddef.h', 'defined __BIONIC__'))
+  libc_type = 'bionic'
+elif cc.links(cpp_cond.format('sys/brand.h', 'defined LABELED_BRAND_NAME'))
+  libc_type = 'solaris'
+  project_c_args += ['-D__EXTENSIONS__', '-D_XOPEN_SOURCE=600']
+endif
+
+if not cc.has_function('localtime_r', prefix: '#include <time.h>', args: project_c_args)
+  if cc.has_function('localtime_r', prefix: '#include <time.h>', args: project_c_args + ['-D_POSIX_C_SOURCE=200112', '-D_XOPEN_SOURCE=600'])
+    project_c_args += ['-D_POSIX_C_SOURCE=200112', '-D_XOPEN_SOURCE=600']
+  endif
+endif
+
+if libc_type != ''
+  conf.set('libc_@0@'.format(libc_type), 1)
+endif
+
+conf.set10('pic', conf.get('pic', cc.links(cpp_cond.format('stdlib.h', 'defined(__PIC__) || defined(__pic__) || defined(PIC)'))))
+
 check_pkg_config = [
   ['alsa', ['alsa/asoundlib.h'], ['snd_pcm_htimestamp'], {}],
   ['ffnvcodec', ['ffnvcodec/nvEncodeAPI.h', 'ffnvcodec/dynlink_cuda.h', 'ffnvcodec/dynlink_cuviddec.h', 'ffnvcodec/dynlink_nvcuvid.h'],
@@ -820,6 +913,7 @@ check_header_funcs = [
   ['machine_rw_barrier', ['mbarrier.h'], {'funcs': ['__machine_rw_barrier']}],
   ['MemoryBarrier', ['windows.h']],
   ['x264_csp_bgr', ['stdint.h', 'x264.h'], {'defines': ['X264_CSP_BGR']}],
+  ['posix_memalign', ['stdlib.h']],
   ['sem_timedwait', ['semaphore.h'], {'preconditions': ['pthreads'], 'extra_deps': ['thread_dep']}],
 ]
 
@@ -835,7 +929,6 @@ check_funcs = [
   ['getaddrinfo'],
   ['inet_aton'],
   ['memalign'],
-  ['posix_memalign'],
   ['access'],
   ['fcntl'],
   ['fork'],
@@ -1344,7 +1437,6 @@ foreach feature : arch_features
   conf.set10(name, have)
 endforeach
 
-conf.set('pic', 1)
 conf.set10('shared', get_option('default_library') == 'shared')
 conf.set('pthreads', 0)
 conf.set('w32threads', 0)
@@ -1519,10 +1611,6 @@ foreach check : all_checks
     foreach symbol : funcs + defines
       conf.set10(symbol.to_lower(), found)
     endforeach
-
-    if found
-      add_project_arguments(c_args, language: 'c')
-    endif
 
     if found
       set_variable('@0@_extra_deps'.format(name.underscorify()), extra_deps)
@@ -1793,6 +1881,8 @@ if not cc.has_header('stdatomic.h') and thread_dep.found()
     common_incs += [include_directories('compat/atomics/win32')]
   endif
 endif
+
+add_project_arguments(project_c_args, language: 'c')
 
 libavutil_optional_deps = [vaapi_drm_extra_deps + vaapi_x11_extra_deps + vdpau_x11_extra_deps]
 libswresample_optional_deps = [libsoxr_extra_deps]
