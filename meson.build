@@ -16,6 +16,7 @@
 # License along with this library; if not, see <http://www.gnu.org/licenses/>.
 
 project('FFmpeg', 'c',
+  meson_version: '>= 0.47.0',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99'],
 )
