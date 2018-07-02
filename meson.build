@@ -23,7 +23,7 @@ project('FFmpeg', 'c',
 
 # HOWTO:
 #
-# Get meson from master then:
+# Get meson 0.47 from pip or your distro's package manager then:
 #
 # meson build && ninja -C build
 #
