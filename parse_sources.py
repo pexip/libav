@@ -109,23 +109,26 @@ with open('generated.build', 'w') as f:
         default_sources = map_.pop('', [])
 
         if default_sources:
-            f.write('%ssources = files([\n' % '_'.join((sys.argv[1].replace('/', '_'), source_type)))
+            f.write('%ssources = files(\n' % '_'.join((sys.argv[1].replace('/', '_'), source_type)))
             for source in default_sources:
                 if '$' in source:
                     print ('Warning: skipping %s' % source)
                     continue
                 f.write("  '%s',\n" % os.path.basename(source))
-            f.write('])\n\n')
+            f.write(')\n\n')
 
         f.write('%soptional_sources = {\n' % '_'.join((sys.argv[1].replace('/', '_'), source_type)))
         for label in sorted (map_):
-            f.write("  '%s' : files([" % label.lower())
-            for source in map_[label]:
+            f.write("  '%s' : files(" % label.lower())
+            l = len (map_[label])
+            for i, source in enumerate(map_[label]):
                 if '$' in source:
                     print ('Warning: skipping %s' % source)
                     continue
-                f.write("'%s'," % os.path.basename(source))
-            f.write(']),\n')
+                f.write("'%s'" % os.path.basename(source))
+                if i + 1 < l:
+                    f.write(',')
+            f.write('),\n')
         f.write('}\n\n')
 
     test_source_map = source_maps['test-prog']
@@ -140,7 +143,7 @@ with open('generated.build', 'w') as f:
                 continue
             basename = os.path.basename(source)
             testname = os.path.splitext(basename)[0]
-            f.write("  ['%s', files(['tests/%s'])],\n" % (testname, basename))
+            f.write("  ['%s', files('tests/%s')],\n" % (testname, basename))
         f.write(']\n\n')
 
     f.write('%s_optional_tests = {\n' % (sys.argv[1].replace('/', '_')))
@@ -152,6 +155,6 @@ with open('generated.build', 'w') as f:
                 continue
             basename = os.path.basename(source)
             testname = os.path.splitext(basename)[0]
-            f.write("    ['%s', files(['tests/%s'])],\n" % (testname, basename))
+            f.write("    ['%s', files('tests/%s')],\n" % (testname, basename))
         f.write('  ],\n')
     f.write('}\n\n')

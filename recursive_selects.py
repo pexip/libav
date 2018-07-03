@@ -45,5 +45,5 @@ build_graph('if')
 build_graph('if_any')
 
 from pprint import pformat
-with open('depgraph.py', 'w') as f:
+with open('tmp_depgraph.py', 'w') as f:
     f.write ('GRAPH = %s\n' % pformat (dict(GRAPH)))
