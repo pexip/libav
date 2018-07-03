@@ -1,6 +1,6 @@
 libswscale_majorver = '5'
-minorver = '0'
-microver = '101'
+minorver = '2'
+microver = '100'
 
 libswscale_version = libswscale_majorver + '.' + minorver + '.' + microver
 

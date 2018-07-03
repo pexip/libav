@@ -1,6 +1,6 @@
 libavutil_majorver = '56'
-minorver = '7'
-microver = '101'
+minorver = '18'
+microver = '102'
 
 libavutil_version = libavutil_majorver + '.' + minorver + '.' + microver
 

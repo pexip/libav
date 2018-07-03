@@ -1,6 +1,6 @@
 libswresample_majorver = '3'
-minorver = '0'
-microver = '101'
+minorver = '2'
+microver = '100'
 
 libswresample_version = libswresample_majorver + '.' + minorver + '.' + microver
 

@@ -1,5 +1,5 @@
 libavdevice_majorver = '58'
-minorver = '2'
+minorver = '4'
 microver = '100'
 
 libavdevice_version = libavdevice_majorver + '.' + minorver + '.' + microver

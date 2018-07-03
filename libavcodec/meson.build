@@ -1,6 +1,6 @@
 libavcodec_majorver = '58'
-minorver = '13'
-microver = '100'
+minorver = '19'
+microver = '105'
 
 libavcodec_version = libavcodec_majorver + '.' + minorver + '.' + microver
 

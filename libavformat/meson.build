@@ -1,5 +1,5 @@
 libavformat_majorver = '58'
-minorver = '10'
+minorver = '17'
 microver = '100'
 
 libavformat_version = libavformat_majorver + '.' + minorver + '.' + microver
