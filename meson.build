@@ -2029,6 +2029,14 @@ foreach built_lib : built_libs
 
   set_variable('lib@0@'.format(built_lib[0]), lib)
 
+  declared_dep = declare_dependency(link_with: lib,
+    include_directories: include_directories('.'),
+    dependencies: deps,
+    version: get_variable('lib@0@_version'.format(built_lib[0]))
+  )
+
+  set_variable('lib@0@_dep'.format(built_lib[0]), declared_dep)
+
   foreach test_ : tests
     test_name = test_[0]
     test_sources = test_[1]
