@@ -1992,6 +1992,7 @@ foreach built_lib : built_libs
       arguments : asm_args + [
 	'-f', asm_format,
 	'-i', meson.current_source_dir() + '/',
+	'-i', meson.current_build_dir() + '/',
 	'-i', join_paths(meson.current_source_dir(), 'lib@0@'.format(built_lib[0]), 'x86', ''),
 	'-P', join_paths(meson.current_build_dir(), 'config.asm'),
 	'@INPUT@',
