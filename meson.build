@@ -1614,9 +1614,9 @@ foreach check : all_checks
     endforeach
 
     if found
-      set_variable('@0@_extra_deps'.format(name.underscorify()), extra_deps)
+      set_variable('@0@_extra_deps'.format(name.to_lower().underscorify()), extra_deps)
     else
-      set_variable('@0@_extra_deps'.format(name.underscorify()), [])
+      set_variable('@0@_extra_deps'.format(name.to_lower().underscorify()), [])
     endif
   endif
 endforeach
@@ -1886,6 +1886,7 @@ endif
 add_project_arguments(project_c_args, language: 'c')
 
 libavutil_optional_deps = [vaapi_drm_extra_deps + vaapi_x11_extra_deps + vdpau_x11_extra_deps]
+libavdevice_extra_deps = [xvgetportattribute_extra_deps]
 libswresample_optional_deps = [libsoxr_extra_deps]
 
 common_deps += libm_extra_deps
