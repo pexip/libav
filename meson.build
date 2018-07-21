@@ -850,7 +850,8 @@ check_libs = [
   ['ole32', ['windows.h'], ['CoTaskMemFree'], ['ole32']],
   ['openal', ['AL/al.h'], ['alGetError'], ['openal']],
   ['openal', ['AL/al.h'], ['alGetError'], ['OpenAL32']],
-  ['opencl', ['CL/cl.h'], ['clEnqueueNDRangeKernel'], ['OpenCL']],
+  # FIXME- Get opencl working - remove the disabler() at that time.
+  ['opencl', ['CL/cl.h'], ['clEnqueueNDRangeKernel'], ['OpenCL', disabler()]],
   ['opengl', ['GL/glx.h'], ['glXGetProcAddress'], ['GL']],
   ['opengl', ['windows.h'], ['wglGetProcAddress'], ['opengl32', 'gdi32']],
   ['openssl', ['openssl/ssl.h'], ['SSL_library_init'], ['ssl', 'crypto']],
