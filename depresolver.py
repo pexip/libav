@@ -56,8 +56,7 @@ def parse_conf(path):
             l = l.strip()
             m = re.match('#define\s+(.*)\s+(.+)', l)
             if m:
-                key = m[1].lower()
-                res[m[1].lower()] = int(m[2])
+                res[m.group(1).lower()] = int(m.group(2))
     return res
 
 
@@ -164,7 +163,7 @@ def parse_components(path):
             l = l.strip()
             m = re.match('#define\s+(.*)', l)
             if m:
-                res.append(m[1].lower())
+                res.append(m.group(1).lower())
     return res
 
 
