@@ -78,6 +78,21 @@ python3 = import('python3').find_python()
 
 cc = meson.get_compiler('c')
 
+if cc.get_id() == 'msvc'
+  # Ignore several spurious warnings for things FFmpeg does very commonly
+  # If a warning is completely useless and spammy, use '/wdXXXX' to suppress it
+  # If a warning is harmless but hard to fix, use '/woXXXX' so it's shown once
+  # NOTE: Only add warnings here if you are sure they're spurious
+  add_project_arguments(
+      '/wo4005', # macro redefinition (this likely need to be fixed)
+      '/wd4018', # implicit signed/unsigned conversion
+      '/wd4146', # unary minus on unsigned (beware INT_MIN)
+      '/wd4244', # lossy type conversion (e.g. double -> int)
+      '/wd4305', # truncating type conversion (e.g. double -> float)
+      '/wd4554', # operator precedence
+      language : 'c')
+endif
+
 project_c_args = [
   '-D_ISOC99_SOURCE',
   '-D_GNU_SOURCE',
