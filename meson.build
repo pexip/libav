@@ -91,6 +91,11 @@ if cc.get_id() == 'msvc'
       '/wd4305', # truncating type conversion (e.g. double -> float)
       '/wd4554', # operator precedence
       language : 'c')
+
+  # see above, better error out with a helpful message until this is fixed
+  if get_option('default_library') != 'static'
+    error('Currently only static builds are supported with MSVC. Please use -Ddefault_library=static for now.')
+  endif
 endif
 
 project_c_args = [
