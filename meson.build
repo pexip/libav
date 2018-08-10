@@ -944,7 +944,7 @@ foreach func : complex_funcs
 endforeach
 
 foreach func : math_funcs
-  check_header_funcs += [[func, ['math.h'], 'extra_deps': ['libm_extra_deps']}]]
+  check_header_funcs += [[func, ['math.h'], {'extra_deps': ['libm_extra_deps']}]]
 endforeach
 
 check_funcs = [
