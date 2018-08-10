@@ -27,9 +27,7 @@ project('FFmpeg', 'c',
 #
 # meson build && ninja -C build
 #
-# Builds on Windows, but only with -Ddefault_library=static:
-#
-# meson -Ddefault_library=static build && ninja -C build
+# Will only build static libraries on Windows
 #
 # FIXME: address that last point
 
@@ -91,11 +89,6 @@ if cc.get_id() == 'msvc'
       '/wd4305', # truncating type conversion (e.g. double -> float)
       '/wd4554', # operator precedence
       language : 'c')
-
-  # see above, better error out with a helpful message until this is fixed
-  if get_option('default_library') != 'static'
-    error('Currently only static builds are supported with MSVC. Please use -Ddefault_library=static for now.')
-  endif
 endif
 
 project_c_args = [
@@ -1459,7 +1452,7 @@ foreach feature : arch_features
   conf.set10(name, have)
 endforeach
 
-conf.set10('shared', get_option('default_library') == 'shared')
+conf.set10('shared', get_option('default_library') == 'shared' and host_machine.system() != 'windows')
 conf.set('pthreads', 0)
 conf.set('w32threads', 0)
 conf.set('os2threads', 0)
@@ -2036,17 +2029,30 @@ foreach built_lib : built_libs
     implicit_include_directories : false,
   )
 
-  lib = library(built_lib[0], gen_objects,
-    objects: static_lib.extract_all_objects(),
-    install: true,
-    dependencies: deps,
-    soversion: version,
-    include_directories: common_incs,
-    link_with: link_with,
-    link_args: link_args,
-    c_args: c_args,
-    implicit_include_directories : false,
-  )
+  if host_machine.system() == 'windows'
+    lib = static_library(built_lib[0], gen_objects,
+      objects: static_lib.extract_all_objects(),
+      install: true,
+      dependencies: deps,
+      include_directories: common_incs,
+      link_with: link_with,
+      link_args: link_args,
+      c_args: c_args,
+      implicit_include_directories : false,
+    )
+  else
+    lib = library(built_lib[0], gen_objects,
+      objects: static_lib.extract_all_objects(),
+      install: true,
+      dependencies: deps,
+      soversion: version,
+      include_directories: common_incs,
+      link_with: link_with,
+      link_args: link_args,
+      c_args: c_args,
+      implicit_include_directories : false,
+    )
+  endif
 
   set_variable('lib@0@'.format(built_lib[0]), lib)
 

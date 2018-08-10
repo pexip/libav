@@ -15,17 +15,7 @@ meson build && ninja -C build
 
 Known to build on Debian, Arch Linux and MacOS High Sierra.
 
-Builds on Windows with MSVC, but only with `-Ddefault_library=static`:
-
-```
-meson -Ddefault_library=static build && ninja -C build
-```
-
-Should also build on Windows with MinGW.
-
-<!---
-FIXME: address that last point
--->
+Currently only builds static libraries on Windows.
 
 # Running the tests:
 
