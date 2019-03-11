@@ -19,6 +19,7 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.47.0',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99'],
+  version: '4.1.1',
 )
 
 # HOWTO:
@@ -1693,7 +1694,7 @@ extern_things = [
   ['AVInputFormat', 'demuxer', 'libavformat/allformats.c', 'demuxer_list'],
   ['AVCodec', 'encoder', 'libavcodec/allcodecs.c', 'encoder_list'],
   ['AVCodec', 'decoder', 'libavcodec/allcodecs.c', 'decoder_list'],
-  ['AVCodecParser', 'parser', 'libavcodec/parser.c', 'parser_list'],
+  ['AVCodecParser', 'parser', 'libavcodec/parsers.c', 'parser_list'],
   ['AVBitStreamFilter', 'bsf', 'libavcodec/bitstream_filters.c', 'bsf_list'],
   ['AVHWAccel', 'hwaccel', 'libavcodec/hwaccels.h', 'hwaccel_list'],
   ['URLProtocol', 'protocol', 'libavformat/protocols.c', 'protocol_list'],
@@ -2083,6 +2084,7 @@ foreach built_lib : built_libs
       implicit_include_directories : false)
 
     test('@0@_@1@'.format(built_lib[0], test_name), exe,
+      timeout: 180,
       workdir: join_paths(meson.current_source_dir(), 'lib@0@'.format(built_lib[0]), 'tests'))
   endforeach
 endforeach

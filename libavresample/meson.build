@@ -6,7 +6,7 @@ libavresample_version = libavresample_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
-libavresample_sources = files([
+libavresample_sources = files(
   'audio_convert.c',
   'audio_data.c',
   'audio_mix.c',
@@ -15,7 +15,7 @@ libavresample_sources = files([
   'options.c',
   'resample.c',
   'utils.c',
-])
+)
 
 libavresample_optional_sources = {
 }
@@ -27,7 +27,7 @@ libavresample_mmx_optional_sources = {
 }
 
 libavresample_tests = [
-  ['avresample', files(['tests/avresample.c'])],
+  ['avresample', files('tests/avresample.c')],
 ]
 
 libavresample_optional_tests = {

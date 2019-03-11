@@ -1,12 +1,12 @@
 libavcodec_majorver = '58'
-minorver = '19'
-microver = '105'
+minorver = '35'
+microver = '100'
 
 libavcodec_version = libavcodec_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
-libavcodec_sources = files([
+libavcodec_sources = files(
   'ac3_parser.c',
   'adts_parser.c',
   'allcodecs.c',
@@ -31,6 +31,7 @@ libavcodec_sources = files([
   'options.c',
   'mjpegenc_huffman.c',
   'parser.c',
+  'parsers.c',
   'profiles.c',
   'qsv_api.c',
   'raw.c',
@@ -41,7 +42,7 @@ libavcodec_sources = files([
   'pthread.c',
   'pthread_slice.c',
   'pthread_frame.c',
-])
+)
 
 libavcodec_optional_sources = {
   'a64multi5_encoder' : files('a64multienc.c','elbg.c'),
@@ -150,13 +151,17 @@ libavcodec_optional_sources = {
   'atrac3pal_decoder' : files('atrac3plusdec.c','atrac3plus.c','atrac3plusdsp.c','atrac.c'),
   'atrac3p_decoder' : files('atrac3plusdec.c','atrac3plus.c','atrac3plusdsp.c','atrac.c'),
   'atrac3_decoder' : files('atrac3.c','atrac.c'),
+  'atrac9_decoder' : files('atrac9dec.c'),
   'audiodsp' : files('audiodsp.c'),
   'audio_frame_queue' : files('audio_frame_queue.c'),
   'aura2_decoder' : files('aura.c'),
   'aura_decoder' : files('cyuv.c'),
+  'av1_metadata_bsf' : files('av1_metadata_bsf.c'),
+  'av1_parser' : files('av1_parser.c','av1_parse.c'),
   'avrn_decoder' : files('avrndec.c','mjpegdec.c'),
   'avrp_decoder' : files('r210dec.c'),
   'avrp_encoder' : files('r210enc.c'),
+  'avs2_parser' : files('avs2_parser.c'),
   'avs_decoder' : files('avs.c'),
   'avui_decoder' : files('avuidec.c'),
   'avui_encoder' : files('avuienc.c'),
@@ -183,8 +188,10 @@ libavcodec_optional_sources = {
   'cavsvideo_parser' : files('cavs_parser.c'),
   'cavs_decoder' : files('cavs.c','cavsdec.c','cavsdsp.c','cavsdata.c'),
   'cbs' : files('cbs.c'),
+  'cbs_av1' : files('cbs_av1.c'),
   'cbs_h264' : files('cbs_h2645.c','h2645_parse.c'),
   'cbs_h265' : files('cbs_h2645.c','h2645_parse.c'),
+  'cbs_jpeg' : files('cbs_jpeg.c'),
   'cbs_mpeg2' : files('cbs_mpeg2.c'),
   'cbs_vp9' : files('cbs_vp9.c'),
   'ccaption_decoder' : files('ccaption_dec.c'),
@@ -270,11 +277,11 @@ libavcodec_optional_sources = {
   'evrc_decoder' : files('evrcdec.c','acelp_vectors.c','lsp.c'),
   'exif' : files('exif.c','tiff_common.c'),
   'exr_decoder' : files('exr.c','exrdsp.c'),
-  'extract_extradata_bsf' : files('extract_extradata_bsf.c','h2645_parse.c'),
+  'extract_extradata_bsf' : files('extract_extradata_bsf.c','av1_parse.c','h2645_parse.c'),
   'faandct' : files('faandct.c'),
   'faanidct' : files('faanidct.c'),
   'fdctdsp' : files('fdctdsp.c','jfdctfst.c','jfdctint.c'),
-  'fft' : files('avfft.c','fft_fixed.c','fft_float.c','fft_fixed_32.c','fft_init_table.c'),
+  'fft' : files('avfft.c','fft_fixed.c','fft_float.c','fft_fixed_32.c','fft_init_table.c',),
   'ffv1_decoder' : files('ffv1dec.c','ffv1.c'),
   'ffv1_encoder' : files('ffv1enc.c','ffv1.c'),
   'ffwavesynth_decoder' : files('ffwavesynth.c'),
@@ -335,7 +342,7 @@ libavcodec_optional_sources = {
   'h264_decoder' : files('h264dec.c','h264_cabac.c','h264_cavlc.c','h264_direct.c','h264_loopfilter.c','h264_mb.c','h264_picture.c','h264_refs.c','h264_sei.c','h264_slice.c','h264data.c'),
   'h264_dxva2_hwaccel' : files('dxva2_h264.c'),
   'h264_mediacodec_decoder' : files('mediacodecdec.c'),
-  'h264_metadata_bsf' : files('h264_metadata_bsf.c'),
+  'h264_metadata_bsf' : files('h264_metadata_bsf.c','h264_levels.c'),
   'h264_mmal_decoder' : files('mmaldec.c'),
   'h264_mp4toannexb_bsf' : files('h264_mp4toannexb_bsf.c'),
   'h264_nvdec_hwaccel' : files('nvdec_h264.c'),
@@ -349,7 +356,7 @@ libavcodec_optional_sources = {
   'h264_rkmpp_decoder' : files('rkmppdec.c'),
   'h264_v4l2m2m_decoder' : files('v4l2_m2m_dec.c'),
   'h264_v4l2m2m_encoder' : files('v4l2_m2m_enc.c'),
-  'h264_vaapi_encoder' : files('vaapi_encode_h264.c'),
+  'h264_vaapi_encoder' : files('vaapi_encode_h264.c','h264_levels.c'),
   'h264_vaapi_hwaccel' : files('vaapi_h264.c'),
   'h264_vdpau_hwaccel' : files('vdpau_h264.c'),
   'h264_videotoolbox_encoder' : files('videotoolboxenc.c'),
@@ -375,7 +382,7 @@ libavcodec_optional_sources = {
   'hevc_rkmpp_decoder' : files('rkmppdec.c'),
   'hevc_v4l2m2m_decoder' : files('v4l2_m2m_dec.c'),
   'hevc_v4l2m2m_encoder' : files('v4l2_m2m_enc.c'),
-  'hevc_vaapi_encoder' : files('vaapi_encode_h265.c'),
+  'hevc_vaapi_encoder' : files('vaapi_encode_h265.c','h265_profile_level.c'),
   'hevc_vaapi_hwaccel' : files('vaapi_hevc.c'),
   'hevc_vdpau_hwaccel' : files('vdpau_hevc.c'),
   'hnm4_video_decoder' : files('hnm4video.c'),
@@ -394,7 +401,9 @@ libavcodec_optional_sources = {
   'iirfilter' : files('iirfilter.c'),
   'ilbc_at_decoder' : files('audiotoolboxdec.c'),
   'ilbc_at_encoder' : files('audiotoolboxenc.c'),
+  'ilbc_decoder' : files('ilbcdec.c'),
   'imc_decoder' : files('imc.c'),
+  'imm4_decoder' : files('imm4.c'),
   'imx_dump_header_bsf' : files('imx_dump_header_bsf.c'),
   'indeo2_decoder' : files('indeo2.c'),
   'indeo3_decoder' : files('indeo3.c'),
@@ -423,6 +432,7 @@ libavcodec_optional_sources = {
   'libcelt_decoder' : files('libcelt_dec.c'),
   'libcodec2_decoder' : files('libcodec2.c','codec2utils.c'),
   'libcodec2_encoder' : files('libcodec2.c','codec2utils.c'),
+  'libdavs2_decoder' : files('libdavs2.c'),
   'libfdk_aac_decoder' : files('libfdk-aacdec.c'),
   'libfdk_aac_encoder' : files('libfdk-aacenc.c'),
   'libgsm_decoder' : files('libgsmdec.c'),
@@ -461,6 +471,7 @@ libavcodec_optional_sources = {
   'libx262_encoder' : files('libx264.c'),
   'libx264_encoder' : files('libx264.c'),
   'libx265_encoder' : files('libx265.c'),
+  'libxavs2_encoder' : files('libxavs2.c'),
   'libxavs_encoder' : files('libxavs.c'),
   'libxvid_encoder' : files('libxvid.c'),
   'libzvbi_teletext_decoder' : files('libzvbi-teletextdec.c','ass.c'),
@@ -590,6 +601,7 @@ libavcodec_optional_sources = {
   'mts2_decoder' : files('mss4.c'),
   'mvc1_decoder' : files('mvcdec.c'),
   'mvc2_decoder' : files('mvcdec.c'),
+  'mwsc_decoder' : files('mwsc.c'),
   'mxf_muxer' : files('dnxhddata.c'),
   'mxpeg_decoder' : files('mxpegdec.c'),
   'nellymoser_decoder' : files('nellymoserdec.c','nellymoser.c'),
@@ -679,6 +691,8 @@ libavcodec_optional_sources = {
   'pcm_u32le_encoder' : files('pcm.c'),
   'pcm_u8_decoder' : files('pcm.c'),
   'pcm_u8_encoder' : files('pcm.c'),
+  'pcm_vidc_decoder' : files('pcm.c'),
+  'pcm_vidc_encoder' : files('pcm.c'),
   'pcm_zork_decoder' : files('pcm.c'),
   'pcx_decoder' : files('pcx.c'),
   'pcx_encoder' : files('pcxenc.c'),
@@ -697,10 +711,11 @@ libavcodec_optional_sources = {
   'pnm_parser' : files('pnm_parser.c','pnm.c'),
   'ppm_decoder' : files('pnmdec.c','pnm.c'),
   'ppm_encoder' : files('pnmenc.c'),
-  'prores_aw_encoder' : files('proresenc_anatoliy.c'),
+  'prores_aw_encoder' : files('proresenc_anatoliy.c','proresdata.c'),
   'prores_decoder' : files('proresdec2.c','proresdsp.c','proresdata.c'),
-  'prores_encoder' : files('proresenc_anatoliy.c'),
+  'prores_encoder' : files('proresenc_anatoliy.c','proresdata.c'),
   'prores_ks_encoder' : files('proresenc_kostya.c','proresdata.c'),
+  'prosumer_decoder' : files('prosumer.c'),
   'psd_decoder' : files('psd.c'),
   'ptx_decoder' : files('ptx.c'),
   'qcelp_decoder' : files('qcelpdec.c','celp_filters.c','acelp_vectors.c','acelp_filters.c'),
@@ -722,6 +737,7 @@ libavcodec_optional_sources = {
   'r210_encoder' : files('r210enc.c'),
   'ralf_decoder' : files('ralf.c'),
   'rangecoder' : files('rangecoder.c'),
+  'rasc_decoder' : files('rasc.c'),
   'rawvideo_decoder' : files('rawdec.c'),
   'rawvideo_encoder' : files('rawenc.c'),
   'ra_144_decoder' : files('ra144dec.c','ra144.c','celp_filters.c'),
@@ -779,7 +795,7 @@ libavcodec_optional_sources = {
   'sonic_ls_encoder' : files('sonic.c'),
   'sp5x_decoder' : files('sp5xdec.c'),
   'spdif_muxer' : files('dca.c'),
-  'speedhq_decoder' : files('speedhq.c','simple_idct.c'),
+  'speedhq_decoder' : files('speedhq.c','mpeg12.c','mpeg12data.c','simple_idct.c'),
   'srgc_decoder' : files('mscc.c'),
   'srt_decoder' : files('srtdec.c','ass.c','htmlsubtitles.c'),
   'srt_encoder' : files('srtenc.c','ass_split.c'),
@@ -905,6 +921,7 @@ libavcodec_optional_sources = {
   'vqa_decoder' : files('vqavideo.c'),
   'wavpack_decoder' : files('wavpack.c'),
   'wavpack_encoder' : files('wavpackenc.c'),
+  'wcmv_decoder' : files('wcmv.c'),
   'webm_muxer' : files('mpeg4audio.c'),
   'webp_decoder' : files('webp.c'),
   'webvtt_decoder' : files('webvttdec.c','ass.c'),
@@ -964,56 +981,60 @@ libavcodec_mmx_optional_sources = {
 }
 
 libavcodec_tests = [
-  ['avpacket', files(['tests/avpacket.c'])],
-  ['codec_desc', files(['tests/codec_desc.c'])],
-  ['htmlsubtitles', files(['tests/htmlsubtitles.c'])],
-  ['imgconvert', files(['tests/imgconvert.c'])],
-  ['jpeg2000dwt', files(['tests/jpeg2000dwt.c'])],
-  ['mathops', files(['tests/mathops.c'])],
-  ['options', files(['tests/options.c'])],
-  ['mjpegenc_huffman', files(['tests/mjpegenc_huffman.c'])],
-  ['utils', files(['tests/utils.c'])],
+  ['avpacket', files('tests/avpacket.c')],
+  ['codec_desc', files('tests/codec_desc.c')],
+  ['htmlsubtitles', files('tests/htmlsubtitles.c')],
+  ['imgconvert', files('tests/imgconvert.c')],
+  ['jpeg2000dwt', files('tests/jpeg2000dwt.c')],
+  ['mathops', files('tests/mathops.c')],
+  ['options', files('tests/options.c')],
+  ['mjpegenc_huffman', files('tests/mjpegenc_huffman.c')],
+  ['utils', files('tests/utils.c')],
 ]
 
 # log2 calculations fail on Windows, not a meson problem afaict
 if host_machine.system() != 'windows'
-  libavcodec_tests += [['celp_math', files(['tests/celp_math.c'])]]
+  libavcodec_tests += [['celp_math', files('tests/celp_math.c')]]
 endif
 
 libavcodec_optional_tests = {
   'cabac' : [
-    ['cabac', files(['tests/cabac.c'])],
+    ['cabac', files('tests/cabac.c')],
   ],
   'dct' : [
-    ['avfft', files(['tests/avfft.c'])],
+    ['avfft', files('tests/avfft.c')],
   ],
   'fft' : [
-    ['fft', files(['tests/fft.c'])],
-    ['fft-fixed', files(['tests/fft-fixed.c'])],
-    ['fft-fixed32', files(['tests/fft-fixed32.c'])],
+    ['fft', files('tests/fft.c')],
+    ['fft-fixed', files('tests/fft-fixed.c')],
+    ['fft-fixed32', files('tests/fft-fixed32.c')],
   ],
   'golomb' : [
-    ['golomb', files(['tests/golomb.c'])],
+    ['golomb', files('tests/golomb.c')],
+  ],
+  'h264_metadata_bsf' : [
+    ['h264_levels', files('tests/h264_levels.c')],
   ],
   'idctdsp' : [
-    ['dct', files(['tests/dct.c', 'dctref.c'])],
+    ['dct', files('tests/dct.c','dctref.c')],
   ],
   'iirfilter' : [
-    ['iirfilter', files(['tests/iirfilter.c'])],
+    ['iirfilter', files('tests/iirfilter.c')],
   ],
   'mmx' : [
-    ['motion', files(['tests/motion.c'])],
+    ['motion', files('tests/motion.c')],
   ],
   'mpegvideo' : [
-    ['mpeg12framerate', files(['tests/mpeg12framerate.c'])],
+    ['mpeg12framerate', files('tests/mpeg12framerate.c')],
   ],
   'rangecoder' : [
-    ['rangecoder', files(['tests/rangecoder.c'])],
+    ['rangecoder', files('tests/rangecoder.c')],
   ],
   'snow_encoder' : [
-    ['snowenc', files(['tests/snowenc.c'])],
+    ['snowenc', files('tests/snowenc.c')],
   ],
 }
+
 
 # Version file
 ver_conf = configuration_data()

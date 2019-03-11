@@ -1,10 +1,10 @@
 libavutil_majorver = '56'
-minorver = '18'
-microver = '102'
+minorver = '22'
+microver = '100'
 
 libavutil_version = libavutil_majorver + '.' + minorver + '.' + microver
 
-libavutil_sources = files([
+libavutil_sources = files(
   'adler32.c',
   'aes.c',
   'aes_ctr.c',
@@ -72,7 +72,7 @@ libavutil_sources = files([
   'xga_font_data.c',
   'xtea.c',
   'tea.c',
-])
+)
 
 libavutil_optional_sources = {
   'cuda' : files('hwcontext_cuda.c'),
@@ -95,66 +95,62 @@ libavutil_mmx_optional_sources = {
 }
 
 libavutil_tests = [
-  ['adler32', files(['tests/adler32.c'])],
-  ['aes', files(['tests/aes.c'])],
-  ['aes_ctr', files(['tests/aes_ctr.c'])],
-  ['audio_fifo', files(['tests/audio_fifo.c'])],
-  ['avstring', files(['tests/avstring.c'])],
-  ['base64', files(['tests/base64.c'])],
-  ['blowfish', files(['tests/blowfish.c'])],
-  ['bprint', files(['tests/bprint.c'])],
-  ['cast5', files(['tests/cast5.c'])],
-  ['camellia', files(['tests/camellia.c'])],
-  ['color_utils', files(['tests/color_utils.c'])],
-  ['cpu', files(['tests/cpu.c'])],
-  ['crc', files(['tests/crc.c'])],
-  ['des', files(['tests/des.c'])],
-  ['dict', files(['tests/dict.c'])],
-  ['display', files(['tests/display.c'])],
-  ['error', files(['tests/error.c'])],
-  ['eval', files(['tests/eval.c'])],
-  ['fifo', files(['tests/fifo.c'])],
-  ['hash', files(['tests/hash.c'])],
-  ['hmac', files(['tests/hmac.c'])],
-  ['hwdevice', files(['tests/hwdevice.c'])],
-  ['integer', files(['tests/integer.c'])],
-  ['imgutils', files(['tests/imgutils.c'])],
-  ['lfg', files(['tests/lfg.c'])],
-  ['lls', files(['tests/lls.c'])],
-  ['log', files(['tests/log.c'])],
-  ['md5', files(['tests/md5.c'])],
-  ['murmur3', files(['tests/murmur3.c'])],
-  ['opt', files(['tests/opt.c'])],
-  ['pca', files(['tests/pca.c'])],
-  ['parseutils', files(['tests/parseutils.c'])],
-  ['pixdesc', files(['tests/pixdesc.c'])],
-  ['pixelutils', files(['tests/pixelutils.c'])],
-  ['pixfmt_best', files(['tests/pixfmt_best.c'])],
-  ['random_seed', files(['tests/random_seed.c'])],
-  ['rational', files(['tests/rational.c'])],
-  ['ripemd', files(['tests/ripemd.c'])],
-  ['sha', files(['tests/sha.c'])],
-  ['sha512', files(['tests/sha512.c'])],
-  ['softfloat', files(['tests/softfloat.c'])],
-  ['tree', files(['tests/tree.c'])],
-  ['twofish', files(['tests/twofish.c'])],
-  # ['utf8', files(['tests/utf8.c'])],
-  ['xtea', files(['tests/xtea.c'])],
-  ['tea', files(['tests/tea.c'])],
+  ['adler32', files('tests/adler32.c')],
+  ['aes', files('tests/aes.c')],
+  ['aes_ctr', files('tests/aes_ctr.c')],
+  ['audio_fifo', files('tests/audio_fifo.c')],
+  ['avstring', files('tests/avstring.c')],
+  ['base64', files('tests/base64.c')],
+  ['blowfish', files('tests/blowfish.c')],
+  ['bprint', files('tests/bprint.c')],
+  ['cast5', files('tests/cast5.c')],
+  ['camellia', files('tests/camellia.c')],
+  ['color_utils', files('tests/color_utils.c')],
+  ['cpu', files('tests/cpu.c')],
+  ['crc', files('tests/crc.c')],
+  ['des', files('tests/des.c')],
+  ['dict', files('tests/dict.c')],
+  ['display', files('tests/display.c')],
+  ['encryption_info', files('tests/encryption_info.c')],
+  ['error', files('tests/error.c')],
+  ['eval', files('tests/eval.c')],
+  ['file', files('tests/file.c')],
+  ['fifo', files('tests/fifo.c')],
+  ['hash', files('tests/hash.c')],
+  ['hmac', files('tests/hmac.c')],
+  ['hwdevice', files('tests/hwdevice.c')],
+  ['integer', files('tests/integer.c')],
+  ['imgutils', files('tests/imgutils.c')],
+  ['lfg', files('tests/lfg.c')],
+  ['lls', files('tests/lls.c')],
+  ['log', files('tests/log.c')],
+  ['md5', files('tests/md5.c')],
+  ['murmur3', files('tests/murmur3.c')],
+  ['opt', files('tests/opt.c')],
+  ['pca', files('tests/pca.c')],
+  ['parseutils', files('tests/parseutils.c')],
+  ['pixdesc', files('tests/pixdesc.c')],
+  ['pixelutils', files('tests/pixelutils.c')],
+  ['pixfmt_best', files('tests/pixfmt_best.c')],
+  ['random_seed', files('tests/random_seed.c')],
+  ['rational', files('tests/rational.c')],
+  ['ripemd', files('tests/ripemd.c')],
+  ['sha', files('tests/sha.c')],
+  ['sha512', files('tests/sha512.c')],
+  ['softfloat', files('tests/softfloat.c')],
+  ['tree', files('tests/tree.c')],
+  ['twofish', files('tests/twofish.c')],
+  # ['utf8', files('tests/utf8.c')],
+  ['xtea', files('tests/xtea.c')],
+  ['tea', files('tests/tea.c')],
 ]
-
-# Test tries to map a file and write to the buffer, except
-# on Windows MapViewOfFile is called with FILE_MAP_READ ...
-if host_machine.system() != 'windows'
-  libavutil_tests += [['file', files(['tests/file.c'])]]
-endif
 
 libavutil_optional_tests = {
   'lzo1x_999_compress' : [
-    ['lzo', files(['tests/lzo.c']), {'extra_libs': ['lzo2']}],
+    ['lzo', files('tests/lzo.c'), {'extra_libs': ['lzo2']}],
   ],
   'threads' : [
-    ['cpu_init', files(['tests/cpu_init.c'])],
+    ['cpu_init', files('tests/cpu_init.c')],
   ],
 }
 

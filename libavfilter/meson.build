@@ -1,12 +1,18 @@
 libavfilter_majorver = '7'
-minorver = '25'
-microver = '100'
+minorver = '40'
+microver = '101'
 
 libavfilter_version = libavfilter_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
-libavfilter_sources = files([
+configure_file(
+  input: 'version.h.in',
+  output: 'version.h',
+  configuration: ver_conf,
+)
+
+libavfilter_sources = files(
   'allfilters.c',
   'audio.c',
   'avfilter.c',
@@ -23,7 +29,7 @@ libavfilter_sources = files([
   'transform.c',
   'video.c',
   'pthread.c',
-])
+)
 
 libavfilter_optional_sources = {
   'abench_filter' : files('f_bench.c'),
@@ -32,7 +38,9 @@ libavfilter_optional_sources = {
   'acontrast_filter' : files('af_acontrast.c'),
   'acopy_filter' : files('af_acopy.c'),
   'acrossfade_filter' : files('af_afade.c'),
+  'acrossover_filter' : files('af_acrossover.c'),
   'acrusher_filter' : files('af_acrusher.c'),
+  'acue_filter' : files('f_cue.c'),
   'adeclick_filter' : files('af_adeclick.c'),
   'adeclip_filter' : files('af_adeclick.c'),
   'adelay_filter' : files('af_adelay.c'),
@@ -43,10 +51,12 @@ libavfilter_optional_sources = {
   'aevalsrc_filter' : files('aeval.c'),
   'aeval_filter' : files('aeval.c'),
   'afade_filter' : files('af_afade.c'),
+  'afftdn_filter' : files('af_afftdn.c'),
   'afftfilt_filter' : files('af_afftfilt.c'),
   'afir_filter' : files('af_afir.c'),
   'aformat_filter' : files('af_aformat.c'),
   'agate_filter' : files('af_agate.c'),
+  'agraphmonitor_filter' : files('f_graphmonitor.c'),
   'ahistogram_filter' : files('avf_ahistogram.c'),
   'aiir_filter' : files('af_aiir.c'),
   'aintegral_filter' : files('af_aderivative.c'),
@@ -63,6 +73,7 @@ libavfilter_optional_sources = {
   'amix_filter' : files('af_amix.c'),
   'amovie_filter' : files('src_movie.c'),
   'amplify_filter' : files('vf_amplify.c'),
+  'amultiply_filter' : files('af_amultiply.c'),
   'anequalizer_filter' : files('af_anequalizer.c'),
   'anoisesrc_filter' : files('asrc_anoisesrc.c'),
   'anullsink_filter' : files('asink_anullsink.c'),
@@ -93,7 +104,7 @@ libavfilter_optional_sources = {
   'atrim_filter' : files('trim.c'),
   'avectorscope_filter' : files('avf_avectorscope.c'),
   'avgblur_filter' : files('vf_avgblur.c'),
-  'avgblur_opencl_filter' : files('vf_avgblur_opencl.c','opencl.c','opencl/avgblur.cl'),
+  'avgblur_opencl_filter' : files('vf_avgblur_opencl.c','opencl.c','opencl/avgblur.cl','boxblur.c'),
   'azmq_filter' : files('f_zmq.c'),
   'bandpass_filter' : files('af_biquads.c'),
   'bandreject_filter' : files('af_biquads.c'),
@@ -105,13 +116,16 @@ libavfilter_optional_sources = {
   'blackdetect_filter' : files('vf_blackdetect.c'),
   'blackframe_filter' : files('vf_blackframe.c'),
   'blend_filter' : files('vf_blend.c','framesync.c'),
-  'boxblur_filter' : files('vf_boxblur.c'),
+  'bm3d_filter' : files('vf_bm3d.c'),
+  'boxblur_filter' : files('vf_boxblur.c','boxblur.c'),
+  'boxblur_opencl_filter' : files('vf_avgblur_opencl.c','opencl.c','opencl/avgblur.cl','boxblur.c'),
   'bs2b_filter' : files('af_bs2b.c'),
   'bwdif_filter' : files('vf_bwdif.c'),
   'cellauto_filter' : files('vsrc_cellauto.c'),
   'channelmap_filter' : files('af_channelmap.c'),
   'channelsplit_filter' : files('af_channelsplit.c'),
   'chorus_filter' : files('af_chorus.c','generate_wave_table.c'),
+  'chromahold_filter' : files('vf_chromakey.c'),
   'chromakey_filter' : files('vf_chromakey.c'),
   'ciescope_filter' : files('vf_ciescope.c'),
   'codecview_filter' : files('vf_codecview.c'),
@@ -120,7 +134,7 @@ libavfilter_optional_sources = {
   'colorkey_filter' : files('vf_colorkey.c'),
   'colorlevels_filter' : files('vf_colorlevels.c'),
   'colormatrix_filter' : files('vf_colormatrix.c'),
-  'colorspace_filter' : files('vf_colorspace.c','colorspacedsp.c'),
+  'colorspace_filter' : files('vf_colorspace.c','colorspace.c','colorspacedsp.c'),
   'color_filter' : files('vsrc_testsrc.c'),
   'compand_filter' : files('af_compand.c'),
   'compensationdelay_filter' : files('af_compensationdelay.c'),
@@ -136,6 +150,7 @@ libavfilter_optional_sources = {
   'crop_filter' : files('vf_crop.c'),
   'crossfeed_filter' : files('af_crossfeed.c'),
   'crystalizer_filter' : files('af_crystalizer.c'),
+  'cue_filter' : files('f_cue.c'),
   'curves_filter' : files('vf_curves.c'),
   'datascope_filter' : files('vf_datascope.c'),
   'dcshift_filter' : files('af_dcshift.c'),
@@ -155,8 +170,9 @@ libavfilter_optional_sources = {
   'despill_filter' : files('vf_despill.c'),
   'detelecine_filter' : files('vf_detelecine.c'),
   'dilation_filter' : files('vf_neighbor.c'),
+  'dilation_opencl_filter' : files('vf_neighbor_opencl.c','opencl.c','opencl/neighbor.cl'),
   'displace_filter' : files('vf_displace.c','framesync.c'),
-  'dnn' : files('dnn_interface.c','dnn_backend_native.c'),
+  'dnn' : files('dnn_interface.c','dnn_backend_native.c',),
   'doubleweave_filter' : files('vf_weave.c'),
   'drawbox_filter' : files('vf_drawbox.c'),
   'drawgraph_filter' : files('f_drawgraph.c'),
@@ -172,6 +188,7 @@ libavfilter_optional_sources = {
   'equalizer_filter' : files('af_biquads.c'),
   'eq_filter' : files('vf_eq.c'),
   'erosion_filter' : files('vf_neighbor.c'),
+  'erosion_opencl_filter' : files('vf_neighbor_opencl.c','opencl.c','opencl/neighbor.cl'),
   'extractplanes_filter' : files('vf_extractplanes.c'),
   'extrastereo_filter' : files('af_extrastereo.c'),
   'fade_filter' : files('vf_fade.c'),
@@ -198,6 +215,8 @@ libavfilter_optional_sources = {
   'gblur_filter' : files('vf_gblur.c'),
   'geq_filter' : files('vf_geq.c'),
   'gradfun_filter' : files('vf_gradfun.c'),
+  'graphmonitor_filter' : files('f_graphmonitor.c'),
+  'greyedge_filter' : files('vf_colorconstancy.c'),
   'haas_filter' : files('af_haas.c'),
   'haldclutsrc_filter' : files('vsrc_testsrc.c'),
   'haldclut_filter' : files('vf_lut3d.c','framesync.c'),
@@ -227,6 +246,7 @@ libavfilter_optional_sources = {
   'kerndeint_filter' : files('vf_kerndeint.c'),
   'ladspa_filter' : files('af_ladspa.c'),
   'lenscorrection_filter' : files('vf_lenscorrection.c'),
+  'lensfun_filter' : files('vf_lensfun.c'),
   'libvmaf_filter' : files('vf_libvmaf.c','framesync.c'),
   'life_filter' : files('vsrc_life.c'),
   'limiter_filter' : files('vf_limiter.c'),
@@ -235,6 +255,7 @@ libavfilter_optional_sources = {
   'lowpass_filter' : files('af_biquads.c'),
   'lowshelf_filter' : files('af_biquads.c'),
   'lumakey_filter' : files('vf_lumakey.c'),
+  'lut1d_filter' : files('vf_lut3d.c'),
   'lut2_filter' : files('vf_lut2.c','framesync.c'),
   'lut3d_filter' : files('vf_lut3d.c'),
   'lutrgb_filter' : files('vf_lut.c'),
@@ -287,6 +308,7 @@ libavfilter_optional_sources = {
   'pp_filter' : files('vf_pp.c'),
   'premultiply_filter' : files('vf_premultiply.c','framesync.c'),
   'prewitt_filter' : files('vf_convolution.c'),
+  'prewitt_opencl_filter' : files('vf_convolution_opencl.c','opencl.c','opencl/convolution.cl'),
   'procamp_vaapi_filter' : files('vf_procamp_vaapi.c','vaapi_vpp.c'),
   'program_opencl_filter' : files('vf_program_opencl.c','opencl.c','framesync.c'),
   'pseudocolor_filter' : files('vf_pseudocolor.c'),
@@ -307,6 +329,7 @@ libavfilter_optional_sources = {
   'reverse_filter' : files('f_reverse.c'),
   'rgbtestsrc_filter' : files('vsrc_testsrc.c'),
   'roberts_filter' : files('vf_convolution.c'),
+  'roberts_opencl_filter' : files('vf_convolution_opencl.c','opencl.c','opencl/convolution.cl'),
   'rotate_filter' : files('vf_rotate.c'),
   'rubberband_filter' : files('af_rubberband.c'),
   'sab_filter' : files('vf_sab.c'),
@@ -321,7 +344,8 @@ libavfilter_optional_sources = {
   'sendcmd_filter' : files('f_sendcmd.c'),
   'separatefields_filter' : files('vf_separatefields.c'),
   'setdar_filter' : files('vf_aspect.c'),
-  'setfield_filter' : files('vf_setfield.c'),
+  'setfield_filter' : files('vf_setparams.c'),
+  'setparams_filter' : files('vf_setparams.c'),
   'setpts_filter' : files('setpts.c'),
   'setrange_filter' : files('vf_setparams.c'),
   'setsar_filter' : files('vf_aspect.c'),
@@ -346,16 +370,18 @@ libavfilter_optional_sources = {
   'signature_filter' : files('vf_signature.c'),
   'silencedetect_filter' : files('af_silencedetect.c'),
   'silenceremove_filter' : files('af_silenceremove.c'),
+  'sinc_filter' : files('asrc_sinc.c'),
   'sine_filter' : files('asrc_sine.c'),
   'smartblur_filter' : files('vf_smartblur.c'),
   'smptebars_filter' : files('vsrc_testsrc.c'),
   'smptehdbars_filter' : files('vsrc_testsrc.c'),
   'sobel_filter' : files('vf_convolution.c'),
+  'sobel_opencl_filter' : files('vf_convolution_opencl.c','opencl.c','opencl/convolution.cl'),
   'sofalizer_filter' : files('af_sofalizer.c'),
   'spectrumsynth_filter' : files('vaf_spectrumsynth.c'),
   'split_filter' : files('split.c'),
   'spp_filter' : files('vf_spp.c'),
-  'srcnn_filter' : files('vf_srcnn.c'),
+  'sr_filter' : files('vf_sr.c'),
   'ssim_filter' : files('vf_ssim.c','framesync.c'),
   'stereo3d_filter' : files('vf_stereo3d.c'),
   'stereotools_filter' : files('af_stereotools.c'),
@@ -378,8 +404,10 @@ libavfilter_optional_sources = {
   'tinterlace_filter' : files('vf_tinterlace.c'),
   'tlut2_filter' : files('vf_lut2.c','framesync.c'),
   'tmix_filter' : files('vf_mix.c','framesync.c'),
-  'tonemap_filter' : files('vf_tonemap.c'),
+  'tonemap_filter' : files('vf_tonemap.c','colorspace.c'),
+  'tonemap_opencl_filter' : files('vf_tonemap_opencl.c','colorspace.c','opencl.c','opencl/tonemap.cl','opencl/colorspace_common.cl'),
   'transpose_filter' : files('vf_transpose.c'),
+  'transpose_npp_filter' : files('vf_transpose_npp.c'),
   'treble_filter' : files('af_biquads.c'),
   'tremolo_filter' : files('af_tremolo.c'),
   'trim_filter' : files('trim.c'),
@@ -391,6 +419,7 @@ libavfilter_optional_sources = {
   'vectorscope_filter' : files('vf_vectorscope.c'),
   'vflip_filter' : files('vf_vflip.c'),
   'vfrdet_filter' : files('vf_vfrdet.c'),
+  'vibrance_filter' : files('vf_vibrance.c'),
   'vibrato_filter' : files('af_vibrato.c','generate_wave_table.c'),
   'vidstabdetect_filter' : files('vidstabutils.c','vf_vidstabdetect.c'),
   'vidstabtransform_filter' : files('vidstabutils.c','vf_vidstabtransform.c'),
@@ -404,7 +433,9 @@ libavfilter_optional_sources = {
   'waveform_filter' : files('vf_waveform.c'),
   'weave_filter' : files('vf_weave.c'),
   'xbr_filter' : files('vf_xbr.c'),
-  'yadif_filter' : files('vf_yadif.c'),
+  'xstack_filter' : files('vf_stack.c','framesync.c'),
+  # 'yadif_cuda_filter' : files('vf_yadif_cuda.c','vf_yadif_cuda.ptx.c','yadif_common.c'),
+  'yadif_filter' : files('vf_yadif.c','yadif_common.c'),
   'yuvtestsrc_filter' : files('vsrc_testsrc.c'),
   'zmq_filter' : files('f_zmq.c'),
   'zoompan_filter' : files('vf_zoompan.c'),
@@ -418,20 +449,14 @@ libavfilter_mmx_optional_sources = {
 }
 
 libavfilter_tests = [
-  ['drawutils', files(['tests/drawutils.c'])],
-  # ['filtfmts', files(['tests/filtfmts.c'])],
-  ['formats', files(['tests/formats.c'])],
-  ['integral', files(['tests/integral.c'])],
+  ['drawutils', files('tests/drawutils.c')],
+  # ['filtfmts', files('tests/filtfmts.c')],
+  ['formats', files('tests/formats.c')],
+  ['integral', files('tests/integral.c')],
 ]
 
 libavfilter_optional_tests = {
 }
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
-)
 
 configure_file(
   input: 'libavfilter.v.in',

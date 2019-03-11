@@ -1,10 +1,10 @@
 libswscale_majorver = '5'
-minorver = '2'
+minorver = '3'
 microver = '100'
 
 libswscale_version = libswscale_majorver + '.' + minorver + '.' + microver
 
-libswscale_sources = files([
+libswscale_sources = files(
   'alphablend.c',
   'hscale.c',
   'hscale_fast_bilinear.c',
@@ -19,17 +19,26 @@ libswscale_sources = files([
   'utils.c',
   'yuv2rgb.c',
   'vscale.c',
-])
+)
 
 libswscale_optional_sources = {
   'shared' : files('log2_tab.c'),
 }
 
+libswscale_x86asm_optional_sources = {
+}
+
+libswscale_mmx_optional_sources = {
+}
+
 libswscale_tests = [
-  ['colorspace', files(['tests/colorspace.c'])],
-  ['pixdesc_query', files(['tests/pixdesc_query.c'])],
-  # ['swscale', files(['tests/swscale.c'])], Too slow
+  ['colorspace', files('tests/colorspace.c')],
+  ['pixdesc_query', files('tests/pixdesc_query.c')],
+  # ['swscale', files('tests/swscale.c')],
 ]
+
+libswscale_optional_tests = {
+}
 
 # Version file
 ver_conf = configuration_data()

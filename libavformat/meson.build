@@ -1,12 +1,12 @@
 libavformat_majorver = '58'
-minorver = '17'
+minorver = '20'
 microver = '100'
 
 libavformat_version = libavformat_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
-libavformat_sources = files([
+libavformat_sources = files(
   'allformats.c',
   'avio.c',
   'aviobuf.c',
@@ -26,7 +26,7 @@ libavformat_sources = files([
   'url.c',
   'utils.c',
   'file_open.c',
-])
+)
 
 libavformat_optional_sources = {
   'a64_muxer' : files('a64.c','rawenc.c'),
@@ -77,6 +77,8 @@ libavformat_optional_sources = {
   'avi_muxer' : files('avienc.c','mpegtsenc.c','avlanguage.c','rawutils.c'),
   'avm2_muxer' : files('swfenc.c','swf.c'),
   'avr_demuxer' : files('avr.c','pcm.c'),
+  'avs2_demuxer' : files('davs2.c','rawdec.c'),
+  'avs2_muxer' : files('rawenc.c'),
   'avs_demuxer' : files('avs.c','voc_packet.c','vocdec.c','voc.c'),
   'bethsoftvid_demuxer' : files('bethsoftvid.c'),
   'bfi_demuxer' : files('bfi.c'),
@@ -270,7 +272,8 @@ libavformat_optional_sources = {
   'm4v_demuxer' : files('m4vdec.c','rawdec.c'),
   'm4v_muxer' : files('rawenc.c'),
   'matroska_demuxer' : files('matroskadec.c','matroska.c','rmsipr.c','flac_picture.c','oggparsevorbis.c','vorbiscomment.c','flac_picture.c','replaygain.c'),
-  'matroska_muxer' : files('matroskaenc.c','matroska.c','avc.c','hevc.c','flacenc_header.c','avlanguage.c','vorbiscomment.c','wv.c','webmdashenc.c','webm_chunk.c'),
+  'matroska_muxer' : files('matroskaenc.c','matroska.c','av1.c','avc.c','hevc.c','flacenc_header.c','avlanguage.c','vorbiscomment.c','wv.c','webmdashenc.c','webm_chunk.c'),
+  'mbedtls': files('tls_mbedtls.c'),
   'md5_muxer' : files('hashenc.c'),
   'md5_protocol' : files('md5proto.c'),
   'mgsts_demuxer' : files('mgsts.c'),
@@ -289,7 +292,7 @@ libavformat_optional_sources = {
   'mmst_protocol' : files('mmst.c','mms.c','asf.c'),
   'mm_demuxer' : files('mm.c'),
   'mov_demuxer' : files('mov.c','mov_chan.c','mov_esds.c','replaygain.c'),
-  'mov_muxer' : files('movenc.c','avc.c','hevc.c','vpcc.c','movenchint.c','mov_chan.c','rtp.c','movenccenc.c','rawutils.c'),
+  'mov_muxer' : files('movenc.c','av1.c','avc.c','hevc.c','vpcc.c','movenchint.c','mov_chan.c','rtp.c','movenccenc.c','rawutils.c'),
   'mp2_muxer' : files('rawenc.c'),
   'mp3_demuxer' : files('mp3dec.c','replaygain.c'),
   'mp3_muxer' : files('mp3enc.c','rawenc.c','id3v2enc.c'),
@@ -378,6 +381,8 @@ libavformat_optional_sources = {
   'pcm_u32le_muxer' : files('pcmenc.c','rawenc.c'),
   'pcm_u8_demuxer' : files('pcmdec.c','pcm.c'),
   'pcm_u8_muxer' : files('pcmenc.c','rawenc.c'),
+  'pcm_vidc_demuxer' : files('pcmdec.c','pcm.c'),
+  'pcm_vidc_muxer' : files('pcmenc.c','rawenc.c'),
   'pipe_protocol' : files('file.c'),
   'pjs_demuxer' : files('pjsdec.c','subtitles.c'),
   'pmp_demuxer' : files('pmpdec.c'),
@@ -411,7 +416,7 @@ libavformat_optional_sources = {
   'rtpenc_chain' : files('rtpenc_chain.c','rtp.c'),
   'rtp_mpegts_muxer' : files('rtpenc_mpegts.c'),
   'rtp_muxer' : files('rtp.c','rtpenc_aac.c','rtpenc_latm.c','rtpenc_amr.c','rtpenc_h261.c','rtpenc_h263.c','rtpenc_h263_rfc2190.c','rtpenc_h264_hevc.c','rtpenc_jpeg.c','rtpenc_mpv.c','rtpenc.c','rtpenc_vc2hq.c','rtpenc_vp8.c','rtpenc_vp9.c','rtpenc_xiph.c','avc.c','hevc.c'),
-  'rtp_protocol' : files('rtpproto.c'),
+  'rtp_protocol' : files('rtpproto.c','ip.c'),
   'rtsp_demuxer' : files('rtsp.c','rtspdec.c','httpauth.c','urldecode.c'),
   'rtsp_muxer' : files('rtsp.c','rtspenc.c','httpauth.c','urldecode.c'),
   's337m_demuxer' : files('s337m.c','spdif.c'),
@@ -433,6 +438,7 @@ libavformat_optional_sources = {
   'segafilm_demuxer' : files('segafilm.c'),
   'segafilm_muxer' : files('segafilmenc.c'),
   'segment_muxer' : files('segment.c'),
+  'ser_demuxer' : files('serdec.c'),
   'shared' : files('log2_tab.c','golomb_tab.c'),
   'shorten_demuxer' : files('shortendec.c','rawdec.c'),
   'siff_demuxer' : files('siff.c'),
@@ -471,7 +477,7 @@ libavformat_optional_sources = {
   'thp_demuxer' : files('thp.c'),
   'threedostr_demuxer' : files('3dostr.c'),
   'tiertexseq_demuxer' : files('tiertexseq.c'),
-  'tls_protocol' : files('tls.c'),
+  'tls_protocol' : files('tls.c',),
   'tmv_demuxer' : files('tmv.c'),
   'truehd_demuxer' : files('rawdec.c','mlpdec.c'),
   'truehd_muxer' : files('rawenc.c'),
@@ -480,8 +486,8 @@ libavformat_optional_sources = {
   'tty_demuxer' : files('tty.c','sauce.c'),
   'txd_demuxer' : files('txd.c'),
   'ty_demuxer' : files('ty.c'),
-  'udplite_protocol' : files('udp.c'),
-  'udp_protocol' : files('udp.c'),
+  'udplite_protocol' : files('udp.c','ip.c'),
+  'udp_protocol' : files('udp.c','ip.c'),
   'uncodedframecrc_muxer' : files('uncodedframecrcenc.c','framehash.c'),
   'unix_protocol' : files('unix.c'),
   'v210x_demuxer' : files('v210.c'),
@@ -507,7 +513,7 @@ libavformat_optional_sources = {
   'wc3_demuxer' : files('wc3movie.c'),
   'webm_chunk_muxer' : files('webm_chunk.c','matroska.c'),
   'webm_dash_manifest_muxer' : files('webmdashenc.c','matroska.c'),
-  'webm_muxer' : files('matroskaenc.c','matroska.c','avc.c','hevc.c','flacenc_header.c','avlanguage.c','wv.c','vorbiscomment.c','webmdashenc.c','webm_chunk.c'),
+  'webm_muxer' : files('matroskaenc.c','matroska.c','av1.c','avc.c','hevc.c','flacenc_header.c','avlanguage.c','wv.c','vorbiscomment.c','webmdashenc.c','webm_chunk.c'),
   'webp_muxer' : files('webpenc.c'),
   'webvtt_demuxer' : files('webvttdec.c','subtitles.c'),
   'webvtt_muxer' : files('webvttenc.c'),
@@ -536,24 +542,24 @@ libavformat_mmx_optional_sources = {
 }
 
 libavformat_tests = [
-  # ['seek', files(['tests/seek.c'])],
-  ['url', files(['tests/url.c'])],
+  # ['seek', files('tests/seek.c')],
+  ['url', files('tests/url.c')],
 ]
 
 libavformat_optional_tests = {
   'ffrtmpcrypt_protocol' : [
-    ['rtmpdh', files(['tests/rtmpdh.c'])],
+    ['rtmpdh', files('tests/rtmpdh.c')],
   ],
   'fifo_muxer' : [
   ],
   'mov_muxer' : [
-    ['movenc', files(['tests/movenc.c'])],
+    ['movenc', files('tests/movenc.c')],
   ],
   'network' : [
-    ['noproxy', files(['tests/noproxy.c'])],
+    ['noproxy', files('tests/noproxy.c')],
   ],
   'srtp' : [
-    ['srtp', files(['tests/srtp.c'])],
+    ['srtp', files('tests/srtp.c')],
   ],
 }
 
