@@ -22,139 +22,162 @@ import sys
 from pprint import pprint
 from collections import defaultdict
 
-source_maps = {
-  'c': defaultdict(list),
-  'asm': defaultdict(list),
-  'test-prog': defaultdict(list),
-  'mmx': defaultdict(list),
-}
+def make_to_meson(path):
+    source_maps = {
+      'c': defaultdict(list),
+      'asm': defaultdict(list),
+      'test-prog': defaultdict(list),
+      'mmx': defaultdict(list),
+    }
 
-with open('%s/Makefile' % sys.argv[1], 'r') as f:
-    accum = []
-    accumulate = False
-    optional = False
-    source_type = None
+    with open(os.path.join(path, 'Makefile'), 'r') as f:
+        accum = []
+        accumulate = False
+        optional = False
+        source_type = None
 
-    for l in f.readlines():
-        l = l.strip()
-        l = l.rsplit('#', 1)[0]
+        for l in f.readlines():
+            l = l.strip()
+            l = l.rsplit('#', 1)[0]
 
-        if accumulate:
-            ofiles = l
-        elif re.match('OBJS-.*CONFIG.*\+\=.*', l):
-            label, ofiles = l.split('+=')
-            label = label.split('CONFIG_')[1].rstrip(' )')
-            source_type = 'c' # arguable ^^
-        elif re.match('OBJS.*=.*', l):
-            label = ''
-            ofiles = l.split('=')[1]
-            source_type = 'c'
-        elif re.match('X86ASM-OBJS-.*CONFIG.*\+\=.*', l):
-            label, ofiles = l.split('+=')
-            label = label.split('CONFIG_')[1].rstrip(' )')
-            source_type = 'asm'
-        elif re.match('X86ASM-OBJS.*=.*', l):
-            label = ''
-            ofiles = l.split('=')[1]
-            source_type = 'asm'
-        elif re.match('MMX-OBJS-.*CONFIG.*\+\=.*', l):
-            label, ofiles = l.split('+=')
-            label = label.split('CONFIG_')[1].rstrip(' )')
-            source_type = 'mmx'
-        elif re.match('MMX-OBJS-.*HAVE.*\+\=.*', l):
-            label, ofiles = l.split('+=')
-            label = label.split('HAVE_')[1].rstrip(' )')
-            source_type = 'mmx'
-        elif re.match('MMX-OBJS.*=.*', l):
-            label = ''
-            ofiles = l.split('=')[1]
-            source_type = 'mmx'
-        elif re.match('TESTPROGS-.*CONFIG.*\+\=.*', l):
-            label, ofiles = l.split('+=')
-            label = label.split('CONFIG_')[1].rstrip(' )')
-            source_type = 'test-prog'
-        elif re.match('TESTPROGS-.*HAVE.*\+\=.*', l):
-            label, ofiles = l.split('+=')
-            label = label.split('HAVE_')[1].rstrip(' )')
-            source_type = 'test-prog'
-        elif re.match('TESTPROGS.*=', l):
-            label = ''
-            ofiles = l.split('=')[1]
-            source_type = "test-prog"
-        else:
-            continue
+            if accumulate:
+                ofiles = l
+            elif re.match('OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'c' # arguable ^^
+            elif re.match('OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'c'
+            elif re.match('X86ASM-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'asm'
+            elif re.match('X86ASM-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'asm'
+            elif re.match('MMX-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'mmx'
+            elif re.match('MMX-OBJS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'mmx'
+            elif re.match('MMX-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'mmx'
+            elif re.match('TESTPROGS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'test-prog'
+            elif re.match('TESTPROGS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'test-prog'
+            elif re.match('TESTPROGS.*=', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = "test-prog"
+            else:
+                continue
 
-        accumulate = ofiles.endswith('\\')
-        ofiles = ofiles.strip('\\')
-        ofiles = ofiles.split()
-        ext = {'c': 'c', 'asm': 'asm', 'test-prog': 'c', 'mmx': 'c'}[source_type]
-        ifiles = [os.path.splitext(ofile)[0] + '.' + ext for ofile in ofiles]
+            accumulate = ofiles.endswith('\\')
+            ofiles = ofiles.strip('\\')
+            ofiles = ofiles.split()
+            ext = {'c': 'c', 'asm': 'asm', 'test-prog': 'c', 'mmx': 'c'}[source_type]
+            ifiles = [os.path.splitext(ofile)[0] + '.' + ext for ofile in ofiles]
 
-        if accumulate:
-            accum += ifiles
-        else:
+            if accumulate:
+                accum += ifiles
+            else:
+                map_ = source_maps[source_type]
+                map_[label] += accum + ifiles
+                accum = []
+
+        # Makefiles can end with '\' and this is just a porting script ;)
+        if accum:
             map_ = source_maps[source_type]
-            map_[label] += accum + ifiles
+            map_[label] += accum
             accum = []
 
-    # Makefiles can end with '\' and this is just a porting script ;)
-    if accum:
-        map_ = source_maps[source_type]
-        map_[label] += accum
-        accum = []
 
+    with open(os.path.join(path, 'meson.build.new'), 'w') as f:
+        for source_type, map_ in (('', source_maps['c']), ('x86asm_', source_maps['asm']), ('mmx_', source_maps['mmx'])):
+            default_sources = map_.pop('', [])
 
-with open('generated.build', 'w') as f:
-    for source_type, map_ in (('', source_maps['c']), ('x86asm_', source_maps['asm']), ('mmx_', source_maps['mmx'])):
-        default_sources = map_.pop('', [])
+            if default_sources:
+                f.write('%ssources = files(\n' % '_'.join((path.replace('/', '_'), source_type)))
+                for source in default_sources:
+                    if '$' in source:
+                        print ('Warning: skipping %s' % source)
+                        continue
+                    f.write("  '%s',\n" % os.path.basename(source))
+                f.write(')\n\n')
 
-        if default_sources:
-            f.write('%ssources = files(\n' % '_'.join((sys.argv[1].replace('/', '_'), source_type)))
-            for source in default_sources:
+            f.write('%soptional_sources = {\n' % '_'.join((path.replace('/', '_'), source_type)))
+            for label in sorted (map_):
+                f.write("  '%s' : files(" % label.lower())
+                l = len (map_[label])
+                for i, source in enumerate(map_[label]):
+                    if '$' in source:
+                        print ('Warning: skipping %s' % source)
+                        continue
+                    f.write("'%s'" % os.path.basename(source))
+                    if i + 1 < l:
+                        f.write(',')
+                f.write('),\n')
+            f.write('}\n\n')
+
+        test_source_map = source_maps['test-prog']
+
+        default_test_sources = test_source_map.pop('', [])
+
+        if default_test_sources:
+            f.write('%s_tests = [\n' % path.replace('/', '_'))
+            for source in default_test_sources:
                 if '$' in source:
                     print ('Warning: skipping %s' % source)
                     continue
-                f.write("  '%s',\n" % os.path.basename(source))
-            f.write(')\n\n')
+                basename = os.path.basename(source)
+                testname = os.path.splitext(basename)[0]
+                f.write("  ['%s', files('tests/%s')],\n" % (testname, basename))
+            f.write(']\n\n')
 
-        f.write('%soptional_sources = {\n' % '_'.join((sys.argv[1].replace('/', '_'), source_type)))
-        for label in sorted (map_):
-            f.write("  '%s' : files(" % label.lower())
-            l = len (map_[label])
-            for i, source in enumerate(map_[label]):
+        f.write('%s_optional_tests = {\n' % path.replace('/', '_'))
+        for label in sorted (test_source_map):
+            f.write("  '%s' : [\n" % label.lower())
+            for source in test_source_map[label]:
                 if '$' in source:
                     print ('Warning: skipping %s' % source)
                     continue
-                f.write("'%s'" % os.path.basename(source))
-                if i + 1 < l:
-                    f.write(',')
-            f.write('),\n')
+                basename = os.path.basename(source)
+                testname = os.path.splitext(basename)[0]
+                f.write("    ['%s', files('tests/%s')],\n" % (testname, basename))
+            f.write('  ],\n')
         f.write('}\n\n')
 
-    test_source_map = source_maps['test-prog']
+paths = [
+        'libavformat',
+        'libavutil',
+        'libavutil/x86',
+        'libswscale',
+        'libswscale/x86',
+        'libavcodec',
+        'libavcodec/x86',
+        'libswresample',
+        'libswresample/x86',
+        'libavfilter',
+        'libavfilter/x86',
+        'libavdevice',
+        'libavresample',
+        'libavresample/x86',
+        'libpostproc',
+]
 
-    default_test_sources = test_source_map.pop('', [])
-
-    if default_test_sources:
-        f.write('%s_tests = [\n' % sys.argv[1].replace('/', '_'))
-        for source in default_test_sources:
-            if '$' in source:
-                print ('Warning: skipping %s' % source)
-                continue
-            basename = os.path.basename(source)
-            testname = os.path.splitext(basename)[0]
-            f.write("  ['%s', files('tests/%s')],\n" % (testname, basename))
-        f.write(']\n\n')
-
-    f.write('%s_optional_tests = {\n' % (sys.argv[1].replace('/', '_')))
-    for label in sorted (test_source_map):
-        f.write("  '%s' : [\n" % label.lower())
-        for source in test_source_map[label]:
-            if '$' in source:
-                print ('Warning: skipping %s' % source)
-                continue
-            basename = os.path.basename(source)
-            testname = os.path.splitext(basename)[0]
-            f.write("    ['%s', files('tests/%s')],\n" % (testname, basename))
-        f.write('  ],\n')
-    f.write('}\n\n')
+if __name__=='__main__':
+    for path in paths:
+        make_to_meson(path)
