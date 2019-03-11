@@ -2030,7 +2030,7 @@ foreach built_lib : built_libs
   )
 
   if host_machine.system() == 'windows'
-    lib = static_library(built_lib[0], gen_objects,
+    lib = static_library(built_lib[0],
       objects: static_lib.extract_all_objects(),
       install: true,
       dependencies: deps,
@@ -2041,7 +2041,7 @@ foreach built_lib : built_libs
       implicit_include_directories : false,
     )
   else
-    lib = library(built_lib[0], gen_objects,
+    lib = library(built_lib[0],
       objects: static_lib.extract_all_objects(),
       install: true,
       dependencies: deps,
