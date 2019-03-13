@@ -835,7 +835,7 @@ check_libs = [
   ['libgsm', ['gsm/gsm.h'], ['gsm_create'], ['gsm']],
   ['libiec61883', ['libiec61883/iec61883.h'], ['iec61883_cmp_connect'], ['raw1394', 'avc1394', 'rom1394', 'iec61883']],
   ['libilbc', ['ilbc.h'], ['WebRtcIlbcfix_InitDecode'], ['lbc']],
-  ['libm', ['math.h'], ['sin'], ['m']],
+  ['libm', ['math.h'], ['sin'], ['m'], {'always-check': true}], # always check for libm don't provide an option to disable it
   ['libnpp', ['npp.h'], ['nppGetLibVersion'], ['nppig', 'nppicc', 'nppc']],
   ['libnpp', ['npp.h'], ['nppGetLibVersion'], ['nppi', 'nppc']],
   ['libopencore_amrnb', ['opencore-amrnb/interf_dec.h'], ['Decoder_Interface_init'], ['opencore-amrnb']],
@@ -1550,16 +1550,22 @@ foreach check : all_checks
     if found
       if check_type != 'pkg-config'
 	foreach link_with : link_withs
-	  dep = cc.find_library(link_with, required : false)
+          if check_type == 'lib' and not ('always-check' in opts)
+            req = get_option(name)
+          else
+            req = false
+          endif
+	  dep = cc.find_library(link_with, required : req)
 	  found = found and dep.found()
 	  extra_deps += dep
 	endforeach
       else
+	req = get_option(name)
 	pkg_name = opts.get('pkg', name)
 	if opts.has_key('version')
-	  dep = dependency(pkg_name, required : false, version: opts.get('version'))
+	  dep = dependency(pkg_name, required : req, version: opts.get('version'))
 	else
-	  dep = dependency(pkg_name, required : false)
+	  dep = dependency(pkg_name, required : req)
 	endif
 	found = found and dep.found()
 	extra_deps += dep
