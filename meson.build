@@ -73,7 +73,7 @@ project('FFmpeg', 'c',
 
 common_incs = [include_directories('.')]
 
-python3 = import('python3').find_python()
+python3 = import('python').find_installation()
 
 cc = meson.get_compiler('c')
 
