@@ -1,0 +1,57 @@
+# Is it worth making an image with ffmpeg git repo and packages installed?
+stages:
+ - 'build'
+ - 'build x86'
+
+.build:
+  image: 'debian:sid'
+  stage: 'build'
+  variables:
+    DEPENDENCIES: >
+      meson
+      ninja-build
+      build-essential
+      git
+  script:
+    - meson ${MESON_OPTIONS} build/
+    - ninja -C build/
+    - ninja -C build/ test
+    - ninja -C build/ install
+  artifacts:
+    paths:
+      - build/meson-logs/
+
+.build nodeps:
+  extends: '.build'
+  image: 'debian:sid'
+  stage: 'build'
+  variables:
+    MESON_OPTIONS: '--auto-features=disabled'
+  before_script:
+    - apt-get update
+    - apt-get install --yes ${DEPENDENCIES}
+
+.build withdeps:
+  extends: '.build'
+  stage: 'build'
+  before_script:
+    - echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
+    - apt-get update
+    - apt-get build-dep --yes ffmpeg
+    - apt-get install --yes ${DEPENDENCIES}
+
+no external deps:
+  extends: '.build nodeps'
+
+no external x86:
+  extends: '.build nodeps'
+  image: 'i386/debian:sid'
+  stage: 'build x86'
+
+with deps:
+  extends: '.build withdeps'
+
+with deps x86:
+  extends: '.build withdeps'
+  image: 'i386/debian:sid'
+  stage: 'build x86'
