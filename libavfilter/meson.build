@@ -6,6 +6,12 @@ libavfilter_version = libavfilter_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
+# Version file
+ver_conf = configuration_data()
+ver_conf.set('majorver', libavfilter_majorver)
+ver_conf.set('minorver', minorver)
+ver_conf.set('microver', microver)
+
 configure_file(
   input: 'version.h.in',
   output: 'version.h',
