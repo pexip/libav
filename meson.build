@@ -1453,7 +1453,7 @@ foreach feature : arch_features
   conf.set10(name, have)
 endforeach
 
-conf.set10('shared', get_option('default_library') == 'shared' and host_machine.system() != 'windows')
+conf.set10('shared', get_option('default_library') != 'static')
 conf.set('pthreads', 0)
 conf.set('w32threads', 0)
 conf.set('os2threads', 0)
@@ -2036,30 +2036,18 @@ foreach built_lib : built_libs
     implicit_include_directories : false,
   )
 
-  if host_machine.system() == 'windows'
-    lib = static_library(built_lib[0],
-      objects: static_lib.extract_all_objects(),
-      install: true,
-      dependencies: deps,
-      include_directories: common_incs,
-      link_with: link_with,
-      link_args: link_args,
-      c_args: c_args,
-      implicit_include_directories : false,
-    )
-  else
-    lib = library(built_lib[0],
-      objects: static_lib.extract_all_objects(),
-      install: true,
-      dependencies: deps,
-      soversion: version,
-      include_directories: common_incs,
-      link_with: link_with,
-      link_args: link_args,
-      c_args: c_args,
-      implicit_include_directories : false,
-    )
-  endif
+  lib = library(built_lib[0],
+    objects: static_lib.extract_all_objects(),
+    dependencies: deps,
+    soversion: version,
+    include_directories: common_incs,
+    link_with: link_with,
+    link_args: link_args,
+    c_args: c_args,
+    vs_module_defs: 'compat/windows/@0@.def'.format(built_lib[0]),
+    implicit_include_directories : false,
+    install: true,
+  )
 
   set_variable('lib@0@'.format(built_lib[0]), lib)
 
