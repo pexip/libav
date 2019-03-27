@@ -13,12 +13,42 @@ and MacOS, or with the installer on Windows, then in FFmpeg:
 meson build && ninja -C build
 ```
 
-Known to build on Debian, Arch Linux and MacOS High Sierra.
+Build FFmpeg without external dependencies:
+```
+meson --auto-features=disabled build && ninja -C build
+```
 
-Currently only builds static libraries on Windows.
+Known to build on Debian, Arch Linux and MacOS High Sierra.
 
 # Running the tests:
 
 ```
 meson test -C build
 ```
+
+# Updating the FFmpeg base snapshot of the Meson port
+
+It's complicated and at the moment not fully documented.
+
+It should only be needed when updating from one feature version to another,
+not for minor bug fix releases (assuming there aren't too many changes in
+`configure` between minor bug fix releases).
+
+The procedure is generally to run two scripts (`parse_sources.py` and
+`recursive_selects.py`), replace the current generated files with them,
+but make sure to bring back in the manual changes (that's the tedious part).
+
+The two scripts can be run in any order.
+
+- `recursive_selects.py` works in place, but you need to check the diff and
+  revert some of the changes.
+
+- `parse_sources.py` creates temporary meson.build files which you need
+  to copy paste from.
+
+Then bump versions and check what changed in `configure` since the last time,
+which is the other complicated bit, as it requires understanding of the
+somewhat complex ffmpeg build system and of the way it was reimplemented
+for the Meson port. Some documentation of that is at the top of `depgraph.py`.
+
+Good luck!
