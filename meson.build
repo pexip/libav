@@ -89,6 +89,10 @@ if cc.get_id() == 'msvc'
       '/wd4244', # lossy type conversion (e.g. double -> int)
       '/wd4305', # truncating type conversion (e.g. double -> float)
       '/wd4554', # operator precedence
+      '/wo4114', # same type qualifier used more than once
+      '/wo4028', # formal parameter {n} different from declaration
+      '/wo4090', # 'function': different 'const' qualifiers
+      cc.get_supported_arguments(['/utf-8']), # set the input encoding to utf-8
       language : 'c')
 endif
 
