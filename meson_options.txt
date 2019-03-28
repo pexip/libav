@@ -76,7 +76,7 @@ option('libcelt', type: 'feature', value: 'auto')
 option('chromaprint', type: 'feature', value: 'auto')
 option('clock_gettime', type: 'feature', value: 'auto')
 option('clock_gettime', type: 'feature', value: 'auto')
-option('cuda_sdk', type: 'feature', value: 'auto')
+option('ff_cuda_sdk', type: 'feature', value: 'auto') # cuda_sdk in ffmpeg
 option('crystalhd', type: 'feature', value: 'auto')
 option('libgme', type: 'feature', value: 'auto')
 option('gcrypt', type: 'feature', value: 'auto')

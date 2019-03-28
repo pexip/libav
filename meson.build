@@ -1473,11 +1473,18 @@ elif host_machine.system() == 'windows'
   conf.set('dos_paths', 1)
 endif
 
+# Our option names can't be 1:1 mapping because newer meson versions disallow
+# options with language prefixes i.e. "cuda_sdk" in our case
+options_map = {
+  'cuda_sdk' : 'ff_cuda_sdk',
+}
+
 foreach check : all_checks
   check_type = check[0]
   check = check[1]
 
   name = check[0]
+  opt_name = options_map.get(name, name)
 
   if check_type == 'func'
     headers = []
@@ -1555,7 +1562,7 @@ foreach check : all_checks
       if check_type != 'pkg-config'
 	foreach link_with : link_withs
           if check_type == 'lib' and not ('always-check' in opts)
-            req = get_option(name)
+            req = get_option(opt_name)
           else
             req = false
           endif
@@ -1564,7 +1571,7 @@ foreach check : all_checks
 	  extra_deps += dep
 	endforeach
       else
-	req = get_option(name)
+	req = get_option(opt_name)
 	pkg_name = opts.get('pkg', name)
 	if opts.has_key('version')
 	  dep = dependency(pkg_name, required : req, version: opts.get('version'))
