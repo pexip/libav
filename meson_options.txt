@@ -138,6 +138,14 @@ option('libmysofa', type: 'feature', value: 'auto')
 option('libx264', type: 'feature', value: 'auto')
 option('libxavs', type: 'feature', value: 'auto')
 
+# Licensing options
+option('gpl', type: 'feature', value: 'disabled',
+  description: 'Allow use of GPL code, the resulting libs and binaries will be under GPL')
+option('version3', type: 'feature', value: 'disabled',
+  description: 'Upgrade (L)GPL to version 3')
+option('nonfree', type: 'feature', value: 'disabled',
+  description: 'Allow use of nonfree code, the resulting libs and binaries will be unredistributable')
+
 # other options
 # cli is disabled by default to speed up the build since it links statically
 option('cli', type: 'feature', value: 'disabled')

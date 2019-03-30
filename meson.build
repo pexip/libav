@@ -1423,7 +1423,7 @@ foreach check_struct : check_structs
 endforeach
 
 foreach license : license_list
-  conf.set(license, 1)
+  conf.set10(license, not get_option(license).disabled())
 endforeach
 
 foreach lib : library_list
@@ -1557,6 +1557,29 @@ foreach check : all_checks
     foreach precondition : preconditions
       found = found and conf.get(precondition) == 1
     endforeach
+
+    # FIXME: or should these just be preconditions in the list above instead?
+    disabled = false
+    if get_option('gpl').disabled()
+      gpl_list = library_gpl_list + library_gplv3_list
+      disabled = gpl_list.contains(name)
+    endif
+    if get_option('version3').disabled()
+      v3_list = library_gplv3_list + library_version3_list
+      disabled = disabled or v3_list.contains(name)
+    endif
+    if get_option('nonfree').disabled()
+      nonfree_list = library_nonfree_list + hwaccel_library_nonfree_list
+      disabled = disabled or nonfree_list.contains(name)
+    endif
+
+    if disabled
+      if get_option(opt_name).enabled()
+        error('Incompatible options combination: @0@ requested, but has disabled license.'.format(name))
+      endif
+      message('Skipping @0@ because of license'.format(name))
+      found = false
+    endif
 
     if found
       if check_type != 'pkg-config'
@@ -2195,7 +2218,6 @@ endforeach
 final_conf = configuration_data()
 
 final_conf.set_quoted('FFMPEG_CONFIGURATION', '') # FIXME
-final_conf.set_quoted('FFMPEG_LICENSE', 'nonfree and unredistributable') # FIXME
 final_conf.set('CONFIG_THIS_YEAR', 2019)
 final_conf.set_quoted('FFMPEG_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('AVCONV_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
@@ -2206,6 +2228,28 @@ final_conf.set('HAVE_MMX2', conf.get('mmxext'))
 final_conf.set('SWS_MAX_FILTER_SIZE', 256)
 final_conf.set('EXTERN_ASM', true)
 final_conf.set_quoted('EXTERN_PREFIX', extern_prefix)
+
+if not get_option('nonfree').disabled()
+  license = 'nonfree and unredistributable'
+elif not get_option('gpl').disabled() and not get_option('version3').disabled()
+  license = 'GPL version 3 or later'
+elif not get_option('version3').disabled()
+  license = 'LGPL version 3 or later'
+elif not get_option('gpl').disabled()
+  license = 'GPL version 2 or later'
+else
+  license = 'LGPL version 2.1 or later'
+endif
+final_conf.set_quoted('FFMPEG_LICENSE', license)
+message('License: ' + license)
+
+if not get_option('version3').disabled()
+  if not get_option('gpl').disabled()
+    conf.set('gplv3', 1)
+  else
+    conf.set('lgplv3', 1)
+  endif
+endif
 
 foreach restrict_kw : ['restrict', '__restrict__', '__restrict', '']
   if not final_conf.has('av_restrict') and cc.compiles('void foo(char * @0@ p);'.format(restrict_kw))
