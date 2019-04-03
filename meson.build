@@ -538,7 +538,7 @@ foreach headers : ioctl_meteor_headers
     foreach header : headers
       header_found = cc.has_header(header)
       if header_found
-	n_headers_found += 1
+        n_headers_found += 1
       endif
     endforeach
 
@@ -757,10 +757,10 @@ check_pkg_config = [
   ['libopencv', ['opencv/cxcore.h'], ['cvCreateImageHeader'], {'pkg': 'opencv'}],
   ['libopenh264', ['wels/codec_api.h'], ['WelsGetCodecVersion'], {'pkg': 'openh264'}],
   ['libopenjpeg', ['openjpeg.h'], ['opj_version'], {'pkg': 'libopenjp2',
-						    'version': '>= 2.1.0'}],
+                                                    'version': '>= 2.1.0'}],
   ['libopenjpeg', ['openjpeg.h'], ['opj_version'], {'pkg': 'libopenjp2',
-						    'version': '>= 2.1.0',
-						    'c_args': ['-DOPJ_STATIC']}],
+                                                    'version': '>= 2.1.0',
+                                                    'c_args': ['-DOPJ_STATIC']}],
   ['libopenmpt', ['libopenmpt/libopenmpt.h'], ['openmpt_module_create'], {'version': '>= 0.2.6557'}],
   ['libopus', ['opus_multistream.h'], ['opus_multistream_decoder_create', 'opus_multistream_surround_encoder_create'], {'pkg': 'opus'}],
   ['libpulse', ['pulse/pulseaudio.h'], ['pa_context_new'], {}],
@@ -833,8 +833,8 @@ check_libs = [
   ['libdl', ['dlfcn.h'], ['dlopen', 'dlsym'], ['dl']],
   ['libfdk_aac', ['fdk-aac/aacenc_lib.h'], ['aacEncOpen'], ['fdk-aac']],
   ['libflite', ['flite/flite.h'], ['flite_init'], ['flite_cmu_time_awb', 'flite_cmu_us_awb', 'flite_cmu_us_kal',
-						   'flite_cmu_us_kal16', 'flite_cmu_us_rms', 'flite_cmu_us_slt',
-						   'flite_usenglish', 'flite_cmulex', 'flite']],
+                                                   'flite_cmu_us_kal16', 'flite_cmu_us_rms', 'flite_cmu_us_slt',
+                                                   'flite_usenglish', 'flite_cmulex', 'flite']],
   ['libgsm', ['gsm.h'], ['gsm_create'], ['gsm']],
   ['libgsm', ['gsm/gsm.h'], ['gsm_create'], ['gsm']],
   ['libiec61883', ['libiec61883/iec61883.h'], ['iec61883_cmp_connect'], ['raw1394', 'avc1394', 'rom1394', 'iec61883']],
@@ -1560,71 +1560,71 @@ foreach check : all_checks
 
     if found
       if check_type != 'pkg-config'
-	foreach link_with : link_withs
+        foreach link_with : link_withs
           if check_type == 'lib' and not ('always-check' in opts)
             req = get_option(opt_name)
           else
             req = false
           endif
-	  dep = cc.find_library(link_with, required : req)
-	  found = found and dep.found()
-	  extra_deps += dep
-	endforeach
+          dep = cc.find_library(link_with, required : req)
+          found = found and dep.found()
+          extra_deps += dep
+        endforeach
       else
-	req = get_option(opt_name)
-	pkg_name = opts.get('pkg', name)
-	if opts.has_key('version')
-	  dep = dependency(pkg_name, required : req, version: opts.get('version'))
-	else
-	  dep = dependency(pkg_name, required : req)
-	endif
-	found = found and dep.found()
-	extra_deps += dep
+        req = get_option(opt_name)
+        pkg_name = opts.get('pkg', name)
+        if opts.has_key('version')
+          dep = dependency(pkg_name, required : req, version: opts.get('version'))
+        else
+          dep = dependency(pkg_name, required : req)
+        endif
+        found = found and dep.found()
+        extra_deps += dep
       endif
     endif
 
     if found
       foreach header : headers
-	if header.endswith('.h')
-	  prefix += '#include <@0@>\n'.format(header)
-	else
-	  prefix += '#include @0@\n'.format(header)
-	endif
+        if header.endswith('.h')
+          prefix += '#include <@0@>\n'.format(header)
+        else
+          prefix += '#include @0@\n'.format(header)
+        endif
 
-	if not conf.has(header.underscorify())
-	  has_header = cc.has_header(header, dependencies: extra_deps)
-	  conf.set10(header.underscorify().to_lower(), has_header)
-	  found = found and has_header
-	endif
+        if not conf.has(header.underscorify())
+          has_header = cc.has_header(header, dependencies: extra_deps)
+          conf.set10(header.underscorify().to_lower(), has_header)
+          found = found and has_header
+        endif
       endforeach
     endif
 
     if found
       n_funcs_found = 0
       foreach symbol : funcs
-	if check_type == 'header-func'
-	  if cc.has_header_symbol(headers[0], symbol, dependencies : extra_deps, prefix: prefix, args : c_args + project_c_args)
-	    n_funcs_found += 1
-	  endif
-	else
-	  if cc.has_function(symbol, dependencies : extra_deps, prefix: prefix, args : c_args + project_c_args)
-	    n_funcs_found += 1
-	  endif
-	endif
+        if check_type == 'header-func'
+          if cc.has_header_symbol(headers[0], symbol, dependencies : extra_deps, prefix: prefix, args : c_args + project_c_args)
+            n_funcs_found += 1
+          endif
+        else
+          if cc.has_function(symbol, dependencies : extra_deps, prefix: prefix, args : c_args + project_c_args)
+            n_funcs_found += 1
+          endif
+        endif
       endforeach
       if has_any_func
         found = n_funcs_found >= 1
       else
-	found = n_funcs_found == funcs.length()
+        found = n_funcs_found == funcs.length()
       endif
     endif
 
     if found
       n_defines_found = 0
       foreach symbol : defines
-	if cc.get_define(symbol, dependencies : extra_deps, prefix: prefix, args : c_args + project_c_args) != ''
-	  n_defines_found += 1
-	endif
+        if cc.get_define(symbol, dependencies : extra_deps, prefix: prefix, args : c_args + project_c_args) != ''
+          n_defines_found += 1
+        endif
       endforeach
       found = n_defines_found == defines.length()
     endif
@@ -1880,13 +1880,13 @@ foreach thing : things_to_print
   foreach comp : thing[3]
     if conf.get(comp) == 1
       if thing[1] == 'AVFilter'
-	comp_name = full_filter_list[ctr]
+        comp_name = full_filter_list[ctr]
       elif thing[2] == 'indev_list'
-	comp_name = '@0@_demuxer'.format(comp.split('_indev')[0])
+        comp_name = '@0@_demuxer'.format(comp.split('_indev')[0])
       elif thing[2] == 'outdev_list'
-	comp_name = '@0@_muxer'.format(comp.split('_outdev')[0])
+        comp_name = '@0@_muxer'.format(comp.split('_outdev')[0])
       else
-	comp_name = comp
+        comp_name = comp
       endif
 
       list += [comp_name]
@@ -1983,9 +1983,9 @@ foreach built_lib : built_libs
     if conf.get(arch_ext, 0) == 1
       optional_sources = get_variable('lib@0@_@1@_@2@_optional_sources'.format(built_lib[0], arch, arch_ext), {})
       foreach comp_name, comp_sources : optional_sources
-	if conf.get(comp_name, 0) == 1
-	  sources += comp_sources
-	endif
+        if conf.get(comp_name, 0) == 1
+          sources += comp_sources
+        endif
       endforeach
     endif
   endforeach
@@ -2015,20 +2015,20 @@ foreach built_lib : built_libs
     deduped_sources = []
     foreach source : x86asm_sources
       if not deduped_sources.contains(source)
-	deduped_sources += [source]
+        deduped_sources += [source]
       endif
     endforeach
 
     asm_gen = generator(x86asm,
       output : '@BASENAME@.o',
       arguments : asm_args + [
-	'-f', asm_format,
-	'-i', meson.current_source_dir() + '/',
-	'-i', meson.current_build_dir() + '/',
-	'-i', join_paths(meson.current_source_dir(), 'lib@0@'.format(built_lib[0]), 'x86', ''),
-	'-P', join_paths(meson.current_build_dir(), 'config.asm'),
-	'@INPUT@',
-	'-o', '@OUTPUT@'])
+        '-f', asm_format,
+        '-i', meson.current_source_dir() + '/',
+        '-i', meson.current_build_dir() + '/',
+        '-i', join_paths(meson.current_source_dir(), 'lib@0@'.format(built_lib[0]), 'x86', ''),
+        '-P', join_paths(meson.current_build_dir(), 'config.asm'),
+        '@INPUT@',
+        '-o', '@OUTPUT@'])
 
     gen_objects += asm_gen.process(deduped_sources)
   endif
