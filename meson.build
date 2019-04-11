@@ -1464,7 +1464,7 @@ conf.set('os2threads', 0)
 conf.set10('bigendian', host_machine.endian() == 'big')
 conf.set10('fast_unaligned', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_machine.cpu_family()))
 
-if ['linux', 'darwin'].contains(host_machine.system())
+if ['linux', 'darwin', 'android'].contains(host_machine.system())
   conf.set10('pthreads', thread_dep.found())
   conf.set('section_data_rel_ro', 1)
 elif host_machine.system() == 'windows'
