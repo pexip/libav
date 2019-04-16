@@ -1682,8 +1682,14 @@ if conf.get('libzvbi') == 1
     prefix: '#include <libzvbi.h>', dependencies: libzvbi_extra_deps))
 endif
 
+x86asm_type = 'none'
 if conf.get('x86') == 1
-  x86asm = find_program('nasm', 'yasm', required : false)
+  x86asm = find_program('nasm', required : false)
+  x86asm_type = 'nasm'
+  if not x86asm.found()
+    x86asm = find_program('yasm', required : false)
+    x86asm_type = 'yasm'
+  endif
   conf.set10('x86asm', x86asm.found())
 else
   x86asm = disabler()
@@ -1700,6 +1706,35 @@ endif
 extern_prefix = cc.symbols_have_underscore_prefix() ? '_' : ''
 
 asm_args = ['-DPIC', '-g']
+# Add debug args explicitly
+# yasm: `-g <format>`
+# nasm: ` -g -F <format>`
+# The only modern debugging format supported by either is DWARF
+if asm_format.startswith('win') and cc.get_id() != 'gcc'
+  # Don't try to generate debugging info for MSVC targets
+  # This can be with cl.exe and clang-cl.exe
+  debug_format = 'null'
+else
+  # Supported on Linux, BSD, macOS, and MinGW
+  debug_format = 'dwarf'
+endif
+# Add the format args
+if x86asm_type == 'yasm'
+  if debug_format == 'dwarf'
+    asm_args += ['dwarf2']
+  else
+    asm_args += ['null']
+  endif
+elif x86asm_type == 'nasm'
+  if debug_format == 'dwarf'
+    asm_args += ['-F', 'dwarf']
+  else
+    asm_args += ['-F', 'null']
+  endif
+else
+  error('Unknown x86 assembler type: ' + x86asm_type)
+endif
+
 asm_inc = join_paths(meson.current_source_dir(), 'libavutil/x86/')
 
 if extern_prefix != ''
