@@ -1705,7 +1705,7 @@ endif
 
 extern_prefix = cc.symbols_have_underscore_prefix() ? '_' : ''
 
-asm_args = ['-DPIC', '-g']
+asm_args = ['-DPIC']
 # Add debug args explicitly
 # yasm: `-g <format>`
 # nasm: ` -g -F <format>`
@@ -1721,15 +1721,13 @@ endif
 # Add the format args
 if x86asm_type == 'yasm'
   if debug_format == 'dwarf'
-    asm_args += ['dwarf2']
+    asm_args += ['-g', 'dwarf2']
   else
-    asm_args += ['null']
+    asm_args += ['-g', 'null']
   endif
 elif x86asm_type == 'nasm'
   if debug_format == 'dwarf'
-    asm_args += ['-F', 'dwarf']
-  else
-    asm_args += ['-F', 'null']
+    asm_args += ['-g', '-F', 'dwarf']
   endif
 else
   error('Unknown x86 assembler type: ' + x86asm_type)
