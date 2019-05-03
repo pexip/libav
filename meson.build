@@ -1945,6 +1945,8 @@ endforeach
 if not cc.has_header('stdatomic.h') and thread_dep.found()
   if host_machine.system() == 'windows'
     common_incs += [include_directories('compat/atomics/win32')]
+  elif cc.get_id() == 'gcc'
+    common_incs += [include_directories('compat/atomics/gcc')]
   endif
 endif
 
