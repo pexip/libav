@@ -2165,21 +2165,23 @@ endforeach
 pkg = import('pkgconfig')
 
 pkg_infos = [
-  ['Multimedia utilities', libavutil, libavutil_version],
-  ['FFmpeg postprocessing library', libpostproc, libpostproc_version],
-  ['FFmpeg audio resampling library', libswresample, libswresample_version],
-  ['FFmpeg image rescaling library', libswscale, libswscale_version],
-  ['Multimedia codecs', libavcodec, libavcodec_version],
-  ['Multimedia formats', libavformat, libavformat_version],
-  ['Media device handling', libavdevice, libavdevice_version],
-  ['Audio/video filtering library', libavfilter, libavfilter_version],
-  ['Libav audio resampling library', libavresample, libavresample_version],
+  ['Multimedia utilities', 'libavutil'],
+  ['FFmpeg postprocessing library', 'libpostproc'],
+  ['FFmpeg audio resampling library', 'libswresample'],
+  ['FFmpeg image rescaling library', 'libswscale'],
+  ['Multimedia codecs', 'libavcodec'],
+  ['Multimedia formats', 'libavformat'],
+  ['Media device handling', 'libavdevice'],
+  ['Audio/video filtering library', 'libavfilter'],
+  ['Libav audio resampling library', 'libavresample'],
 ]
 
 foreach pkg_info : pkg_infos
-  pkg.generate(pkg_info[1],
+  libname = pkg_info[1]
+  pkg.generate(get_variable(libname),
+    filebase:  libname,
     description: pkg_info[0],
-    version: pkg_info[2]
+    version: get_variable(libname + '_version')
   )
 endforeach
 
