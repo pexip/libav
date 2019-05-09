@@ -4,6 +4,85 @@ microver = '100'
 
 libavutil_version = libavutil_majorver + '.' + minorver + '.' + microver
 
+libavutil_headers = files(
+  'adler32.h',
+  'aes.h',
+  'aes_ctr.h',
+  'attributes.h',
+  'audio_fifo.h',
+  'avassert.h',
+  'avstring.h',
+  'avutil.h',
+  'base64.h',
+  'blowfish.h',
+  'bprint.h',
+  'bswap.h',
+  'buffer.h',
+  'cast5.h',
+  'camellia.h',
+  'channel_layout.h',
+  'common.h',
+  'cpu.h',
+  'crc.h',
+  'des.h',
+  'dict.h',
+  'display.h',
+  'downmix_info.h',
+  'encryption_info.h',
+  'error.h',
+  'eval.h',
+  'fifo.h',
+  'file.h',
+  'frame.h',
+  'hash.h',
+  'hmac.h',
+  'hwcontext.h',
+  'hwcontext_cuda.h',
+  'hwcontext_d3d11va.h',
+  'hwcontext_drm.h',
+  'hwcontext_dxva2.h',
+  'hwcontext_qsv.h',
+  'hwcontext_mediacodec.h',
+  'hwcontext_vaapi.h',
+  'hwcontext_videotoolbox.h',
+  'hwcontext_vdpau.h',
+  'imgutils.h',
+  'intfloat.h',
+  'intreadwrite.h',
+  'lfg.h',
+  'log.h',
+  'macros.h',
+  'mathematics.h',
+  'mastering_display_metadata.h',
+  'md5.h',
+  'mem.h',
+  'motion_vector.h',
+  'murmur3.h',
+  'opt.h',
+  'parseutils.h',
+  'pixdesc.h',
+  'pixelutils.h',
+  'pixfmt.h',
+  'random_seed.h',
+  'rc4.h',
+  'rational.h',
+  'replaygain.h',
+  'ripemd.h',
+  'samplefmt.h',
+  'sha.h',
+  'sha512.h',
+  'spherical.h',
+  'stereo3d.h',
+  'threadmessage.h',
+  'time.h',
+  'timecode.h',
+  'timestamp.h',
+  'tree.h',
+  'twofish.h',
+  'xtea.h',
+  'tea.h',
+)
+
 libavutil_sources = files(
   'adler32.c',
   'aes.c',
@@ -164,7 +243,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libavutil'),
+  install: true,
 )
+
+install_headers(libavutil_headers, subdir: 'libavutil')
 
 # Lavu configuration file
 lavu_conf = configuration_data()
@@ -174,6 +257,8 @@ lavu_conf.set10('HAVE_FAST_UNALIGNED', ['x86', 'x86_64', 'aarch', 'ppc'].contain
 configure_file(
   output: 'avconfig.h',
   configuration: lavu_conf,
+  install_dir: join_paths(get_option('includedir'), 'libavutil'),
+  install: true,
 )
 
 configure_file(
@@ -186,6 +271,8 @@ ffversion_h = custom_target('ffversion.h',
   output: 'ffversion.h',
   command: [find_program('version.py'), join_paths(meson.current_source_dir(), '..'), '@OUTPUT@', ''],
   build_by_default: true,
+  install_dir: join_paths(get_option('includedir'), 'libavutil'),
+  install: true,
 )
 
 subdir('x86')

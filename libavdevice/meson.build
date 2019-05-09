@@ -6,6 +6,10 @@ libavdevice_version = libavdevice_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
+libavdevice_headers = files(
+  'avdevice.h',
+)
+
 libavdevice_sources = files(
   'alldevices.c',
   'avdevice.c',
@@ -73,7 +77,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libavdevice'),
+  install: true,
 )
+
+install_headers(libavdevice_headers, subdir: 'libavdevice')
 
 configure_file(
   input: 'libavdevice.v.in',

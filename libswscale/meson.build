@@ -4,6 +4,10 @@ microver = '100'
 
 libswscale_version = libswscale_majorver + '.' + minorver + '.' + microver
 
+libswscale_headers = files(
+  'swscale.h',
+)
+
 libswscale_sources = files(
   'alphablend.c',
   'hscale.c',
@@ -50,7 +54,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libswscale'),
+  install: true,
 )
+
+install_headers(libswscale_headers, subdir: 'libswscale')
 
 configure_file(
   input: 'libswscale.v.in',

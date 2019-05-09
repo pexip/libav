@@ -6,6 +6,11 @@ libavformat_version = libavformat_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
+libavformat_headers = files(
+  'avformat.h',
+  'avio.h',
+)
+
 libavformat_sources = files(
   'allformats.c',
   'avio.c',
@@ -573,7 +578,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libavformat'),
+  install: true,
 )
+
+install_headers(libavformat_headers, subdir: 'libavformat')
 
 configure_file(
   input: 'libavformat.v.in',

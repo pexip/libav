@@ -6,16 +6,10 @@ libavfilter_version = libavfilter_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
-# Version file
-ver_conf = configuration_data()
-ver_conf.set('majorver', libavfilter_majorver)
-ver_conf.set('minorver', minorver)
-ver_conf.set('microver', microver)
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
+libavfilter_headers = files(
+  'avfilter.h',
+  'buffersink.h',
+  'buffersrc.h',
 )
 
 libavfilter_sources = files(
@@ -463,6 +457,22 @@ libavfilter_tests = [
 
 libavfilter_optional_tests = {
 }
+
+# Version file
+ver_conf = configuration_data()
+ver_conf.set('majorver', libavfilter_majorver)
+ver_conf.set('minorver', minorver)
+ver_conf.set('microver', microver)
+
+configure_file(
+  input: 'version.h.in',
+  output: 'version.h',
+  configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libavfilter'),
+  install: true,
+)
+
+install_headers(libavfilter_headers, subdir: 'libavfilter')
 
 configure_file(
   input: 'libavfilter.v.in',

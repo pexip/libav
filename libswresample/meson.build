@@ -4,6 +4,10 @@ microver = '100'
 
 libswresample_version = libswresample_majorver + '.' + minorver + '.' + microver
 
+libswresample_headers = files(
+  'swresample.h',
+)
+
 libswresample_sources = files(
   'audioconvert.c',
   'dither.c',
@@ -43,7 +47,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libswresample'),
+  install: true,
 )
+
+install_headers(libswresample_headers, subdir: 'libswresample')
 
 configure_file(
   input: 'libswresample.v.in',

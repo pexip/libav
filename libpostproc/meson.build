@@ -4,6 +4,10 @@ microver = '100'
 
 libpostproc_version = libpostproc_majorver + '.' + minorver + '.' + microver
 
+libpostproc_headers = files(
+  'postprocess.h',
+)
+
 libpostproc_sources = files(
   'postprocess.c',
 )
@@ -18,7 +22,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libpostproc'),
+  install: true,
 )
+
+install_headers(libpostproc_headers, subdir: 'libpostproc')
 
 configure_file(
   input: 'libpostproc.v.in',

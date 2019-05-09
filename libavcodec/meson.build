@@ -6,6 +6,26 @@ libavcodec_version = libavcodec_majorver + '.' + minorver + '.' + microver
 
 cc = meson.get_compiler('c')
 
+libavcodec_headers = files(
+  'ac3_parser.h',
+  'adts_parser.h',
+  'avcodec.h',
+  'avdct.h',
+  'avfft.h',
+  'd3d11va.h',
+  'dirac.h',
+  'dv_profile.h',
+  'dxva2.h',
+  'jni.h',
+  'mediacodec.h',
+  'qsv.h',
+  'vaapi.h',
+  'vdpau.h',
+  'videotoolbox.h',
+  'vorbis_parser.h',
+  'xvmc.h',
+)
+
 libavcodec_sources = files(
   'ac3_parser.c',
   'adts_parser.c',
@@ -1046,7 +1066,11 @@ configure_file(
   input: 'version.h.in',
   output: 'version.h',
   configuration: ver_conf,
+  install_dir: join_paths(get_option('includedir'), 'libavcodec'),
+  install: true,
 )
+
+install_headers(libavcodec_headers, subdir: 'libavcodec')
 
 configure_file(
   input: 'libavcodec.v.in',
