@@ -2130,12 +2130,13 @@ foreach built_lib : built_libs
 endforeach
 
 built_exe_list = []
-
-foreach program : program_list
-  if conf.get(program) == 1
-    built_exe_list += program
-  endif
-endforeach
+if not get_option('cli').disabled()
+  foreach program : program_list
+    if conf.get(program) == 1
+      built_exe_list += program
+    endif
+  endforeach
+endif
 
 foreach built_exe : built_exe_list
   sources = get_variable('@0@_sources'.format(built_exe))

@@ -137,3 +137,7 @@ option('libmp3lame', type: 'feature', value: 'auto')
 option('libmysofa', type: 'feature', value: 'auto')
 option('libx264', type: 'feature', value: 'auto')
 option('libxavs', type: 'feature', value: 'auto')
+
+# other options
+# cli is disabled by default to speed up the build since it links statically
+option('cli', type: 'feature', value: 'disabled')
