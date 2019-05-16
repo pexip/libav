@@ -1729,8 +1729,6 @@ elif x86asm_type == 'nasm'
   if debug_format == 'dwarf'
     asm_args += ['-g', '-F', 'dwarf']
   endif
-else
-  error('Unknown x86 assembler type: ' + x86asm_type)
 endif
 
 asm_inc = join_paths(meson.current_source_dir(), 'libavutil/x86/')
