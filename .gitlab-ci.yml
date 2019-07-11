@@ -9,6 +9,7 @@ stages:
   variables:
     DEPENDENCIES: >
       meson
+      python3-setuptools
       ninja-build
       build-essential
       git
