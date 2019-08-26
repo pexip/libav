@@ -6,6 +6,13 @@ ffmpeg_sources = files([
   'cmdutils.c',
 ])
 
+ffmpeg_optional_sources = {
+  'cuvid' : files('ffmpeg_cuvid.c'),
+  'libmfx' : files('ffmpeg_qsv.c'),
+  'vda' : files('ffmpeg_videotoolbox.c'),
+  'videotoolbox' : files('ffmpeg_videotoolbox.c'),
+}
+
 ffplay_sources = files([
   'ffplay.c',
   'cmdutils.c',

@@ -2142,6 +2142,14 @@ foreach built_exe : built_exe_list
 
   message('Checking @0@ dependencies'.format(built_exe))
 
+  optional_sources = get_variable('@0@_optional_sources'.format(built_exe), {})
+
+  foreach comp_name, comp_sources : optional_sources
+    if conf.get(comp_name, 0) == 1
+      sources += comp_sources
+    endif
+  endforeach
+
   foreach dep_comp_name: get_variable('@0@_flattened_deps'.format(built_exe), [])
     optional_deps += get_variable('@0@_extra_deps'.format(dep_comp_name), [])
   endforeach
