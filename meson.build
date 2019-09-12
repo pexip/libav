@@ -1710,12 +1710,12 @@ asm_args = ['-DPIC']
 # yasm: `-g <format>`
 # nasm: ` -g -F <format>`
 # The only modern debugging format supported by either is DWARF
-if asm_format.startswith('win') and cc.get_id() != 'gcc'
-  # Don't try to generate debugging info for MSVC targets
-  # This can be with cl.exe and clang-cl.exe
+#
+# nasm and yasm don't support DWARF in the PE format (Windows)
+if asm_format.startswith('win')
   debug_format = 'null'
 else
-  # Supported on Linux, BSD, macOS, and MinGW
+  # Supported on Linux, BSD, macOS
   debug_format = 'dwarf'
 endif
 # Add the format args
