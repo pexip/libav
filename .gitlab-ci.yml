@@ -1,7 +1,6 @@
 # Is it worth making an image with ffmpeg git repo and packages installed?
 stages:
  - 'build'
- - 'build x86'
 
 .build:
   image: 'debian:sid'
@@ -58,7 +57,7 @@ no external deps:
 no external x86:
   extends: '.build nodeps'
   image: 'i386/debian:sid'
-  stage: 'build x86'
+  stage: 'build'
 
 with deps:
   extends: '.build withdeps'
@@ -69,7 +68,7 @@ with deps yasm:
 with deps x86:
   extends: '.build withdeps'
   image: 'i386/debian:sid'
-  stage: 'build x86'
+  stage: 'build'
 
 .build windows:
   image: 'registry.freedesktop.org/gstreamer/gst-ci/amd64/windows:v8'
@@ -108,7 +107,7 @@ vs2017:
 
 vs2017 x86:
   extends: '.build windows'
-  stage: 'build x86'
+  stage: 'build'
   variables:
     ARCH: 'x86'
 
