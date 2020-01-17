@@ -1815,7 +1815,7 @@ components_h = configure_file(configuration: components_to_resolve, output: 'com
 
 dep_resolver = find_program('depresolver.py')
 
-res = run_command(dep_resolver, tmpconfig_h, components_h)
+res = run_command(dep_resolver, tmpconfig_h, components_h, check: true)
 
 conf = configuration_data()
 
