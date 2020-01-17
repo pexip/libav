@@ -28,7 +28,7 @@ import re
 import itertools
 import sys
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from depgraph import GRAPH
 
@@ -150,7 +150,7 @@ def resolve(conf, thing, flattened_deps, checking={}):
 
     for dep in itertools.chain(dep_all, dep_any, dep_sel, dep_sgs):
         if enabled(conf, dep):
-            flattened_deps[thing].add(dep)
+            flattened_deps[thing].update({dep: None})
             flattened_deps[thing].update(flattened_deps[dep])
 
     checking[thing] = False
@@ -175,7 +175,7 @@ if __name__=='__main__':
 
     conf = parse_conf(args.input)
 
-    flattened_deps = defaultdict(set)
+    flattened_deps = defaultdict(OrderedDict)
 
     things = parse_components(args.components)
     things = [thing.lower() for thing in things]
@@ -194,5 +194,5 @@ if __name__=='__main__':
 
     for comp, deps in flattened_deps.items():
         if enabled(conf, comp):
-            deps.add(comp)
+            deps.update({comp: None})
         print ('%s=%s' % (comp, ','.join(deps)))
