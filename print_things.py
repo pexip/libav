@@ -17,10 +17,23 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, see <http://www.gnu.org/licenses/>.
 
-import argparse
 import os
-import re
 import sys
+import filecmp
+import argparse
+
+def replace_if_changed(new, old):
+    '''
+    Compare contents and only replace if changed to avoid triggering a rebuild.
+    '''
+    try:
+        changed = not filecmp.cmp(new, old, shallow=False)
+    except FileNotFoundError:
+        changed = True
+    if changed:
+        os.replace(new, old)
+    else:
+        os.remove(new)
 
 # Used to output list of muxers, demuxers, encoders, etc.
 if __name__ == '__main__':
@@ -40,8 +53,10 @@ if __name__ == '__main__':
 
     args = arg_parser.parse_args()
 
-    with open(args.filename, 'w') as f:
+    tmp_filename = args.filename + '~'
+    with open(tmp_filename, 'w') as f:
         f.write('static const %s * const %s[] = {\n' % (args.struct_name, args.name))
         for thing in args.things:
             f.write('    &ff_%s,\n' % (thing))
         f.write('    NULL };\n')
+    replace_if_changed(tmp_filename, args.filename)
