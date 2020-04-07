@@ -1590,7 +1590,7 @@ foreach check : all_checks
             req = false
           endif
           dep = cc.find_library(link_with, required : req)
-          found = found and dep.found()
+          found = dep.found()
           extra_deps += dep
         endforeach
       else
@@ -1601,7 +1601,7 @@ foreach check : all_checks
         else
           dep = dependency(pkg_name, required : req)
         endif
-        found = found and dep.found()
+        found = dep.found() and dep.type_name() != 'internal'
         extra_deps += dep
       endif
     endif
