@@ -1706,6 +1706,9 @@ if conf.get('libzvbi') == 1
 endif
 
 x86asm_type = 'none'
+
+x86asm_checks = []
+
 if conf.get('x86') == 1
   x86asm = find_program('nasm', required : false)
   x86asm_type = 'nasm'
@@ -1714,6 +1717,15 @@ if conf.get('x86') == 1
     x86asm_type = 'yasm'
   endif
   conf.set10('x86asm', x86asm.found())
+  if x86asm.found()
+    x86asm_checks += [
+      ['meson_asm_checks/cpunop.asm', 'cpunop'],
+      ['meson_asm_checks/avx2_external.asm', 'avx2_external'],
+      ['meson_asm_checks/avx512_external.asm', 'avx512_external'],
+      ['meson_asm_checks/fma4_external.asm', 'fma4_external'],
+      ['meson_asm_checks/xop_external.asm', 'xop_external'],
+    ]
+  endif
 else
   x86asm = disabler()
 endif
@@ -1759,6 +1771,16 @@ asm_inc = join_paths(meson.current_source_dir(), 'libavutil/x86/')
 if extern_prefix != ''
   asm_args += ['-DPREFIX']
 endif
+
+foreach check: x86asm_checks
+  result = run_command(x86asm_type, '-f', asm_format, asm_args, '-Werror', check[0], '-o', 'tmpasm.o')
+
+  if result.returncode() == 0
+    conf.set(check[1], 1)
+  else
+    message('@0@ x68 asm check failed: @1@'.format(check[1], result.stderr().strip()))
+  endif
+endforeach
 
 extern_things = [
   ['AVOutputFormat', 'muxer', 'libavformat/allformats.c', 'muxer_list'],
@@ -1912,7 +1934,6 @@ foreach ext : arch_ext_list_x86_simd
   conf.set10('@0@_inline'.format(ext), conf.get(ext) == 1 and conf.get('inline_asm') == 1)
   conf.set10('@0@_external'.format(ext), conf.get(ext) == 1 and conf.get('x86asm') == 1)
 endforeach
-
 
 things_to_print = [
   ['libavcodec/codec_list.c', 'AVCodec', 'codec_list', encoder_list + decoder_list],
