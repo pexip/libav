@@ -1773,7 +1773,7 @@ if extern_prefix != ''
 endif
 
 foreach check: x86asm_checks
-  result = run_command(x86asm_type, '-f', asm_format, asm_args, '-Werror', check[0], '-o', 'tmpasm.o')
+  result = run_command(x86asm, '-f', asm_format, asm_args, '-Werror', check[0], '-o', 'tmpasm.o')
 
   if result.returncode() == 0
     conf.set(check[1], 1)
