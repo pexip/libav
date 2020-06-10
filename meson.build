@@ -1590,7 +1590,7 @@ foreach check : all_checks
             req = false
           endif
           dep = cc.find_library(link_with, required : req)
-          found = dep.found()
+          found = found and dep.found()
           extra_deps += dep
         endforeach
       else
