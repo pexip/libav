@@ -149,3 +149,4 @@ option('nonfree', type: 'feature', value: 'disabled',
 # other options
 # cli is disabled by default to speed up the build since it links statically
 option('cli', type: 'feature', value: 'disabled')
+option('tests', type : 'feature', value : 'auto', description : 'Build tests')

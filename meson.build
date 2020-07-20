@@ -2147,28 +2147,30 @@ foreach built_lib : built_libs
 
   set_variable('lib@0@_dep'.format(built_lib[0]), declared_dep)
 
-  foreach test_ : tests
-    test_name = test_[0]
-    test_sources = test_[1]
-    opts = test_.get(2, {})
-    test_deps = deps
+  if not get_option('tests').disabled()
+    foreach test_ : tests
+      test_name = test_[0]
+      test_sources = test_[1]
+      opts = test_.get(2, {})
+      test_deps = deps
 
-    extra_libs = opts.get('extra_libs', [])
-    foreach libname: extra_libs
-      test_deps += [cc.find_library(libname)]
+      extra_libs = opts.get('extra_libs', [])
+      foreach libname: extra_libs
+        test_deps += [cc.find_library(libname)]
+      endforeach
+
+      exe = executable('test_@0@_@1@'.format(built_lib[0], test_name), test_sources,
+        c_args: c_args,
+        dependencies: test_deps,
+        include_directories: common_incs,
+        link_with: [link_with, static_lib],
+        implicit_include_directories : false)
+
+      test('@0@_@1@'.format(built_lib[0], test_name), exe,
+        timeout: 180,
+        workdir: join_paths(meson.current_source_dir(), 'lib@0@'.format(built_lib[0]), 'tests'))
     endforeach
-
-    exe = executable('test_@0@_@1@'.format(built_lib[0], test_name), test_sources,
-      c_args: c_args,
-      dependencies: test_deps,
-      include_directories: common_incs,
-      link_with: [link_with, static_lib],
-      implicit_include_directories : false)
-
-    test('@0@_@1@'.format(built_lib[0], test_name), exe,
-      timeout: 180,
-      workdir: join_paths(meson.current_source_dir(), 'lib@0@'.format(built_lib[0]), 'tests'))
-  endforeach
+  endif
 endforeach
 
 built_exe_list = []
