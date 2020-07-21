@@ -8,9 +8,14 @@ libpostproc_headers = files(
   'postprocess.h',
 )
 
+#### --- GENERATED --- ####
+
 libpostproc_sources = files(
   'postprocess.c',
 )
+
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

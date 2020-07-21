@@ -18,9 +18,21 @@
 
 import re
 import os
+import io
 import sys
 from pprint import pprint
 from collections import defaultdict
+
+
+SOURCE_TYPE_EXTS_MAP = {'c': ['c', 'cpp', 'm', 'cl'], 'asm': ['asm'], 'test-prog': ['c'], 'mmx': ['c']}
+SOURCE_TYPE_DIRS = {'test-prog': 'tests'}
+
+
+def add_source(f, source, prefix='', suffix=''):
+    if not source.startswith('opencl/'):
+        source = os.path.basename(source)
+    f.write("%s'%s'%s" % (prefix, source, suffix))
+
 
 def make_to_meson(path):
     source_maps = {
@@ -29,6 +41,8 @@ def make_to_meson(path):
       'test-prog': defaultdict(list),
       'mmx': defaultdict(list),
     }
+
+    skipped = set()
 
     with open(os.path.join(path, 'Makefile'), 'r') as f:
         accum = []
@@ -88,8 +102,22 @@ def make_to_meson(path):
             accumulate = ofiles.endswith('\\')
             ofiles = ofiles.strip('\\')
             ofiles = ofiles.split()
-            ext = {'c': 'c', 'asm': 'asm', 'test-prog': 'c', 'mmx': 'c'}[source_type]
-            ifiles = [os.path.splitext(ofile)[0] + '.' + ext for ofile in ofiles]
+            exts = SOURCE_TYPE_EXTS_MAP[source_type]
+            ifiles = []
+            for ofile in ofiles:
+                fname = os.path.splitext(ofile)[0]
+                for ext in exts:
+                    tmpf = fname + '.' + ext
+                    if os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), tmpf)):
+                        ifiles.append(tmpf)
+                        break
+                    if os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), os.path.basename(tmpf))):
+                        ifiles.append(tmpf)
+                        break
+
+            if len([of for of in ofiles if not of.startswith("$")]) != len(ifiles):
+                print("WARNING: %s and %s size don't match, not building!" % ([of for of in ofiles if not of.startswith("$")], ifiles))
+                skipped.add(label)
 
             if accumulate:
                 accum += ifiles
@@ -105,60 +133,93 @@ def make_to_meson(path):
             accum = []
 
 
-    with open(os.path.join(path, 'meson.build.new'), 'w') as f:
-        for source_type, map_ in (('', source_maps['c']), ('x86asm_', source_maps['asm']), ('mmx_', source_maps['mmx'])):
-            default_sources = map_.pop('', [])
+    lines = []
+    has_not_generated = False
+    try:
+        with open(os.path.join(path, 'meson.build'), 'r') as meson_file:
+            for l in meson_file.readlines():
+                if l == '#### --- GENERATED --- ####\n':
+                    lines += [l, '\n']
+                    has_not_generated = True
+                    break
+                lines.append(l)
+    except FileNotFoundError:
+        pass
 
-            if default_sources:
-                f.write('%ssources = files(\n' % '_'.join((path.replace('/', '_'), source_type)))
-                for source in default_sources:
-                    if '$' in source:
-                        print ('Warning: skipping %s' % source)
-                        continue
-                    f.write("  '%s',\n" % os.path.basename(source))
-                f.write(')\n\n')
+    f = io.StringIO()
+    for source_type, map_ in (('', source_maps['c']), ('x86asm_', source_maps['asm']), ('mmx_', source_maps['mmx'])):
+        default_sources = map_.pop('', [])
 
-            f.write('%soptional_sources = {\n' % '_'.join((path.replace('/', '_'), source_type)))
-            for label in sorted (map_):
+        if default_sources:
+            f.write('%ssources = files(\n' % '_'.join((path.replace('/', '_'), source_type)))
+            for source in default_sources:
+                if '$' in source:
+                    print ('Warning: skipping %s' % source)
+                    continue
+                add_source(f, source, prefix='  ', suffix=',\n')
+            f.write(')\n\n')
+
+        f.write('%soptional_sources = {\n' % '_'.join((path.replace('/', '_'), source_type)))
+        for label in sorted (map_):
+            if label in skipped:
+                f.write("  # '%s' : files(" % label.lower())
+            else:
                 f.write("  '%s' : files(" % label.lower())
-                l = len (map_[label])
-                for i, source in enumerate(map_[label]):
-                    if '$' in source:
-                        print ('Warning: skipping %s' % source)
-                        continue
-                    f.write("'%s'" % os.path.basename(source))
-                    if i + 1 < l:
-                        f.write(',')
-                f.write('),\n')
-            f.write('}\n\n')
-
-        test_source_map = source_maps['test-prog']
-
-        default_test_sources = test_source_map.pop('', [])
-
-        if default_test_sources:
-            f.write('%s_tests = [\n' % path.replace('/', '_'))
-            for source in default_test_sources:
+            l = len (map_[label])
+            for i, source in enumerate(map_[label]):
                 if '$' in source:
                     print ('Warning: skipping %s' % source)
                     continue
-                basename = os.path.basename(source)
-                testname = os.path.splitext(basename)[0]
-                f.write("  ['%s', files('tests/%s')],\n" % (testname, basename))
-            f.write(']\n\n')
-
-        f.write('%s_optional_tests = {\n' % path.replace('/', '_'))
-        for label in sorted (test_source_map):
-            f.write("  '%s' : [\n" % label.lower())
-            for source in test_source_map[label]:
-                if '$' in source:
-                    print ('Warning: skipping %s' % source)
-                    continue
-                basename = os.path.basename(source)
-                testname = os.path.splitext(basename)[0]
-                f.write("    ['%s', files('tests/%s')],\n" % (testname, basename))
-            f.write('  ],\n')
+                add_source(f, source)
+                if i + 1 < l:
+                    f.write(',')
+            f.write('),\n')
         f.write('}\n\n')
+
+    test_source_map = source_maps['test-prog']
+
+    default_test_sources = test_source_map.pop('', [])
+
+    if default_test_sources:
+        f.write('%s_tests = [\n' % path.replace('/', '_'))
+        for source in default_test_sources:
+            if '$' in source:
+                print ('Warning: skipping %s' % source)
+                continue
+            basename = os.path.basename(source)
+            testname = os.path.splitext(basename)[0]
+            f.write("  ['%s', files('tests/%s')],\n" % (testname, basename))
+        f.write(']\n\n')
+
+    f.write('%s_optional_tests = {\n' % path.replace('/', '_'))
+    for label in sorted (test_source_map):
+        f.write("  '%s' : [\n" % label.lower())
+        for source in test_source_map[label]:
+            if '$' in source:
+                print ('Warning: skipping %s' % source)
+                continue
+            basename = os.path.basename(source)
+            testname = os.path.splitext(basename)[0]
+            f.write("    ['%s', files('tests/%s')],\n" % (testname, basename))
+        f.write('  ],\n')
+    f.write('}\n\n')
+
+    if has_not_generated:
+        lines.append(f.getvalue())
+        with open(os.path.join(path, 'meson.build'), 'r') as meson_file:
+            out_generated = False
+            for l in meson_file.readlines():
+                if l == '#### --- END GENERATED --- ####\n':
+                    out_generated = True
+                if out_generated:
+                    lines.append(l)
+        content = ''.join(lines)
+    else:
+        content = f.getvalue()
+
+
+    with open(os.path.join(path, 'meson.build'), 'w') as meson_file:
+        meson_file.write(content)
 
 paths = [
         'libavformat',

@@ -8,6 +8,8 @@ libswresample_headers = files(
   'swresample.h',
 )
 
+#### --- GENERATED --- ####
+
 libswresample_sources = files(
   'audioconvert.c',
   'dither.c',
@@ -36,6 +38,8 @@ libswresample_tests = [
 
 libswresample_optional_tests = {
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

@@ -26,6 +26,8 @@ libavcodec_headers = files(
   'xvmc.h',
 )
 
+#### --- GENERATED --- ####
+
 libavcodec_sources = files(
   'ac3_parser.c',
   'adts_parser.c',
@@ -1055,6 +1057,7 @@ libavcodec_optional_tests = {
   ],
 }
 
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

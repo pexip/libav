@@ -10,6 +10,8 @@ libavresample_headers = files(
   'avresample.h',
 )
 
+#### --- GENERATED --- ####
+
 libavresample_sources = files(
   'audio_convert.c',
   'audio_data.c',
@@ -36,6 +38,8 @@ libavresample_tests = [
 
 libavresample_optional_tests = {
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

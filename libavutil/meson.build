@@ -83,6 +83,8 @@ libavutil_headers = files(
   'tea.h',
 )
 
+#### --- GENERATED --- ####
+
 libavutil_sources = files(
   'adler32.c',
   'aes.c',
@@ -232,6 +234,8 @@ libavutil_optional_tests = {
     ['cpu_init', files('tests/cpu_init.c')],
   ],
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

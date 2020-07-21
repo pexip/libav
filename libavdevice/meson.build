@@ -10,6 +10,8 @@ libavdevice_headers = files(
   'avdevice.h',
 )
 
+#### --- GENERATED --- ####
+
 libavdevice_sources = files(
   'alldevices.c',
   'avdevice.c',
@@ -66,6 +68,8 @@ libavdevice_optional_tests = {
     ['timefilter', files('tests/timefilter.c')],
   ],
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

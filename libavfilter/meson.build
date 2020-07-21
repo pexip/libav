@@ -12,6 +12,8 @@ libavfilter_headers = files(
   'buffersrc.h',
 )
 
+#### --- GENERATED --- ####
+
 libavfilter_sources = files(
   'allfilters.c',
   'audio.c',
@@ -457,6 +459,8 @@ libavfilter_tests = [
 
 libavfilter_optional_tests = {
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

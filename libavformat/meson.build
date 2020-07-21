@@ -11,6 +11,8 @@ libavformat_headers = files(
   'avio.h',
 )
 
+#### --- GENERATED --- ####
+
 libavformat_sources = files(
   'allformats.c',
   'avio.c',
@@ -567,6 +569,8 @@ libavformat_optional_tests = {
     ['srtp', files('tests/srtp.c')],
   ],
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()

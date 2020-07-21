@@ -43,8 +43,8 @@ The two scripts can be run in any order.
 - `recursive_selects.py` works in place, but you need to check the diff and
   revert some of the changes.
 
-- `parse_sources.py` creates temporary meson.build files which you need
-  to copy paste from.
+- `parse_sources.py` updates the meson.build files trying to keep manually written parts
+  as specified by the `#### --- [END] GENERATED --- ####` specifiers
 
 Then bump versions and check what changed in `configure` since the last time,
 which is the other complicated bit, as it requires understanding of the

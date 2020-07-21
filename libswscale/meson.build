@@ -8,6 +8,9 @@ libswscale_headers = files(
   'swscale.h',
 )
 
+
+#### --- GENERATED --- ####
+
 libswscale_sources = files(
   'alphablend.c',
   'hscale.c',
@@ -43,6 +46,8 @@ libswscale_tests = [
 
 libswscale_optional_tests = {
 }
+
+#### --- END GENERATED --- ####
 
 # Version file
 ver_conf = configuration_data()
