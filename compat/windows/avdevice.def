@@ -1,6 +1,7 @@
 EXPORTS
-av_device_capabilities
-av_device_ffversion
+av_device_capabilities DATA
+av_device_ffversion DATA
+av_fopen_utf8
 av_input_audio_device_next
 av_input_video_device_next
 av_output_audio_device_next

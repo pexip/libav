@@ -57,6 +57,7 @@ av_buffer_get_opaque
 av_buffer_get_ref_count
 av_buffer_is_writable
 av_buffer_make_writable
+av_buffer_pool_buffer_get_opaque
 av_buffer_pool_get
 av_buffer_pool_init
 av_buffer_pool_init2
@@ -117,7 +118,10 @@ av_display_rotation_get
 av_display_rotation_set
 av_div_i
 av_div_q
+av_dovi_alloc
 av_downmix_info_update_side_data
+av_dynamic_hdr_plus_alloc
+av_dynamic_hdr_plus_create_side_data
 av_dynarray2_add
 av_dynarray_add
 av_dynarray_add_nofree
@@ -131,6 +135,8 @@ av_encryption_init_info_alloc
 av_encryption_init_info_free
 av_encryption_init_info_get_side_data
 av_escape
+av_expr_count_func
+av_expr_count_vars
 av_expr_eval
 av_expr_free
 av_expr_parse
@@ -205,6 +211,7 @@ av_frame_unref
 av_free
 av_freep
 av_gcd
+av_gcd_q
 av_get_alt_sample_fmt
 av_get_bits_per_pixel
 av_get_bytes_per_sample
@@ -258,6 +265,7 @@ av_hmac_update
 av_hwdevice_ctx_alloc
 av_hwdevice_ctx_create
 av_hwdevice_ctx_create_derived
+av_hwdevice_ctx_create_derived_opts
 av_hwdevice_ctx_init
 av_hwdevice_find_type_by_name
 av_hwdevice_get_hwframe_constraints
@@ -301,6 +309,7 @@ av_log_format_line
 av_log_format_line2
 av_log_get_flags
 av_log_get_level
+av_log_once
 av_log_set_callback
 av_log_set_flags
 av_log_set_level
@@ -441,6 +450,7 @@ av_spherical_alloc
 av_spherical_from_name
 av_spherical_projection_name
 av_spherical_tile_bounds
+av_sscanf
 av_stereo3d_alloc
 av_stereo3d_create_side_data
 av_stereo3d_from_name
@@ -495,11 +505,15 @@ av_twofish_alloc
 av_twofish_crypt
 av_twofish_init
 av_twofish_size DATA
+av_tx_init
+av_tx_uninit
 av_usleep
 av_utf8_decode
 av_util_ffversion DATA
 av_vbprintf
 av_version_info
+av_video_enc_params_alloc
+av_video_enc_params_create_side_data
 av_vlog
 av_write_image_line
 av_write_image_line2
@@ -509,7 +523,6 @@ av_xtea_init
 av_xtea_le_crypt
 av_xtea_le_init
 avpriv_alloc_fixed_dsp
-avpriv_cga_font DATA
 avpriv_cga_font DATA
 avpriv_dict_set_timestamp
 avpriv_float_dsp_alloc
@@ -525,9 +538,6 @@ avpriv_slicethread_execute
 avpriv_slicethread_free
 avpriv_solve_lls
 avpriv_vga16_font DATA
-avpriv_vga16_font DATA
 avutil_configuration
 avutil_license
 avutil_version
-ff_log2_tab DATA
-ff_reverse DATA

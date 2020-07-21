@@ -57,6 +57,7 @@ av_fft_calc
 av_fft_end
 av_fft_init
 av_fft_permute
+av_fopen_utf8
 av_free_packet
 av_get_audio_frame_duration
 av_get_audio_frame_duration2
@@ -227,6 +228,7 @@ avpriv_mjpeg_val_dc DATA
 avpriv_mpa_bitrate_tab DATA
 avpriv_mpa_freq_tab DATA
 avpriv_mpeg4audio_get_config
+avpriv_mpeg4audio_get_config2
 avpriv_mpeg4audio_sample_rates DATA
 avpriv_mpegaudio_decode_header
 avpriv_pix_fmt_bps_avi DATA
@@ -236,6 +238,3 @@ avpriv_split_xiph_headers
 avpriv_tak_parse_streaminfo
 avpriv_toupper4
 avsubtitle_free
-ff_interleaved_dirac_golomb_vlc_code DATA
-ff_interleaved_golomb_vlc_len DATA
-ff_interleaved_ue_golomb_vlc_code DATA
