@@ -77,6 +77,8 @@ python3 = import('python').find_installation()
 
 cc = meson.get_compiler('c')
 
+languages_map = {}
+
 if cc.get_id() == 'msvc'
   # Ignore several spurious warnings for things FFmpeg does very commonly
   # If a warning is completely useless and spammy, use '/wdXXXX' to suppress it
@@ -823,6 +825,7 @@ check_components = [
   ['bcrypt', ['windows.h', 'bcrypt.h'], ['BCryptGenRandom'], ['bcrypt']],
   ['bzlib', ['bzlib.h'], ['BZ2_bzlibVersion'], ['bz2']],
   ['camera2ndk', ['stdbool.h', 'stdint.h', 'camera/NdkCameraManager.h'], ['ACameraManager_create'], ['camera2ndk']],
+  ['decklink', ['DeckLinkAPI.h'], [], []],
   ['libcelt', ['celt/celt.h'], ['celt_decoder_create_custom'], ['celt0']],
   ['chromaprint', ['chromaprint.h'], ['chromaprint_get_version'], ['chromaprint']],
   ['clock_gettime', ['time.h'], ['clock_gettime'], []],
@@ -869,11 +872,13 @@ check_components = [
     {'defines': ['VPX_IMG_FMT_HIGHBITDEPTH'], 'extra_deps': ['libm_extra_deps', 'thread_dep']}],
   ['libwavpack', ['wavpack/wavpack.h'], ['WavpackOpenFileOutput'], ['wavpack']],
   ['libxvid', ['xvid.h'], ['xvid_global'], ['xvidcore']],
+  ['linux_fb_h', ['linux/fb.h'], [], []],
   ['lzma', ['lzma.h'], ['lzma_version_number'], ['lzma']],
   ['mediandk', ['stdint.h', 'media/NdkImage.h'], ['AImage_delete'], ['mediandk']],
   ['mmal', ['interface/mmal/mmal.h'], ['mmal_port_connect'], ['mmal_core', 'mmal_util', 'mmal_vc_client', 'bcm_host']],
   ['nanosleep', ['time.h'], ['nanosleep'], ['rt']],
   ['ole32', ['windows.h'], ['CoTaskMemFree'], ['ole32']],
+  ['omx', ['OMX_Core.h'], [], []],
   ['openal', ['AL/al.h'], ['alGetError'], ['openal']],
   ['openal', ['AL/al.h'], ['alGetError'], ['OpenAL32']],
   # FIXME- Get opencl working - remove the disabler() at that time.
@@ -1054,13 +1059,10 @@ foreach check : check_types
 endforeach
 
 check_headers = [
-  ['DeckLinkAPI.h'],
   ['direct.h'],
   ['dirent.h'],
   ['dxgidebug.h'],
-  ['linux/fb.h'],
   ['msa.h'],
-  ['OMX_Core.h'],
   ['net/udplite.h'],
   ['sys/param.h'],
   ['sys/resource.h'],
@@ -1481,6 +1483,7 @@ endif
 # options with language prefixes i.e. "cuda_sdk" in our case
 options_map = {
   'cuda_sdk' : 'ff_cuda_sdk',
+  'linux_fb_h' : 'linux_fbdev',
 }
 
 foreach check : all_checks
@@ -2049,6 +2052,12 @@ foreach built_lib : built_libs
   foreach comp_name, comp_sources : optional_sources
     if conf.get(comp_name, 0) == 1
       sources += comp_sources
+    endif
+
+    if languages_map.has_key(comp_name)
+      foreach lang: languages_map[comp_name]
+        add_languages(languages_map[comp_name], required: get_option(comp_name), native: false)
+      endforeach
     endif
   endforeach
 

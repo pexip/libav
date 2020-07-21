@@ -515,6 +515,12 @@ libavfilter_tests = [
 libavfilter_optional_tests = {
 }
 
+languages_map += {
+  'coreimage_filter': ['objc'],
+  'coreimagesrc_filter': ['objc'],
+  'libglslang': ['cpp'],
+}
+
 #### --- END GENERATED --- ####
 subdir('dnn')
 

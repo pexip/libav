@@ -34,6 +34,13 @@ def add_source(f, source, prefix='', suffix=''):
     f.write("%s'%s'%s" % (prefix, source, suffix))
 
 
+def add_language(languages_map, ext, label):
+    if ext == 'cpp':
+        languages_map[label].add('cpp')
+    elif ext == 'm':
+        languages_map[label].add('objc')
+
+
 def make_to_meson(path):
     source_maps = {
       'c': defaultdict(list),
@@ -49,6 +56,7 @@ def make_to_meson(path):
         accumulate = False
         optional = False
         source_type = None
+        languages_map = defaultdict(set)
 
         for l in f.readlines():
             l = l.strip()
@@ -110,9 +118,11 @@ def make_to_meson(path):
                     tmpf = fname + '.' + ext
                     if os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), tmpf)):
                         ifiles.append(tmpf)
+                        add_language(languages_map, ext, label)
                         break
                     if os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), os.path.basename(tmpf))):
                         ifiles.append(tmpf)
+                        add_language(languages_map, ext, label)
                         break
 
             if len([of for of in ofiles if not of.startswith("$")]) != len(ifiles):
@@ -203,6 +213,12 @@ def make_to_meson(path):
             f.write("    ['%s', files('tests/%s')],\n" % (testname, basename))
         f.write('  ],\n')
     f.write('}\n\n')
+
+    if languages_map:
+        f.write('language_map += {\n')
+        for label, languages in languages_map.items():
+            f.write("  '%s': %s,\n" % (label.lower(), list(languages)))
+        f.write('}\n')
 
     if has_not_generated:
         lines.append(f.getvalue())

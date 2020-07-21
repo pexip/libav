@@ -67,6 +67,11 @@ libavdevice_optional_tests = {
   ],
 }
 
+languages_map += {
+  'avfoundation_indev': ['objc'],
+  'decklink_outdev': ['cpp'],
+  'decklink_indev': ['cpp'],
+}
 #### --- END GENERATED --- ####
 
 # Version file
