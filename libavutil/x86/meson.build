@@ -27,3 +27,4 @@ libavutil_x86_mmx_optional_sources = {
 
 libavutil_x86_optional_tests = {
 }
+

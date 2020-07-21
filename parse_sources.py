@@ -233,6 +233,7 @@ paths = [
         'libswresample/x86',
         'libavfilter',
         'libavfilter/x86',
+        'libavfilter/dnn',
         'libavdevice',
         'libavresample',
         'libavresample/x86',

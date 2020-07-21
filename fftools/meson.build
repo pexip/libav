@@ -7,7 +7,6 @@ ffmpeg_sources = files([
 ])
 
 ffmpeg_optional_sources = {
-  'cuvid' : files('ffmpeg_cuvid.c'),
   'libmfx' : files('ffmpeg_qsv.c'),
   'vda' : files('ffmpeg_videotoolbox.c'),
   'videotoolbox' : files('ffmpeg_videotoolbox.c'),

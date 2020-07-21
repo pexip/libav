@@ -1,5 +1,5 @@
 libavutil_majorver = '56'
-minorver = '22'
+minorver = '51'
 microver = '100'
 
 libavutil_version = libavutil_majorver + '.' + minorver + '.' + microver
@@ -91,6 +91,7 @@ libavutil_sources = files(
   'aes_ctr.c',
   'audio_fifo.c',
   'avstring.c',
+  'avsscanf.c',
   'base64.c',
   'blowfish.c',
   'bprint.c',
@@ -104,6 +105,7 @@ libavutil_sources = files(
   'des.c',
   'dict.c',
   'display.c',
+  'dovi_meta.c',
   'downmix_info.c',
   'encryption_info.c',
   'error.c',
@@ -115,6 +117,7 @@ libavutil_sources = files(
   'fixed_dsp.c',
   'frame.c',
   'hash.c',
+  'hdr_dynamic_metadata.c',
   'hmac.c',
   'hwcontext.c',
   'imgutils.c',
@@ -153,6 +156,11 @@ libavutil_sources = files(
   'xga_font_data.c',
   'xtea.c',
   'tea.c',
+  'tx.c',
+  'tx_float.c',
+  'tx_double.c',
+  'tx_int32.c',
+  'video_enc_params.c',
 )
 
 libavutil_optional_sources = {
@@ -167,6 +175,7 @@ libavutil_optional_sources = {
   'vaapi' : files('hwcontext_vaapi.c'),
   'vdpau' : files('hwcontext_vdpau.c'),
   'videotoolbox' : files('hwcontext_videotoolbox.c'),
+  # MANUAL 'vulkan' : files('hwcontext_vulkan.c'),
 }
 
 libavutil_x86asm_optional_sources = {
@@ -221,13 +230,14 @@ libavutil_tests = [
   ['softfloat', files('tests/softfloat.c')],
   ['tree', files('tests/tree.c')],
   ['twofish', files('tests/twofish.c')],
-  # ['utf8', files('tests/utf8.c')],
+  # MANUAL ['utf8', files('tests/utf8.c')],
   ['xtea', files('tests/xtea.c')],
   ['tea', files('tests/tea.c')],
 ]
 
 libavutil_optional_tests = {
   'lzo1x_999_compress' : [
+    # MANUAL ['lzo', files('tests/lzo.c')],
     ['lzo', files('tests/lzo.c'), {'extra_libs': ['lzo2']}],
   ],
   'threads' : [

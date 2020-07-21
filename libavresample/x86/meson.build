@@ -22,3 +22,4 @@ libavresample_x86_mmx_optional_sources = {
 
 libavresample_x86_optional_tests = {
 }
+

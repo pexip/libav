@@ -13,3 +13,13 @@ libswresample_x86_x86asm_sources = files(
   'rematrix.asm',
   'resample.asm',
 )
+
+libswresample_x86_x86asm_optional_sources = {
+}
+
+libswresample_x86_mmx_optional_sources = {
+}
+
+libswresample_x86_optional_tests = {
+}
+

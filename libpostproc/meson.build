@@ -14,6 +14,17 @@ libpostproc_sources = files(
   'postprocess.c',
 )
 
+libpostproc_optional_sources = {
+}
+
+libpostproc_x86asm_optional_sources = {
+}
+
+libpostproc_mmx_optional_sources = {
+}
+
+libpostproc_optional_tests = {
+}
 
 #### --- END GENERATED --- ####
 

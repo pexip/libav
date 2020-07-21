@@ -1,5 +1,5 @@
 libswscale_majorver = '5'
-minorver = '3'
+minorver = '7'
 microver = '100'
 
 libswscale_version = libswscale_majorver + '.' + minorver + '.' + microver
@@ -41,7 +41,7 @@ libswscale_mmx_optional_sources = {
 libswscale_tests = [
   ['colorspace', files('tests/colorspace.c')],
   ['pixdesc_query', files('tests/pixdesc_query.c')],
-  # ['swscale', files('tests/swscale.c')],
+  # MANUAL ['swscale', files('tests/swscale.c')],
 ]
 
 libswscale_optional_tests = {

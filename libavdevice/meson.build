@@ -1,5 +1,5 @@
 libavdevice_majorver = '58'
-minorver = '5'
+minorver = '10'
 microver = '100'
 
 libavdevice_version = libavdevice_majorver + '.' + minorver + '.' + microver
@@ -38,8 +38,6 @@ libavdevice_optional_sources = {
   'lavfi_indev' : files('lavfi.c'),
   'libcdio_indev' : files('libcdio.c'),
   'libdc1394_indev' : files('libdc1394.c'),
-  'libndi_newtek_indev' : files('libndi_newtek_dec.c'),
-  'libndi_newtek_outdev' : files('libndi_newtek_enc.c'),
   'openal_indev' : files('openal-dec.c'),
   'opengl_outdev' : files('opengl_enc.c'),
   'oss_indev' : files('oss_dec.c','oss.c'),

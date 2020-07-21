@@ -38,6 +38,7 @@ libavcodec_x86_optional_sources = {
   'llviddsp' : files('lossless_videodsp_init.c'),
   'llvidencdsp' : files('lossless_videoencdsp_init.c'),
   'lpc' : files('lpc.c'),
+  'lscr_decoder' : files('pngdsp_init.c'),
   'mdct15' : files('mdct15_init.c'),
   'me_cmp' : files('me_cmp_init.c'),
   'mlp_decoder' : files('mlpdsp_init.c'),
@@ -45,8 +46,8 @@ libavcodec_x86_optional_sources = {
   'mpegaudiodsp' : files('mpegaudiodsp.c'),
   'mpegvideo' : files('mpegvideo.c','mpegvideodsp.c'),
   'mpegvideoenc' : files('mpegvideoenc.c','mpegvideoencdsp_init.c'),
-  'opus_decoder' : files('opus_dsp_init.c'),
-  'opus_encoder' : files('opus_dsp_init.c'),
+  'opus_decoder' : files('opusdsp_init.c'),
+  'opus_encoder' : files('celt_pvq_init.c'),
   'pixblockdsp' : files('pixblockdsp_init.c'),
   'png_decoder' : files('pngdsp_init.c'),
   'prores_decoder' : files('proresdsp_init.c'),
@@ -110,13 +111,15 @@ libavcodec_x86_x86asm_optional_sources = {
   'llauddsp' : files('lossless_audiodsp.asm'),
   'llviddsp' : files('lossless_videodsp.asm'),
   'llvidencdsp' : files('lossless_videoencdsp.asm'),
+  'lscr_decoder' : files('pngdsp.asm'),
   'mdct15' : files('mdct15.asm'),
   'me_cmp' : files('me_cmp.asm'),
   'mlp_decoder' : files('mlpdsp.asm'),
   'mpeg4_decoder' : files('xvididct.asm'),
   'mpegaudiodsp' : files('imdct36.asm'),
   'mpegvideoenc' : files('mpegvideoencdsp.asm'),
-  'opus_encoder' : files('opus_pvq_search.asm'),
+  'opus_decoder' : files('opusdsp.asm'),
+  'opus_encoder' : files('celt_pvq_search.asm'),
   'pixblockdsp' : files('pixblockdsp.asm'),
   'png_decoder' : files('pngdsp.asm'),
   'prores_decoder' : files('proresdsp.asm'),
@@ -153,3 +156,4 @@ libavcodec_x86_mmx_optional_sources = {
 
 libavcodec_x86_optional_tests = {
 }
+
