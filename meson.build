@@ -596,6 +596,7 @@ external_autodetect_library_list = [
 library_gpl_list = [
   'avisynth',
   'frei0r',
+  'libaribb24',
   'libcdio',
   'librubberband',
   'libvidstab',
@@ -607,7 +608,6 @@ library_gpl_list = [
 
 library_nonfree_list = [
   'decklink',
-  'libndi_newtek',
   'libfdk_aac',
   'openssl',
   'libtls',
@@ -732,10 +732,11 @@ conf.set10('pic', conf.get('pic', cc.links(cpp_cond.format('stdlib.h', 'defined(
 check_pkg_config = [
   ['alsa', ['alsa/asoundlib.h'], ['snd_pcm_htimestamp'], {}],
   ['ffnvcodec', ['ffnvcodec/nvEncodeAPI.h', 'ffnvcodec/dynlink_cuda.h', 'ffnvcodec/dynlink_cuviddec.h', 'ffnvcodec/dynlink_nvcuvid.h'],
-    [], {'version': '>= 8.0.14.1'}],
+    [], {'versions': ['>= 9.1.23.1', ['>= 9.0.18.3', '< 9.1'], ['>= 8.2.15.10', '< 8.3'], ['>= 8.1.24.11', '< 8.2']]}],
   ['libgme', ['gme/gme.h'], ['gme_new_emu'], {}],
   ['gnutls', ['gnutls/gnutls.h'], ['gnutls_global_init'], {}],
   ['libaom', ['aom/aom_codec.h'], ['aom_codec_version'], {'pkg': 'aom', 'version': '>= 0.1.0'}],
+  ['libaribb24', ['aribb24/aribb24.h'], ['arib_instance_new'], {'pkg': 'aribb24', 'version': '> 1.0.3'}],
   ['lv2', ['lilv-0/lilv/lilv.h'], ['lilv_world_new'], {'pkg': 'lilv-0'}],
   ['libass', ['ass/ass.h'], ['ass_library_init'], {}],
   ['libbluray', ['libbluray/bluray.h'], ['bd_open'], {}],
@@ -756,6 +757,7 @@ check_pkg_config = [
   ['libopencv', ['opencv2/core/core_c.h'], ['cvCreateImageHeader'], {'pkg': 'opencv'}],
   ['libopencv', ['opencv/cxcore.h'], ['cvCreateImageHeader'], {'pkg': 'opencv'}],
   ['libopenh264', ['wels/codec_api.h'], ['WelsGetCodecVersion'], {'pkg': 'openh264'}],
+  ['libdav1d', ['dav1d/dav1d.h'], ['dav1d_version'], {'pkg': 'dav1d', 'version': '>= 0.4.0'}],
   ['libopenjpeg', ['openjpeg.h'], ['opj_version'], {'pkg': 'libopenjp2',
                                                     'version': '>= 2.1.0'}],
   ['libopenjpeg', ['openjpeg.h'], ['opj_version'], {'pkg': 'libopenjp2',
@@ -764,6 +766,8 @@ check_pkg_config = [
   ['libopenmpt', ['libopenmpt/libopenmpt.h'], ['openmpt_module_create'], {'version': '>= 0.2.6557'}],
   ['libopus', ['opus_multistream.h'], ['opus_multistream_decoder_create', 'opus_multistream_surround_encoder_create'], {'pkg': 'opus'}],
   ['libpulse', ['pulse/pulseaudio.h'], ['pa_context_new'], {}],
+  ['librabbitmq', ['amqp.h'], ['amqp_new_connection'], {'pkg': 'librabbitmq', 'version': '>= 0.7.1'}],
+  ['librav1e', ['rav1e.h'], ['rav1e_context_new'], {'pkg': 'rav1e', 'version': '>= 0.1.0'}],
   ['librsvg', ['librsvg-2.0/librsvg/rsvg.h'], ['rsvg_handle_render_cairo'], {'pkg': 'librsvg-2.0'}],
   ['librtmp', ['librtmp/rtmp.h'], ['RTMP_Socket'], {}],
   ['librubberband', ['rubberband/rubberband-c.h'], ['rubberband_new'], {'pkg': 'rubberband', 'version': '>= 1.8.1'}],
@@ -796,6 +800,7 @@ check_pkg_config = [
   ['libzmq', ['zmq.h'], ['zmq_ctx_new'], {}],
   ['libzvbi', ['libzvbi.h'], ['vbi_decoder_new'], {'pkg': 'zvbi-0.2'}],
   ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl', 'SSL_library_init'], {'has_any_func': true}],
+  ['pocketsphinx', ['pocketsphinx/pocketsphinx.h'], ['ps_init'], {}],
   ['rkmpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'pkg': 'rockchip_mpp'}],
   ['rockchip_mpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'version': '>= 1.3.7'}],
   ['sdl2', ['SDL_events.h'], ['SDL_PollEvent'], {'version': ['>= 2.0.1', '< 2.1.0']}],
@@ -810,8 +815,9 @@ conf.set10('vdpau', cc.has_header('vdpau/vdpau.h') and
 
 conf.set10('nanosleep', cc.has_function('nanosleep'), prefix: '#include <time.h>')
 
-check_libs = [
+check_components = [
   ['advapi32', ['windows.h'], ['RegCloseKey'], ['advapi32']],
+  ['avsynth', ['avisynth/avisynth_c.h'], [], []],
   ['alsa', ['alsa/asoundlib.h'], ['snd_pcm_htimestamp'], ['asound']],
   ['android', ['android/native_window.h'], ['ANativeWindow_acquire'], ['android']],
   ['bcrypt', ['windows.h', 'bcrypt.h'], ['BCryptGenRandom'], ['bcrypt']],
@@ -823,9 +829,11 @@ check_libs = [
   ['clock_gettime', ['time.h'], ['clock_gettime'], ['rt']],
   ['cuda_sdk', ['cuda.h'], ['cuCtxCreate'], ['cuda']],
   ['crystalhd', ['stdint.h', 'libcrystalhd/libcrystalhd_if.h'], ['DtsCrystalHDVersion'], ['crystalhd']],
+  ['frei0r', ['frei0r.h', 'dlfcn.h'], [], []],
   ['libgme', ['gme/gme.h'], ['gme_new_emu'], ['gme', 'stdc++']],
   ['gcrypt', ['gcrypt.h'], ['gcry_mpi_new'], ['gcrypt']],
   ['gmp', ['gmp.h'], ['mpz_export'], ['gmp']],
+  ['ladspa', ['ladspa.h', 'dlfcn.h'], [], []],
   ['libcdio', ['cdio/cdda.h', 'cdio/paranoia.h'], ['cdio_cddap_open'], ['cdio_paranoia', 'cdio_cdda', 'cdio']],
   ['libcdio', ['cdio/paranoia/cdda.h', 'cdio/paranoia/paranoia.h'], ['cdio_cddap_open'], ['cdio_paranoia', 'cdio_cdda', 'cdio']],
   ['libcodec2', ['codec2/codec2.h'], ['codec2_create'], ['codec2']],
@@ -902,8 +910,8 @@ check_libs = [
     {'preconditions': ['libm'], 'extra_deps': ['libm_extra_deps']}],
 ]
 
-foreach check : check_libs
-  all_checks += [['lib', check]]
+foreach check : check_components
+  all_checks += [['component', check]]
 endforeach
 
 check_header_funcs = [
@@ -1050,13 +1058,10 @@ check_headers = [
   ['direct.h'],
   ['dirent.h'],
   ['dxgidebug.h'],
-  ['frei0r.h'],
-  ['ladspa.h'],
   ['linux/fb.h'],
   ['msa.h'],
   ['OMX_Core.h'],
   ['net/udplite.h'],
-  ['Processing.NDI.Lib.h'],
   ['sys/param.h'],
   ['sys/resource.h'],
   ['sys/select.h'],
@@ -1085,7 +1090,6 @@ external_library_list = library_gpl_list + library_nonfree_list + library_versio
   'gcrypt',
   'gnutls',
   'jni',
-  'ladspa',
   'libaom',
   'libass',
   'libbluray',
@@ -1504,7 +1508,7 @@ foreach check : all_checks
     if check.length() > 3
       opts = check[3]
     endif
-  elif check_type == 'lib'
+  elif check_type == 'component'
     link_withs = check[3]
     if check.length() > 4
       opts = check[4]
@@ -1532,7 +1536,7 @@ foreach check : all_checks
   if check_type == 'header-func' or check_type == 'func'
     funcs = opts.get('funcs', [name])
     link_withs = opts.get('link_with', [])
-  elif check_type == 'pkg-config' or check_type == 'lib'
+  elif check_type == 'pkg-config' or check_type == 'component'
     funcs = check[2]
   endif
 
@@ -1584,7 +1588,7 @@ foreach check : all_checks
     if found
       if check_type != 'pkg-config'
         foreach link_with : link_withs
-          if check_type == 'lib' and not ('always-check' in opts)
+          if check_type == 'component' and not ('always-check' in opts)
             req = get_option(opt_name)
           else
             req = false
@@ -1596,7 +1600,15 @@ foreach check : all_checks
       else
         req = get_option(opt_name)
         pkg_name = opts.get('pkg', name)
-        if opts.has_key('version')
+        if opts.has_key('versions')
+          foreach version: opts['versions']
+            dep = dependency(pkg_name, required: false, version: version)
+          endforeach
+
+          if not dep.found() and req.enabled()
+            error('@0@ @1@ could not be found'.format(pkg_name, opts['versions']))
+          endif
+        elif opts.has_key('version')
           dep = dependency(pkg_name, required : req, version: opts.get('version'))
         else
           dep = dependency(pkg_name, required : req)
