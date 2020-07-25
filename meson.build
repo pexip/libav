@@ -19,12 +19,12 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.50.0',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99'],
-  version: '4.1.6',
+  version: '4.3.1',
 )
 
 # HOWTO:
 #
-# Get meson 0.47 from pip or your distro's package manager then:
+# Get meson >= 0.50 from pip or your distro's package manager then:
 #
 # meson build && ninja -C build
 #
