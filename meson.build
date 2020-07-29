@@ -18,7 +18,7 @@
 project('FFmpeg', 'c',
   meson_version: '>= 0.50.0',
   license: 'LGPL2.1+',
-  default_options: [ 'buildtype=debugoptimized', 'c_std=c99'],
+  default_options: [ 'buildtype=debugoptimized'],
   version: '4.3.1',
 )
 
@@ -115,6 +115,7 @@ project_c_args = [
   '-Wno-bool-operation',
   '-Wno-incompatible-pointer-types',
   '-Wno-address',
+  '-std=c99',
 ]
 
 project_c_args = cc.get_supported_arguments(project_c_args)
