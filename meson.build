@@ -2185,7 +2185,7 @@ foreach built_lib : built_libs
         c_args: c_args,
         dependencies: test_deps,
         include_directories: common_incs,
-        link_with: [link_with, static_lib],
+        link_with: [static_lib] + link_with,
         implicit_include_directories : false)
 
       test('@0@_@1@'.format(built_lib[0], test_name), exe,
