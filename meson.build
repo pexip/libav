@@ -1388,7 +1388,7 @@ config_list = (
 
 check_compiles = [
   ['v4l2_m2m', ['linux/videodev2.h'], 'int i = V4L2_CAP_VIDEO_M2M_MPLANE | V4L2_CAP_VIDEO_M2M | V4L2_BUF_FLAG_LAST;'],
-  ['pragma_deprecated', [], '_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")'],
+  ['pragma_deprecated', [], 'int main(void) {_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\""); return 0; }'],
   ['const_nan', ['math.h'], 'struct { double d; } static const bar[] = { { NAN } };'],
   ['intrinsics_neon', ['arm_neon.h'], 'int16x8_t test = vdupq_n_s16(0);'],
 ]
