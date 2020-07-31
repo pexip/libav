@@ -21,8 +21,6 @@
 
 %include "libavutil/x86/x86util.asm"
 
-%if HAVE_AVX2_EXTERNAL
-
 SECTION_RODATA
 
 pb_mask: db 0,4,8,12,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
@@ -252,5 +250,4 @@ cglobal remap4_8bit_line, 7, 9, 11, dst, width, src, in_linesize, u, v, ker, x, 
         jl .loop
     RET
 
-%endif
 %endif
