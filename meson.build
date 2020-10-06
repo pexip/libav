@@ -1726,7 +1726,11 @@ x86asm_type = 'none'
 x86asm_checks = []
 
 if conf.get('x86') == 1
-  x86asm = find_program('nasm', required : false)
+  nasm_version = '>=0'
+  if host_machine.system() == 'windows'
+    nasm_version = '>=2.12'
+  endif
+  x86asm = find_program('nasm', version: nasm_version, required : false)
   x86asm_type = 'nasm'
   if not x86asm.found()
     x86asm = find_program('yasm', required : false)
