@@ -83,7 +83,8 @@ if cc.get_id() == 'msvc'
   # Ignore several spurious warnings for things FFmpeg does very commonly
   # If a warning is completely useless and spammy, use '/wdXXXX' to suppress it
   # If a warning is harmless but hard to fix, use '/woXXXX' so it's shown once
-  # NOTE: Only add warnings here if you are sure they're spurious
+  # NOTE: Only add warnings here if you are sure they're spurious or they're
+  # for a pattern that ffmpeg does not care about
   add_project_arguments(
       '/wo4005', # macro redefinition (this likely need to be fixed)
       '/wd4018', # implicit signed/unsigned conversion
@@ -91,9 +92,10 @@ if cc.get_id() == 'msvc'
       '/wd4244', # lossy type conversion (e.g. double -> int)
       '/wd4305', # truncating type conversion (e.g. double -> float)
       '/wd4554', # operator precedence
-      '/wo4114', # same type qualifier used more than once
-      '/wo4028', # formal parameter {n} different from declaration
-      '/wo4090', # 'function': different 'const' qualifiers
+      '/wd4114', # same type qualifier used more than once
+      '/wd4028', # formal parameter {n} different from declaration
+      '/wd4090', # 'function': different 'const' qualifiers
+      '/wd4133', # 'type' : incompatible types - from 'type1' to 'type2'
       cc.get_supported_arguments(['/utf-8']), # set the input encoding to utf-8
       language : 'c')
 endif
