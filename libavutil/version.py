@@ -84,7 +84,11 @@ if __name__=='__main__':
     old_revision = None
     if os.path.exists(args.output):
         with open(args.output, 'r') as f:
-            old_revision = f.readlines()[3].strip().split('"')[1]
+            for line in f:
+                parts = line.split()
+                if len(parts) >= 3 and parts[0] == '#define' and parts[1] == 'FFMPEG_VERSION':
+                    old_revision = parts[2].split('"')[1]
+                    break
 
     if revision != old_revision:
         with open(args.output, 'w') as f:
