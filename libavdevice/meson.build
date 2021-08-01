@@ -23,6 +23,7 @@ libavdevice_optional_sources = {
   'alsa_indev' : files('alsa_dec.c','alsa.c','timefilter.c'),
   'alsa_outdev' : files('alsa_enc.c','alsa.c'),
   'android_camera_indev' : files('android_camera.c'),
+  'audiotoolbox_outdev' : files('audiotoolbox.m'),
   'avfoundation_indev' : files('avfoundation.m'),
   'bktr_indev' : files('bktr.c'),
   'caca_outdev' : files('caca.c'),
@@ -68,6 +69,7 @@ libavdevice_optional_tests = {
 }
 
 languages_map += {
+  'audiotoolbox_outdev': ['objc'],
   'avfoundation_indev': ['objc'],
   'decklink_outdev': ['cpp'],
   'decklink_indev': ['cpp'],

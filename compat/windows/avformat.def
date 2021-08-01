@@ -6,7 +6,6 @@ av_codec_get_id
 av_codec_get_tag
 av_codec_get_tag2
 av_demuxer_iterate
-av_demuxer_open
 av_dump_format
 av_filename_number_test
 av_find_best_stream

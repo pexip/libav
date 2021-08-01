@@ -19,7 +19,7 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.54',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized'],
-  version: '4.3.1',
+  version: '4.4.0',
 )
 
 # HOWTO:
@@ -2269,7 +2269,7 @@ endforeach
 final_conf = configuration_data()
 
 final_conf.set_quoted('FFMPEG_CONFIGURATION', '') # FIXME
-final_conf.set('CONFIG_THIS_YEAR', 2020)
+final_conf.set('CONFIG_THIS_YEAR', 2021)
 final_conf.set_quoted('FFMPEG_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('AVCONV_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('CC_IDENT', cc.get_id())

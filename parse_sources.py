@@ -215,7 +215,7 @@ def make_to_meson(path):
     f.write('}\n\n')
 
     if languages_map:
-        f.write('language_map += {\n')
+        f.write('languages_map += {\n')
         for label, languages in languages_map.items():
             f.write("  '%s': %s,\n" % (label.lower(), list(languages)))
         f.write('}\n')

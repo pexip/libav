@@ -1,5 +1,6 @@
 # pkg-config options
 option('alsa', type: 'feature', value: 'auto')
+option('audiotoolbox_outdev', type: 'feature', value: 'auto')
 option('avisynth', type: 'feature', value: 'auto')
 option('avfoundation_indev', type: 'feature', value: 'auto')
 option('coreimage_filter', type: 'feature', value: 'auto')

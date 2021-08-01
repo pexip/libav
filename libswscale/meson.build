@@ -40,6 +40,7 @@ libswscale_mmx_optional_sources = {
 
 libswscale_tests = [
   ['colorspace', files('tests/colorspace.c')],
+  ['floatimg_cmp', files('tests/floatimg_cmp.c')],
   ['pixdesc_query', files('tests/pixdesc_query.c')],
   # MANUAL ['swscale', files('tests/swscale.c')],
 ]

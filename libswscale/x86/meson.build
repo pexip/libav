@@ -14,6 +14,7 @@ libswscale_x86_x86asm_sources = files(
   'scale.asm',
   'rgb_2_rgb.asm',
   'yuv_2_rgb.asm',
+  'yuv2yuvX.asm',
 )
 
 libswscale_x86_x86asm_optional_sources = {
