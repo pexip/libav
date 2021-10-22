@@ -2152,11 +2152,11 @@ foreach built_lib : built_libs
   )
 
   lib = library(built_lib[0],
-    objects: static_lib.extract_all_objects(),
     dependencies: deps,
     soversion: version,
     include_directories: common_incs,
     link_with: link_with,
+    link_whole: static_lib,
     link_args: link_args,
     c_args: c_args,
     vs_module_defs: 'compat/windows/@0@.def'.format(built_lib[0]),
