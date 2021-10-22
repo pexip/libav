@@ -2144,7 +2144,6 @@ foreach built_lib : built_libs
   link_args = cc.get_supported_link_arguments([vflag])
 
   static_lib = static_library('@0@-static'.format(built_lib[0]), sources + gen_objects,
-    install: true,
     dependencies: deps,
     include_directories: common_incs,
     link_with: link_with,
