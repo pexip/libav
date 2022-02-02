@@ -818,7 +818,7 @@ endforeach
 conf.set10('vdpau', cc.has_header('vdpau/vdpau.h') and
   cc.get_define('VDP_DECODER_PROFILE_MPEG4_PART2_ASP', prefix: '#include <vdpau/vdpau.h>') != '')
 
-conf.set10('nanosleep', cc.has_function('nanosleep'), prefix: '#include <time.h>')
+conf.set10('nanosleep', cc.has_function('nanosleep', prefix: '#include <time.h>'))
 
 check_components = [
   ['advapi32', ['windows.h'], ['RegCloseKey'], ['advapi32']],
