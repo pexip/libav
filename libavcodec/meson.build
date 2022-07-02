@@ -121,6 +121,7 @@ libavcodec_optional_sources = {
   'adpcm_ima_alp_decoder' : files('adpcm.c','adpcm_data.c'),
   'adpcm_ima_alp_encoder' : files('adpcmenc.c','adpcm_data.c'),
   'adpcm_ima_amv_decoder' : files('adpcm.c','adpcm_data.c'),
+  'adpcm_ima_amv_encoder' : files('adpcmenc.c','adpcm_data.c'),
   'adpcm_ima_apc_decoder' : files('adpcm.c','adpcm_data.c'),
   'adpcm_ima_apm_decoder' : files('adpcm.c','adpcm_data.c'),
   'adpcm_ima_apm_encoder' : files('adpcmenc.c','adpcm_data.c'),
