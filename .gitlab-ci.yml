@@ -152,24 +152,6 @@ vs2017 x86:
   variables:
     ARCH: 'x86'
 
-msys2:
-  extends: '.build windows'
-  when: 'manual'
-  allow_failure: true
-  script:
-    # For some reason, options are separated by newline instead of space, so we
-    # have to replace them first.
-    # - $env:MESON_ARGS = $env:MESON_ARGS.replace("`n"," ")
-
-    - $env:PATH += ";C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\msys64\mingw32\bin"
-    # XXX: Copied from https://gitlab.freedesktop.org/gstreamer/gst-ci/blob/master/gitlab/ci_template.yml#L487
-    # For some reason docker build hangs if this is included in the image, needs more troubleshooting
-    - C:\msys64\usr\bin\bash -c "pacman-key --init && pacman-key --populate msys2 && pacman-key --refresh-keys || true"
-    - C:\msys64\usr\bin\bash -c "pacman -Syuu --noconfirm"
-    - C:\msys64\usr\bin\bash -c "pacman -Sy --noconfirm --needed mingw-w64-x86_64-toolchain ninja"
-    - C:\msys64\usr\bin\bash -c "meson build $env:MESON_ARGS &&
-        ninja -C build"
-
 macOS:
   stage: 'build'
   tags:
