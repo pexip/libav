@@ -112,12 +112,12 @@ with deps@i386:
     - apt-get install --yes ${DEPENDENCIES}
 
 .build windows:
-  image: 'registry.freedesktop.org/gstreamer/gst-ci/amd64/windows:v10'
+  image: 'registry.freedesktop.org/gstreamer/gstreamer/amd64/windows:2022-07-31.0-main'
   stage: 'build'
   tags:
     - 'docker'
     - 'windows'
-    - '1809'
+    - '2022'
   variables:
     # Make sure any failure in PowerShell scripts is fatal
     ErrorActionPreference: 'Stop'
@@ -141,12 +141,12 @@ with deps@i386:
         meson build $env:MESON_ARGS &&
         ninja -C build"
 
-vs2017:
+vs2019:
   extends: '.build windows'
   variables:
     ARCH: 'amd64'
 
-vs2017 x86:
+vs2019 x86:
   extends: '.build windows'
   stage: 'build'
   variables:
