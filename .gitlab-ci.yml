@@ -1,17 +1,50 @@
+include:
+  - remote: "https://gitlab.freedesktop.org/freedesktop/ci-templates/-/raw/e9a461877f8c7f9fed9fff5491067ec3c3472559/templates/debian.yml"
+
 # Is it worth making an image with ffmpeg git repo and packages installed?
 stages:
- - 'build'
+  - 'image-build'
+  - 'build'
 
-.build:
-  image: 'debian:sid'
-  stage: 'build'
+.container.debian@common:
   variables:
-    DEPENDENCIES: >
+    FDO_DISTRIBUTION_VERSION: "sid-slim"
+    FDO_UPSTREAM_REPO: "gstreamer/meson-ports/ffmpeg"
+    FDO_DISTRIBUTION_PACKAGES: >-
       meson
       python3-setuptools
       ninja-build
       build-essential
       git
+
+.container.debian@common.minimum:
+  extends: '.container.debian@common'
+  variables:
+    FDO_DISTRIBUTION_TAG: "2022-08-08.1-meson-4.4-minimum"
+
+.container.debian@common.full:
+  extends: '.container.debian@common'
+  variables:
+    FDO_DISTRIBUTION_TAG: "2022-08-08.1-meson-4.4-full"
+    FDO_DISTRIBUTION_EXEC: >-
+      echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
+      apt-get update
+      apt-get build-dep --yes ffmpeg
+
+debian-container-build@x86_64@minimum:
+  extends:
+    - '.fdo.container-build@debian@x86_64'
+    - '.container.debian@common.minimum'
+  stage: 'image-build'
+
+debian-container-build@x86_64@full:
+  extends:
+    - '.fdo.container-build@debian@x86_64'
+    - '.container.debian@common.full'
+  stage: 'image-build'
+
+.build:
+  stage: 'build'
   script:
     - meson ${MESON_OPTIONS} build/
     - ninja -C build/
@@ -22,42 +55,27 @@ stages:
       - build/meson-logs/
 
 .build nodeps:
-  extends: '.build'
-  image: 'debian:sid'
-  stage: 'build'
+  extends:
+    - '.build'
+    - '.container.debian@common.minimum'
+    - '.fdo.distribution-image@debian'
   variables:
     MESON_OPTIONS: '--auto-features=disabled'
-  before_script:
-    - apt-get update
-    - apt-get install --yes ${DEPENDENCIES}
 
 .build withdeps:
-  extends: '.build'
-  stage: 'build'
-  before_script:
-    - echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
-    - apt-get update
-    - apt-get build-dep --yes ffmpeg
-    - apt-get install --yes ${DEPENDENCIES}
+  extends:
+    - '.build'
+    - '.container.debian@common.full'
+    - '.fdo.distribution-image@debian'
 
 .build withdepsnoyasm:
-  extends: '.build'
-  stage: 'build'
+  extends: '.build withdeps'
   before_script:
-    - echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
-    - apt-get update
-    - apt-get build-dep --yes ffmpeg
-    - apt-get install --yes ${DEPENDENCIES}
     - apt-get remove --yes nasm
     - apt-get install --yes yasm
 
 no external deps:
   extends: '.build nodeps'
-
-no external x86:
-  extends: '.build nodeps'
-  image: 'i386/debian:sid'
-  stage: 'build'
 
 with deps:
   extends: '.build withdeps'
@@ -65,10 +83,33 @@ with deps:
 with deps yasm:
   extends: '.build withdepsnoyasm'
 
-with deps x86:
-  extends: '.build withdeps'
+.build@i386.common:
   image: 'i386/debian:sid'
-  stage: 'build'
+  variables:
+    DEPENDENCIES: >-
+      meson
+      python3-setuptools
+      ninja-build
+      build-essential
+      git
+
+no external@i386:
+  extends:
+    - '.build nodeps'
+    - '.build@i386.common'
+  before_script:
+    - apt-get update
+    - apt-get install --yes ${DEPENDENCIES}
+
+with deps@i386:
+  extends:
+    - '.build withdeps'
+    - '.build@i386.common'
+  before_script:
+    - echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
+    - apt-get update
+    - apt-get build-dep --yes ffmpeg
+    - apt-get install --yes ${DEPENDENCIES}
 
 .build windows:
   image: 'registry.freedesktop.org/gstreamer/gst-ci/amd64/windows:v10'
