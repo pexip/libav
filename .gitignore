@@ -23,6 +23,8 @@
 *_g
 \#*
 .\#*
+/.cache
+/__pycache__
 /.config
 /.version
 /ffmpeg
