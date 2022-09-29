@@ -2061,6 +2061,8 @@ built_libs = [
   ['avdevice', ['libavutil', 'libavformat', 'libavfilter', 'libavcodec']],
 ]
 
+windows = import('windows')
+
 foreach built_lib : built_libs
   sources = get_variable('lib@0@_sources'.format(built_lib[0])) + [ffversion_h]
   x86asm_sources = []
@@ -2069,6 +2071,14 @@ foreach built_lib : built_libs
   optional_deps = get_variable('lib@0@_optional_deps'.format(built_lib[0]), [])
 
   sources += get_variable('lib@0@_@1@_sources'.format(built_lib[0], arch), [])
+
+  if host_machine.system() == 'windows'
+    sources += windows.compile_resources(
+      'lib@0@/@1@res.rc'.format(built_lib[0], built_lib[0]),
+      include_directories: common_incs,
+      depends: ffversion_h
+    )
+  endif
 
   foreach arch_ext : arch_ext_list
     if conf.get(arch_ext, 0) == 1
