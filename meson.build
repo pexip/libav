@@ -18,7 +18,7 @@
 project('FFmpeg', 'c',
   meson_version: '>= 0.54',
   license: 'LGPL2.1+',
-  default_options: [ 'buildtype=debugoptimized'],
+  default_options: [ 'buildtype=debugoptimized', 'c_std=c99', 'cpp_std=c++11'],
   version: '4.4.3',
 )
 
@@ -71,6 +71,12 @@ project('FFmpeg', 'c',
 #   bits of logic
 # * Exposing options, for now everything is automatically enabled
 
+# Work around meson subprojects ignoring default_options
+# https://github.com/mesonbuild/meson/issues/1889#issuecomment-1275991958
+if meson.is_subproject() and not meson.project_version().compare_version('>=0.63')
+  project_c_args += ['-std=c99']
+endif
+
 common_incs = [include_directories('.')]
 
 python3 = import('python').find_installation()
@@ -117,7 +123,6 @@ project_c_args = [
   '-Wno-bool-operation',
   '-Wno-incompatible-pointer-types',
   '-Wno-address',
-  '-std=c99',
 ]
 
 project_c_args = cc.get_supported_arguments(project_c_args)
