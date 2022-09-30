@@ -26,7 +26,8 @@ if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Find filter registrations in allfilters.c')
 
     arg_parser.add_argument('--full', action='store_true')
-
+    arg_parser.add_argument('--meson-options', action='store_true',
+                            help='format list into Meson options')
     arg_parser.add_argument('files', metavar='FILE', nargs='*',
                             type=argparse.FileType('r'),
                             help='File with lists of declarations, ' +
@@ -43,7 +44,10 @@ if __name__ == '__main__':
             else:
                 matches = re.match(r'^[^#]*extern AVFilter\s*ff_(.*_.*);', line.strip())
             if (matches):
-                if not args.full:
+                if args.meson_options:
+                    print('option(\'%s_filter\', type: \'feature\', value: \'auto\')' %
+                          matches.group(1).strip())
+                elif not args.full:
                     print ('%s_filter' % matches.group(1).strip())
                 else:
                     print (matches.group(1).strip())

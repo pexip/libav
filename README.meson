@@ -45,6 +45,13 @@ tedious part).
 - `parse_sources.py` updates the meson.build files trying to keep manually written parts
   as specified by the `#### --- [END] GENERATED --- ####` specifiers
 
+- `find_things_extern.py` generates the component configuration entries
+  - add the flag `--meson-options` to generate the `options()` that
+    need to go into each section in `meson_options.txt`
+  - basically, run `find_things_extern.py` on each of the entries defined in
+    `extern_things`, then copy and paste the output in each section
+  - options are defined between "Library options" and "Licensing options"
+
 Then bump versions and check what changed in `configure` since the last time,
 which is the other complicated bit, as it requires understanding of the
 somewhat complex ffmpeg build system and of the way it was reimplemented

@@ -35,6 +35,8 @@ if __name__ == '__main__':
     arg_parser.add_argument('--thing-suffix', metavar='STRING',
                             default='',
                             help='suffix to add to the thing name')
+    arg_parser.add_argument('--meson-options', action='store_true',
+                            help='format list into Meson options')
     arg_parser.add_argument('files', metavar='FILE', nargs='*',
                             type=argparse.FileType('r'),
                             help='File with lists of declarations, ' +
@@ -51,4 +53,8 @@ if __name__ == '__main__':
                 things += [matches.group(1).strip()]
 
     for thing in things:
-        print('%s_%s' % (thing, args.thing_suffix))
+        option = '%s_%s' % (thing, args.thing_suffix)
+        if args.meson_options:
+            print('option(\'%s\', type: \'feature\', value: \'auto\')' % option)
+        else:
+            print(option)

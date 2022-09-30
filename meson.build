@@ -1867,7 +1867,7 @@ foreach extern_thing : extern_things
   list = result.stdout().strip().split('\n')
 
   foreach elem : list
-    conf.set(elem, 1)
+    conf.set(elem, get_option(elem).enabled().to_int())
   endforeach
 
   set_variable(variable_name, list)
@@ -1880,7 +1880,7 @@ assert(result.returncode() == 0, 'Could not extract filter list!')
 filter_list = result.stdout().strip().split('\n')
 
 foreach filter : filter_list
-  conf.set(filter, 1)
+  conf.set(filter, get_option(filter).enabled().to_int())
 endforeach
 
 foreach program : program_list
@@ -2100,7 +2100,7 @@ foreach built_lib : built_libs
 
     if languages_map.has_key(comp_name)
       foreach lang: languages_map[comp_name]
-        add_languages(languages_map[comp_name], required: get_option(comp_name), native: false)
+        add_languages(languages_map[comp_name], required: get_option(comp_name).enabled(), native: false)
       endforeach
     endif
   endforeach
