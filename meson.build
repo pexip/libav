@@ -2247,7 +2247,7 @@ if not get_option('cli').disabled()
 endif
 
 foreach built_exe : built_exe_list
-  sources = get_variable('@0@_sources'.format(built_exe))
+  sources = get_variable('@0@_sources'.format(built_exe)) + [ffversion_h]
   optional_deps = []
 
   message('Checking @0@ dependencies'.format(built_exe))
