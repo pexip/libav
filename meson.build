@@ -2063,6 +2063,20 @@ built_libs = [
 
 windows = import('windows')
 
+makedef = find_program('compat/windows/makedef.py')
+
+makedef_args = [makedef]
+
+if cc.get_id() != 'msvc'
+  nm = find_program('nm', required: true)
+  makedef_args += ['--nm', nm]
+else
+  dumpbin = find_program('dumpbin', required: true)
+  makedef_args += ['--dumpbin', dumpbin]
+endif
+
+makedef_args += ['--prefix', extern_prefix]
+
 foreach built_lib : built_libs
   sources = get_variable('lib@0@_sources'.format(built_lib[0])) + [ffversion_h]
   x86asm_sources = []
@@ -2188,6 +2202,12 @@ foreach built_lib : built_libs
     implicit_include_directories : false,
   )
 
+  vs_module_def = custom_target('@0@-def'.format(built_lib[0]),
+    output: '@0@.def'.format(built_lib[0]),
+    command: [makedef_args, '@0@/lib@1@/lib@1@.ver'.format(meson.current_build_dir(), built_lib[0]), static_lib],
+    capture: true
+  )
+
   lib = library(built_lib[0],
     dependencies: deps,
     soversion: version,
@@ -2196,7 +2216,7 @@ foreach built_lib : built_libs
     link_whole: static_lib,
     link_args: link_args,
     c_args: c_args,
-    vs_module_defs: 'compat/windows/@0@.def'.format(built_lib[0]),
+    vs_module_defs: vs_module_def,
     implicit_include_directories : false,
     install: true,
   )
