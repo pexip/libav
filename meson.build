@@ -16,7 +16,7 @@
 # License along with this library; if not, see <http://www.gnu.org/licenses/>.
 
 project('FFmpeg', 'c',
-  meson_version: '>= 0.54',
+  meson_version: '>= 0.59',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99', 'cpp_std=c++11'],
   version: '4.4.3',
@@ -24,7 +24,7 @@ project('FFmpeg', 'c',
 
 # HOWTO:
 #
-# Get meson >= 0.50 from pip or your distro's package manager then:
+# Get meson >= 0.59 from pip or your distro's package manager then:
 #
 # meson build && ninja -C build
 #
@@ -1867,7 +1867,7 @@ foreach extern_thing : extern_things
   list = result.stdout().strip().split('\n')
 
   foreach elem : list
-    conf.set(elem, get_option(elem).enabled().to_int())
+    conf.set(elem, get_option(elem).allowed().to_int())
   endforeach
 
   set_variable(variable_name, list)
@@ -1880,7 +1880,7 @@ assert(result.returncode() == 0, 'Could not extract filter list!')
 filter_list = result.stdout().strip().split('\n')
 
 foreach filter : filter_list
-  conf.set(filter, get_option(filter).enabled().to_int())
+  conf.set(filter, get_option(filter).allowed().to_int())
 endforeach
 
 foreach program : program_list
