@@ -27,10 +27,6 @@ project('FFmpeg', 'c',
 # Get meson >= 0.59 from pip or your distro's package manager then:
 #
 # meson build && ninja -C build
-#
-# Will only build static libraries on Windows
-#
-# FIXME: address that last point
 
 # Overview of the configure process:
 #
@@ -69,7 +65,6 @@ project('FFmpeg', 'c',
 # * Porting the FATE test suite
 # * Continue going over the configure script and importing various
 #   bits of logic
-# * Exposing options, for now everything is automatically enabled
 
 # Work around meson subprojects ignoring default_options
 # https://github.com/mesonbuild/meson/issues/1889#issuecomment-1275991958
