@@ -2323,7 +2323,7 @@ final_conf.set_quoted('FFMPEG_CONFIGURATION', '') # FIXME
 final_conf.set('CONFIG_THIS_YEAR', 2022)
 final_conf.set_quoted('FFMPEG_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('AVCONV_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
-final_conf.set_quoted('CC_IDENT', cc.get_id())
+final_conf.set_quoted('CC_IDENT', '@0@ @1@'.format(cc.get_id(), cc.version()))
 final_conf.set_quoted('BUILDSUF', '')
 final_conf.set_quoted('SLIBSUF', host_machine.system() == 'windows' ? '.dll' : '.so')
 final_conf.set('HAVE_MMX2', conf.get('mmxext'))
