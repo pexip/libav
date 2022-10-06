@@ -34,7 +34,8 @@ It should only be needed when updating from one feature version to another,
 not for minor bug fix releases (assuming there aren't too many changes in
 `configure` between minor bug fix releases).
 
-The procedure is generally to run two scripts (`parse_sources.py` and
+The procedure is generally to run four scripts (
+`parse_sources.py`, `find_things_extern.py`, `find_things.py` and
 `recursive_selects.py`), replace the current generated files with them, but
 make sure to bring back in the manual changes (that's the tedious part).
 
@@ -44,12 +45,9 @@ make sure to bring back in the manual changes (that's the tedious part).
 - `parse_sources.py` updates the meson.build files trying to keep manually written parts
   as specified by the `#### --- [END] GENERATED --- ####` specifiers
 
-- `find_things_extern.py` generates the component configuration entries
-  - add the flag `--meson-options` to generate the `options()` that
-    need to go into each section in `meson_options.txt`
-  - basically, run `find_things_extern.py` on each of the entries defined in
-    `extern_things`, then copy and paste the output in each section
-  - options are defined between "Library options" and "Licensing options"
+- `find_things_extern.py` and `find_things.py` update the meson_options.txt file trying to keep manually written parts
+  as specified by the `#### --- [END] GENERATED [EXTERN|FILTER] OPTIONS --- ####` specifiers, respectively
+  - run the scripts with the flag `--update-options` to trigger the update
 
 Then bump versions and check what changed in `configure` since the last time,
 which is the other complicated bit, as it requires understanding of the

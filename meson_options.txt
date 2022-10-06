@@ -121,7 +121,8 @@ option('libmysofa', type: 'feature', value: 'auto')
 option('libxavs', type: 'feature', value: 'auto')
 option('omx', type: 'feature', value: 'auto')
 
-# Muxers options
+#### --- GENERATED EXTERN OPTIONS --- ####
+# Generated muxer options
 option('a64_muxer', type: 'feature', value: 'auto')
 option('ac3_muxer', type: 'feature', value: 'auto')
 option('adts_muxer', type: 'feature', value: 'auto')
@@ -293,7 +294,7 @@ option('wv_muxer', type: 'feature', value: 'auto')
 option('yuv4mpegpipe_muxer', type: 'feature', value: 'auto')
 option('chromaprint_muxer', type: 'feature', value: 'auto')
 
-# Demuxers options
+# Generated demuxer options
 option('aa_demuxer', type: 'feature', value: 'auto')
 option('aac_demuxer', type: 'feature', value: 'auto')
 option('aax_demuxer', type: 'feature', value: 'auto')
@@ -625,7 +626,7 @@ option('libmodplug_demuxer', type: 'feature', value: 'auto')
 option('libopenmpt_demuxer', type: 'feature', value: 'auto')
 option('vapoursynth_demuxer', type: 'feature', value: 'auto')
 
-# Encoders options
+# Generated encoder options
 option('a64multi_encoder', type: 'feature', value: 'auto')
 option('a64multi5_encoder', type: 'feature', value: 'auto')
 option('alias_pix_encoder', type: 'feature', value: 'auto')
@@ -861,7 +862,7 @@ option('vp8_vaapi_encoder', type: 'feature', value: 'auto')
 option('vp9_vaapi_encoder', type: 'feature', value: 'auto')
 option('vp9_qsv_encoder', type: 'feature', value: 'auto')
 
-# Decoders options
+# Generated decoder options
 option('aasc_decoder', type: 'feature', value: 'auto')
 option('aic_decoder', type: 'feature', value: 'auto')
 option('alias_pix_decoder', type: 'feature', value: 'auto')
@@ -1414,7 +1415,7 @@ option('vp9_cuvid_decoder', type: 'feature', value: 'auto')
 option('vp9_mediacodec_decoder', type: 'feature', value: 'auto')
 option('vp9_qsv_decoder', type: 'feature', value: 'auto')
 
-# Parsers options
+# Generated parser options
 option('aac_parser', type: 'feature', value: 'auto')
 option('aac_latm_parser', type: 'feature', value: 'auto')
 option('ac3_parser', type: 'feature', value: 'auto')
@@ -1468,7 +1469,7 @@ option('webp_parser', type: 'feature', value: 'auto')
 option('xbm_parser', type: 'feature', value: 'auto')
 option('xma_parser', type: 'feature', value: 'auto')
 
-# Bitstream filters options
+# Generated bsf options
 option('aac_adtstoasc_bsf', type: 'feature', value: 'auto')
 option('av1_frame_merge_bsf', type: 'feature', value: 'auto')
 option('av1_frame_split_bsf', type: 'feature', value: 'auto')
@@ -1507,7 +1508,7 @@ option('vp9_raw_reorder_bsf', type: 'feature', value: 'auto')
 option('vp9_superframe_bsf', type: 'feature', value: 'auto')
 option('vp9_superframe_split_bsf', type: 'feature', value: 'auto')
 
-# Hardware acceleration options
+# Generated hwaccel options
 option('av1_d3d11va_hwaccel', type: 'feature', value: 'auto')
 option('av1_d3d11va2_hwaccel', type: 'feature', value: 'auto')
 option('av1_dxva2_hwaccel', type: 'feature', value: 'auto')
@@ -1568,7 +1569,7 @@ option('wmv3_nvdec_hwaccel', type: 'feature', value: 'auto')
 option('wmv3_vaapi_hwaccel', type: 'feature', value: 'auto')
 option('wmv3_vdpau_hwaccel', type: 'feature', value: 'auto')
 
-# Protocol options
+# Generated protocol options
 option('async_protocol', type: 'feature', value: 'auto')
 option('bluray_protocol', type: 'feature', value: 'auto')
 option('cache_protocol', type: 'feature', value: 'auto')
@@ -1619,7 +1620,7 @@ option('libssh_protocol', type: 'feature', value: 'auto')
 option('libsmbclient_protocol', type: 'feature', value: 'auto')
 option('libzmq_protocol', type: 'feature', value: 'auto')
 
-# Muxing devices options
+# Generated outdev options
 option('alsa_outdev', type: 'feature', value: 'auto')
 option('audiotoolbox_outdev', type: 'feature', value: 'auto')
 option('caca_outdev', type: 'feature', value: 'auto')
@@ -1633,7 +1634,7 @@ option('sndio_outdev', type: 'feature', value: 'auto')
 option('v4l2_outdev', type: 'feature', value: 'auto')
 option('xv_outdev', type: 'feature', value: 'auto')
 
-# Demuxing devices options
+# Generated indev options
 option('alsa_indev', type: 'feature', value: 'auto')
 option('android_camera_indev', type: 'feature', value: 'auto')
 option('avfoundation_indev', type: 'feature', value: 'auto')
@@ -1656,7 +1657,9 @@ option('xcbgrab_indev', type: 'feature', value: 'auto')
 option('libcdio_indev', type: 'feature', value: 'auto')
 option('libdc1394_indev', type: 'feature', value: 'auto')
 
-# Filters options
+#### --- END GENERATED EXTERN OPTIONS --- ####
+
+#### --- GENERATED FILTER OPTIONS --- ####
 option('abench_filter', type: 'feature', value: 'auto')
 option('acompressor_filter', type: 'feature', value: 'auto')
 option('acontrast_filter', type: 'feature', value: 'auto')
@@ -2143,6 +2146,7 @@ option('amovie_filter', type: 'feature', value: 'auto')
 option('movie_filter', type: 'feature', value: 'auto')
 option('afifo_filter', type: 'feature', value: 'auto')
 option('fifo_filter', type: 'feature', value: 'auto')
+#### --- END GENERATED FILTER OPTIONS --- ####
 
 # Licensing options
 option('gpl', type: 'feature', value: 'disabled',
