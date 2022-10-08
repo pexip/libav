@@ -1861,8 +1861,11 @@ foreach extern_thing : extern_things
   assert(result.returncode() == 0, 'Could not extract @0@ list!'.format(type))
   list = result.stdout().strip().split('\n')
 
+  thing_allowed = get_option('@0@s'.format(thing_suffix)).allowed()
+
   foreach elem : list
-    conf.set(elem, get_option(elem).allowed().to_int())
+    opt = get_option(elem)
+    conf.set(elem, (opt.enabled() or (opt.allowed() and thing_allowed)).to_int())
   endforeach
 
   set_variable(variable_name, list)
@@ -1874,8 +1877,11 @@ result = run_command(find_things, files('libavfilter/allfilters.c'))
 assert(result.returncode() == 0, 'Could not extract filter list!')
 filter_list = result.stdout().strip().split('\n')
 
+filters_allowed = get_option('filters').allowed()
+
 foreach filter : filter_list
-  conf.set(filter, get_option(filter).allowed().to_int())
+  opt = get_option(filter)
+  conf.set(filter, (opt.enabled() or (opt.allowed() and filters_allowed)).to_int())
 endforeach
 
 foreach program : program_list

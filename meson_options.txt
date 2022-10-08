@@ -293,6 +293,7 @@ option('wtv_muxer', type: 'feature', value: 'auto')
 option('wv_muxer', type: 'feature', value: 'auto')
 option('yuv4mpegpipe_muxer', type: 'feature', value: 'auto')
 option('chromaprint_muxer', type: 'feature', value: 'auto')
+option('muxers', type: 'feature', value: 'auto', description: 'Enable or disable all muxers')
 
 # Generated demuxer options
 option('aa_demuxer', type: 'feature', value: 'auto')
@@ -625,6 +626,7 @@ option('libgme_demuxer', type: 'feature', value: 'auto')
 option('libmodplug_demuxer', type: 'feature', value: 'auto')
 option('libopenmpt_demuxer', type: 'feature', value: 'auto')
 option('vapoursynth_demuxer', type: 'feature', value: 'auto')
+option('demuxers', type: 'feature', value: 'auto', description: 'Enable or disable all demuxers')
 
 # Generated encoder options
 option('a64multi_encoder', type: 'feature', value: 'auto')
@@ -861,6 +863,7 @@ option('vp8_v4l2m2m_encoder', type: 'feature', value: 'auto')
 option('vp8_vaapi_encoder', type: 'feature', value: 'auto')
 option('vp9_vaapi_encoder', type: 'feature', value: 'auto')
 option('vp9_qsv_encoder', type: 'feature', value: 'auto')
+option('encoders', type: 'feature', value: 'auto', description: 'Enable or disable all encoders')
 
 # Generated decoder options
 option('aasc_decoder', type: 'feature', value: 'auto')
@@ -1414,6 +1417,7 @@ option('vp8_qsv_decoder', type: 'feature', value: 'auto')
 option('vp9_cuvid_decoder', type: 'feature', value: 'auto')
 option('vp9_mediacodec_decoder', type: 'feature', value: 'auto')
 option('vp9_qsv_decoder', type: 'feature', value: 'auto')
+option('decoders', type: 'feature', value: 'auto', description: 'Enable or disable all decoders')
 
 # Generated parser options
 option('aac_parser', type: 'feature', value: 'auto')
@@ -1468,6 +1472,7 @@ option('vp9_parser', type: 'feature', value: 'auto')
 option('webp_parser', type: 'feature', value: 'auto')
 option('xbm_parser', type: 'feature', value: 'auto')
 option('xma_parser', type: 'feature', value: 'auto')
+option('parsers', type: 'feature', value: 'auto', description: 'Enable or disable all parsers')
 
 # Generated bsf options
 option('aac_adtstoasc_bsf', type: 'feature', value: 'auto')
@@ -1507,6 +1512,7 @@ option('vp9_metadata_bsf', type: 'feature', value: 'auto')
 option('vp9_raw_reorder_bsf', type: 'feature', value: 'auto')
 option('vp9_superframe_bsf', type: 'feature', value: 'auto')
 option('vp9_superframe_split_bsf', type: 'feature', value: 'auto')
+option('bsfs', type: 'feature', value: 'auto', description: 'Enable or disable all bsfs')
 
 # Generated hwaccel options
 option('av1_d3d11va_hwaccel', type: 'feature', value: 'auto')
@@ -1568,6 +1574,7 @@ option('wmv3_dxva2_hwaccel', type: 'feature', value: 'auto')
 option('wmv3_nvdec_hwaccel', type: 'feature', value: 'auto')
 option('wmv3_vaapi_hwaccel', type: 'feature', value: 'auto')
 option('wmv3_vdpau_hwaccel', type: 'feature', value: 'auto')
+option('hwaccels', type: 'feature', value: 'auto', description: 'Enable or disable all hwaccels')
 
 # Generated protocol options
 option('async_protocol', type: 'feature', value: 'auto')
@@ -1619,6 +1626,7 @@ option('libsrt_protocol', type: 'feature', value: 'auto')
 option('libssh_protocol', type: 'feature', value: 'auto')
 option('libsmbclient_protocol', type: 'feature', value: 'auto')
 option('libzmq_protocol', type: 'feature', value: 'auto')
+option('protocols', type: 'feature', value: 'auto', description: 'Enable or disable all protocols')
 
 # Generated outdev options
 option('alsa_outdev', type: 'feature', value: 'auto')
@@ -1633,6 +1641,7 @@ option('sdl2_outdev', type: 'feature', value: 'auto')
 option('sndio_outdev', type: 'feature', value: 'auto')
 option('v4l2_outdev', type: 'feature', value: 'auto')
 option('xv_outdev', type: 'feature', value: 'auto')
+option('outdevs', type: 'feature', value: 'auto', description: 'Enable or disable all outdevs')
 
 # Generated indev options
 option('alsa_indev', type: 'feature', value: 'auto')
@@ -1656,6 +1665,7 @@ option('vfwcap_indev', type: 'feature', value: 'auto')
 option('xcbgrab_indev', type: 'feature', value: 'auto')
 option('libcdio_indev', type: 'feature', value: 'auto')
 option('libdc1394_indev', type: 'feature', value: 'auto')
+option('indevs', type: 'feature', value: 'auto', description: 'Enable or disable all indevs')
 
 #### --- END GENERATED EXTERN OPTIONS --- ####
 
@@ -2146,6 +2156,7 @@ option('amovie_filter', type: 'feature', value: 'auto')
 option('movie_filter', type: 'feature', value: 'auto')
 option('afifo_filter', type: 'feature', value: 'auto')
 option('fifo_filter', type: 'feature', value: 'auto')
+option('filters', type: 'feature', value: 'auto', description: 'Enable or disable all filters')
 #### --- END GENERATED FILTER OPTIONS --- ####
 
 # Licensing options

@@ -64,6 +64,8 @@ def update_meson_options(options):
                             value = 'auto'
                         lines.append(
                             ('option(\'%s\', type: \'feature\', value: \'%s\')\n' % (option, value)))
+                    lines.append(
+                        f"option('{component}s', type: 'feature', value: 'auto', description: 'Enable or disable all {component}s')\n")
                     lines.append('\n')
             elif l == closing:
                 lines.append(l)
