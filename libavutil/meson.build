@@ -291,6 +291,7 @@ configure_file(
 
 ffversion_h = custom_target('ffversion.h',
   output: 'ffversion.h',
+  build_always_stale: true,
   command: [find_program('version.py'), join_paths(meson.current_source_dir(), '..'), '@OUTPUT@', ''],
   build_by_default: true,
   install_dir: join_paths(get_option('includedir'), 'libavutil'),
