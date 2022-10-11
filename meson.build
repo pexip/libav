@@ -19,7 +19,7 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.54',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized'],
-  version: '4.4.2',
+  version: '4.4.3',
 )
 
 # HOWTO:
@@ -808,7 +808,7 @@ check_pkg_config = [
   ['pocketsphinx', ['pocketsphinx/pocketsphinx.h'], ['ps_init'], {}],
   ['rkmpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'pkg': 'rockchip_mpp'}],
   ['rockchip_mpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'version': '>= 1.3.7'}],
-  ['sdl2', ['SDL_events.h'], ['SDL_PollEvent'], {'version': ['>= 2.0.1', '< 2.1.0']}],
+  ['sdl2', ['SDL_events.h'], ['SDL_PollEvent'], {'version': ['>= 2.0.1', '< 3.0.0']}],
 ]
 
 foreach check : check_pkg_config
@@ -1395,6 +1395,11 @@ check_compiles = [
   ['intrinsics_neon', ['arm_neon.h'], 'int16x8_t test = vdupq_n_s16(0);'],
 ]
 
+check_links = [
+  ['stdatomic', ['stdatomic.h'], 'int main(void) {atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0); foo += bar;}', {'link_with': ['atomic']}],
+  ['stdatomic', ['stdatomic.h'], 'int main(void) {atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0); foo += bar;}'],
+]
+
 v4l2m2m_formats = [
   ['vc1', 'VC1_ANNEX_G'],
   ['mpeg1'],
@@ -1414,6 +1419,10 @@ endforeach
 
 foreach check : check_compiles
   all_checks += [['compiles', check]]
+endforeach
+
+foreach check : check_links
+  all_checks += [['links', check]]
 endforeach
 
 foreach arch : arch_list
@@ -1508,6 +1517,7 @@ foreach check : all_checks
   link_withs = []
   funcs = []
   compiles = ''
+  links = ''
   type = ''
 
   if check_type == 'pkg-config'
@@ -1532,6 +1542,11 @@ foreach check : all_checks
       opts = check[3]
     endif
     compiles = check[2]
+  elif check_type == 'links'
+    if check.length() > 3
+      opts = check[3]
+    endif
+    links = check[2]
   elif check_type == 'type'
     if check.length() > 2
       opts = check[2]
@@ -1541,9 +1556,12 @@ foreach check : all_checks
 
   if check_type == 'header-func' or check_type == 'func'
     funcs = opts.get('funcs', [name])
-    link_withs = opts.get('link_with', [])
   elif check_type == 'pkg-config' or check_type == 'component'
     funcs = check[2]
+  endif
+
+  if check_type != 'component'
+    link_withs = opts.get('link_with', [])
   endif
 
   found = false
@@ -1672,6 +1690,10 @@ foreach check : all_checks
 
     if found and compiles != ''
       found = cc.compiles('\n\n'.join([prefix, compiles]), dependencies : extra_deps, args : c_args + project_c_args, name: name)
+    endif
+
+    if found and links != ''
+      found = cc.links('\n\n'.join([prefix, links]), dependencies : extra_deps, args : c_args + project_c_args, name: name)
     endif
 
     if found and type != ''
@@ -2268,7 +2290,7 @@ endforeach
 final_conf = configuration_data()
 
 final_conf.set_quoted('FFMPEG_CONFIGURATION', '') # FIXME
-final_conf.set('CONFIG_THIS_YEAR', 2021)
+final_conf.set('CONFIG_THIS_YEAR', 2022)
 final_conf.set_quoted('FFMPEG_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('AVCONV_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('CC_IDENT', cc.get_id())
