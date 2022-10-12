@@ -796,6 +796,7 @@ check_pkg_config = [
   ['libvmaf', ['libvmaf.h'], ['compute_vmaf'], {'version': '>= 0.6.2'}],
   ['libvorbis', ['vorbis/codec.h'], ['vorbis_info_init'], {'pkg': 'vorbis'}],
   ['libvorbisenc', ['vorbis/vorbisenc.h'], ['vorbis_encode_init'], {'pkg': 'vorbisenc'}],
+  ['libvpx', ['vpx/vpx_decoder.h', 'vpx/vpx_encoder.h'], [], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
   ['libvpx_vp8_decoder', ['vpx/vpx_decoder.h', 'vpx/vp8dx.h'], ['vpx_codec_vp8_dx'], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
   ['libvpx_vp8_encoder', ['vpx/vpx_encoder.h', 'vpx/vp8cx.h'], ['vpx_codec_vp8_cx'], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
   ['libvpx_vp9_decoder', ['vpx/vpx_decoder.h', 'vpx/vp8dx.h'], ['vpx_codec_vp9_dx'], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
