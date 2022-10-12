@@ -1817,7 +1817,7 @@ if extern_prefix != ''
 endif
 
 foreach check: x86asm_checks
-  result = run_command(x86asm, '-f', asm_format, asm_args, '-Werror', check[0], '-o', join_paths(meson.current_build_dir(), 'tmpasm.o'))
+  result = run_command(x86asm, '-f', asm_format, asm_args, '-Werror', check[0], '-o', join_paths(meson.current_build_dir(), 'tmpasm.o'), check: false)
 
   if result.returncode() == 0
     conf.set(check[1], 1)
@@ -1857,8 +1857,8 @@ foreach extern_thing : extern_things
                        '--type=@0@'.format(c_type),
                        '--suffix=@0@'.format(type),
                        '--thing-suffix=@0@'.format(thing_suffix),
-                       files(filename))
-  assert(result.returncode() == 0, 'Could not extract @0@ list!'.format(type))
+                       files(filename),
+                       check: true)
   list = result.stdout().strip().split('\n')
 
   thing_allowed = get_option('@0@s'.format(thing_suffix)).allowed()
@@ -1873,8 +1873,7 @@ endforeach
 
 find_things = find_program('find_things.py')
 
-result = run_command(find_things, files('libavfilter/allfilters.c'))
-assert(result.returncode() == 0, 'Could not extract filter list!')
+result = run_command(find_things, files('libavfilter/allfilters.c'), check: true)
 filter_list = result.stdout().strip().split('\n')
 
 filters_allowed = get_option('filters').allowed()
@@ -1888,8 +1887,7 @@ foreach program : program_list
   conf.set(program, get_option(program).allowed().to_int())
 endforeach
 
-result = run_command(find_things, '--full', files('libavfilter/allfilters.c'))
-assert(result.returncode() == 0, 'Could not extract filter full names list!')
+result = run_command(find_things, '--full', files('libavfilter/allfilters.c'), check: true)
 full_filter_list = result.stdout().strip().split('\n')
 
 avcodec_components_list = bsf_list + decoder_list + encoder_list + hwaccel_list + parser_list
@@ -2027,11 +2025,7 @@ foreach thing : things_to_print
     '--filename=@0@'.format(join_paths(meson.current_build_dir(), thing[0])),
     '--struct-name=@0@'.format(thing[1]),
     '--name=@0@'.format(thing[2]),
-    list)
-
-  if res.returncode() != 0
-    error(res.stderr().strip())
-  endif
+    list, check: true)
 endforeach
 
 if not cc.check_header('stdatomic.h') and thread_dep.found()
