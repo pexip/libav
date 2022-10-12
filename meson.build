@@ -68,7 +68,7 @@ project('FFmpeg', 'c',
 
 # Work around meson subprojects ignoring default_options
 # https://github.com/mesonbuild/meson/issues/1889#issuecomment-1275991958
-if meson.is_subproject() and not meson.project_version().compare_version('>=0.63')
+if meson.is_subproject() and not meson.version().version_compare('>=0.63')
   project_c_args += ['-std=c99']
 endif
 
