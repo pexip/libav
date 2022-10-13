@@ -1848,7 +1848,7 @@ foreach check: x86asm_checks
   if result.returncode() == 0
     conf.set(check[1], 1)
   else
-    message('@0@ x68 asm check failed: @1@'.format(check[1], result.stderr().strip()))
+    message('@0@ x86 asm check failed: @1@'.format(check[1], result.stderr().strip()))
   endif
 endforeach
 
