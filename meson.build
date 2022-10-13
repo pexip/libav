@@ -2005,8 +2005,14 @@ if conf.get('schannel') == 1
 endif
 
 foreach ext : arch_ext_list_x86_simd
-  conf.set10('@0@_inline'.format(ext), conf.get(ext) == 1 and conf.get('inline_asm') == 1)
-  conf.set10('@0@_external'.format(ext), conf.get(ext) == 1 and conf.get('x86asm') == 1)
+  inline = '@0@_inline'.format(ext)
+  external = '@0@_external'.format(ext)
+  if not conf.has(inline)
+    conf.set10(inline, conf.get(ext) == 1 and conf.get('inline_asm') == 1)
+  endif
+  if not conf.has(external)
+    conf.set10(external, conf.get(ext) == 1 and conf.get('x86asm') == 1)
+  endif
 endforeach
 
 things_to_print = [
