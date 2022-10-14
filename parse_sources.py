@@ -23,8 +23,13 @@ import sys
 from pprint import pprint
 from collections import defaultdict
 
+ASM_EXTS = ['asm', 'S', 'c']
 
-SOURCE_TYPE_EXTS_MAP = {'c': ['c', 'cpp', 'm', 'cl'], 'asm': ['asm'], 'test-prog': ['c'], 'mmx': ['c']}
+SOURCE_TYPE_EXTS_MAP = {
+    'c': ['c', 'cpp', 'm', 'cl', 'S'],
+    'asm': ASM_EXTS,
+    'test-prog': ['c'],
+    'mmx': ['c']}
 SOURCE_TYPE_DIRS = {'test-prog': 'tests'}
 
 
@@ -165,7 +170,14 @@ def make_to_meson(path):
         pass
 
     f = io.StringIO()
-    for source_type, map_ in (('', source_maps['c']), ('x86asm_', source_maps['asm']), ('mmx_', source_maps['mmx'])):
+
+    source_types = (
+        ('', source_maps['c']),
+        ('x86asm_', source_maps['asm']),
+        ('mmx_', source_maps['mmx'])
+    )
+
+    for source_type, map_ in source_types:
         default_sources = map_.pop('', [])
 
         if default_sources:
@@ -248,6 +260,8 @@ def make_to_meson(path):
 paths = [
         'libavformat',
         'libavutil',
+        'libavutil/aarch64',
+        'libavutil/arm',
         'libavutil/x86',
         'libswscale',
         'libswscale/x86',

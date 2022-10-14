@@ -19,6 +19,7 @@ libavutil_x86_x86asm_sources = files(
 )
 
 libavutil_x86_x86asm_optional_sources = {
+  'mmx_external' : files('emms.asm'), # MANUAL
   'pixelutils' : files('pixelutils.asm'),
 }
 

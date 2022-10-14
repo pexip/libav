@@ -463,13 +463,30 @@ types_list = [
   'struct_v4l2_frmivalenum_discrete',
 ]
 
+conf.set('runtime_cpudetect', 1)
+asm = get_option('asm')
+inline_asm = get_option('inline_asm')
+
+conf.set10('asm', asm.allowed())
+
+if inline_asm.allowed()
+  conf.set10('inline_asm', 
+    cc.compiles(
+      'void foo(void){ __asm__ volatile(@0@); }'.format('"" ::'),
+      name: 'inline_asm'
+    )
+  )
+else
+  conf.set10('inline_asm', false)
+endif
+
 arch_ext_list_external = []
 arch_ext_list_inline = []
 
 foreach arch_ext : arch_ext_list
-  conf.set(arch_ext, 0)
-  conf.set('@0@_external'.format(arch_ext), 0)
-  conf.set('@0@_inline'.format(arch_ext), 0)
+  conf.set10(arch_ext, conf.get('asm') == 1)
+  conf.set10('@0@_external'.format(arch_ext), conf.get('asm') == 1)
+  conf.set10('@0@_inline'.format(arch_ext), conf.get('asm') == 1 and conf.get('inline_asm') == 1)
   arch_ext_list_external += ['@0@_external'.format(arch_ext)]
   arch_ext_list_inline += ['@0@_inline'.format(arch_ext)]
 endforeach
@@ -1476,12 +1493,14 @@ endforeach
 
 arch = 'c'
 
-if host_machine.cpu_family() == 'x86'
+cpu = host_machine.cpu_family()
+
+if cpu == 'x86'
   arch = 'x86'
   conf.set('x86', 1)
   conf.set('i686', 1)
   conf.set('x86_32', 1)
-elif host_machine.cpu_family() == 'x86_64'
+elif cpu == 'x86_64'
   arch = 'x86'
   conf.set('x86', 1)
   conf.set('i686', 1)
@@ -1501,6 +1520,34 @@ foreach feature : arch_features
   conf.set10(name, have)
 endforeach
 
+if cc.get_id() == 'clang' 
+  if conf.get('x86_32') == 1
+    # Clang doesn't support maintaining alignment without assuming the
+    # same alignment in every function. If 16 byte alignment would be
+    # enabled, one would also have to either add attribute_align_arg on
+    # every single entry point into the libraries or enable -mstackrealign
+    # (doing stack realignment in every single function).
+
+    if ['windows', 'freebsd', 'netbsd', 'openbsd'].contains(host_machine.system())
+      conf.set('aligned_stack', 0)
+    else
+      project_c_args += cc.get_supported_arguments([
+        '-mllvm -stack-alignment=16',
+        '-mstack-alignment=16'
+      ])
+    endif
+  else
+    project_c_args += cc.get_supported_arguments([
+        '-mllvm -stack-alignment=16',
+        '-mstack-alignment=16'
+      ])
+  endif
+elif cc.get_id() == 'msvc'
+  if conf.get('x86_32') == 1
+    conf.set('aligned_stack', 0)
+  endif
+endif
+
 conf.set10('shared', get_option('default_library') != 'static')
 conf.set('pthreads', 0)
 conf.set('w32threads', 0)
@@ -1510,11 +1557,14 @@ conf.set10('fast_unaligned', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_mac
 
 if ['linux', 'darwin', 'android'].contains(host_machine.system())
   conf.set10('pthreads', thread_dep.found())
-  conf.set('section_data_rel_ro', 1)
 elif host_machine.system() == 'windows'
   conf.set10('w32threads', thread_dep.found())
   conf.set('symver', 0)
   conf.set('dos_paths', 1)
+endif
+
+if ['linux', 'openbsd', 'android'].contains(host_machine.system())
+  conf.set('section_data_rel_ro', 1)
 endif
 
 # Our option names can't be 1:1 mapping because newer meson versions disallow
@@ -1775,27 +1825,90 @@ x86asm_type = 'none'
 
 x86asm_checks = []
 
+asm_inline_checks = [
+  ['"1:\\n"', 'inline_asm_labels'],
+  ['"Label:\\n"', 'inline_asm_nonlocal_labels']
+]
+
+extern_prefix = cc.symbols_have_underscore_prefix() ? '_' : ''
+
+asm_insn_checks = []
+
+asm_as_checks = []
+
+if host_machine.system() == 'windows'
+  asm_format = conf.get('x86_64') == 1 ? 'win64' : 'win32'
+elif host_machine.system() == 'darwin'
+  asm_format = conf.get('x86_64') == 1 ? 'macho64' : 'macho32'
+else
+  asm_format = conf.get('x86_64') == 1 ? 'elf64' : 'elf32'
+endif
+
+x86asm = disabler()
+conf.set('x86asm', 0)
+
 if conf.get('x86') == 1
-  nasm_version = '>=0'
-  if host_machine.system() == 'windows'
-    nasm_version = '>=2.12'
+  conf.set10('rdtsc', cc.has_function('__rdtsc', prefix: '#include <intrin.h>'))
+  conf.set10('mm_empty', cc.has_function('_mm_empty', prefix: '#include <mmintrin.h>'))
+
+  conf.set('local_aligned', 1)
+
+  if conf.get('asm', 0) == 1
+    nasm_version = '>=0'
+    if host_machine.system() == 'windows'
+      nasm_version = '>=2.12'
+    endif
+    x86asm = find_program('nasm', version: nasm_version, required: false)
+    x86asm_type = 'nasm'
+    if not x86asm.found()
+      x86asm = find_program('yasm', required: false)
+      x86asm_type = 'yasm'
+    endif
+    conf.set10('x86asm', x86asm.found())
+    if x86asm.found()
+      x86asm_checks += [
+        ['meson_asm_checks/cpunop.asm', 'cpunop'],
+        ['meson_asm_checks/avx2_external.asm', 'avx2_external'],
+        ['meson_asm_checks/avx512_external.asm', 'avx512_external'],
+        ['meson_asm_checks/fma4_external.asm', 'fma4_external'],
+        ['meson_asm_checks/xop_external.asm', 'xop_external'],
+      ]
+
+      asm_inline_checks += [
+        ['"":::"%xmm0"', 'xmm_clobbers'],
+        ['"pabsw %xmm0, %xmm0"', 'ssse3_inline'],
+        ['"pmaxub %mm0, %mm1"', 'mmxext_inline'],
+      ]
+    endif
   endif
-  x86asm = find_program('nasm', version: nasm_version, required : false)
-  x86asm_type = 'nasm'
-  if not x86asm.found()
-    x86asm = find_program('yasm', required : false)
-    x86asm_type = 'yasm'
-  endif
-  conf.set10('x86asm', x86asm.found())
-  if x86asm.found()
-    x86asm_checks += [
-      ['meson_asm_checks/cpunop.asm', 'cpunop'],
-      ['meson_asm_checks/avx2_external.asm', 'avx2_external'],
-      ['meson_asm_checks/avx512_external.asm', 'avx512_external'],
-      ['meson_asm_checks/fma4_external.asm', 'fma4_external'],
-      ['meson_asm_checks/xop_external.asm', 'xop_external'],
-    ]
-  endif
+
+  ebp_available = cc.run('''
+  int main() {
+    volatile int i=0;
+    __asm__ volatile ("xorl %%ebp, %%ebp" ::: "%ebp");
+    return i;
+  }
+  ''', name: 'if_ebp_available_this_should_crash')
+
+  # FFmpeg upstream doesn't know that EBP is always unavailable
+  # under Clang if stack realignment is used. This is probably
+  # because the only compilers still supporting the architecture
+  # are the Android NDK and MSYS CLANG32.
+  # Thus an additional check on aligned_stack is done here.
+  # See:
+  # - https://github.com/android/ndk/issues/693
+  # - https://bugs.llvm.org/show_bug.cgi?id=37542
+  conf.set10('ebp_available', conf.get('aligned_stack') == 1 and ebp_available.compiled() and ebp_available.returncode() != 0)
+
+  asm_inline_checks += [
+    ['""::"b"(0)', 'ebx_available_1'],
+    ['"":::"%ebx"', 'ebx_available_2'],
+    ['"movl @0@test, %eax"'.format(extern_prefix), 'inline_asm_direct_symbol_refs_1'],
+    ['"movl @0@test(%rip), %eax"'.format(extern_prefix), 'inline_asm_direct_symbol_refs_2'],
+    ['"":::"%xmm0"', 'xmm_clobbers'],
+    ['"pabsw %xmm0, %xmm0"', 'ssse3_inline'],
+    ['"pmaxub %mm0, %mm1"', 'mmxext_inline'],
+  ]
 else
   x86asm = disabler()
 endif
@@ -1807,8 +1920,6 @@ elif host_machine.system() == 'darwin'
 else
   asm_format = conf.get('x86_64') == 1 ? 'elf64' : 'elf32'
 endif
-
-extern_prefix = cc.symbols_have_underscore_prefix() ? '_' : ''
 
 asm_args = ['-DPIC']
 # Add debug args explicitly
@@ -1842,15 +1953,84 @@ if extern_prefix != ''
   asm_args += ['-DPREFIX']
 endif
 
+foreach ext : arch_ext_list_x86_simd
+  if ext == 'mmx'
+    continue
+  endif
+
+  inline = '@0@_inline'.format(ext)
+  external = '@0@_external'.format(ext)
+  conf.set10(inline, conf.get(ext) == 1 and conf.get('inline_asm') == 1 and conf.get('x86') == 1)
+  conf.set10(external, conf.get(ext) == 1 and conf.get('x86asm') == 1)
+endforeach
+
 foreach check: x86asm_checks
   result = run_command(x86asm, '-f', asm_format, asm_args, '-Werror', check[0], '-o', join_paths(meson.current_build_dir(), 'tmpasm.o'), check: false)
 
-  if result.returncode() == 0
-    conf.set(check[1], 1)
-  else
+  if conf.get('asm') == 1
+    conf.set10(check[1], result.returncode() == 0)
+
+    if result.returncode() != 0
     message('@0@ x86 asm check failed: @1@'.format(check[1], result.stderr().strip()))
+    endif
+  else
+    conf.set10(check[1], false)
   endif
 endforeach
+
+foreach check : asm_insn_checks
+  asm_inline_checks += [
+    ['"@0@"'.format(check[0]), '@0@_inline'.format(check[1])]
+  ]
+  asm_as_checks += [
+    [check[0], '@0@_external'.format(check[1])]
+  ]
+endforeach
+
+foreach check: asm_inline_checks
+  if conf.get('inline_asm') == 1
+    result = cc.compiles(
+      'void foo(void){ __asm__ volatile(@0@); }'.format(check[0]),
+      name: check[1]
+    )
+
+    conf.set10(check[1], result)
+  else
+    conf.set10(check[1], false)
+  endif
+endforeach
+
+# FIXME: this won't work until Meson detects and
+# exposes the underlying assembler.
+# These checks cannot be done with run_command either
+# because they rely on setup-time input.
+# See:
+# - https://github.com/mesonbuild/meson/issues/9889
+# - https://github.com/mesonbuild/meson/pull/10916
+# - https://github.com/mesonbuild/meson/pull/10922
+foreach check : asm_as_checks
+  warning('Meson does not yet expose the ASM compiler, skipping @0@ check'.format(check[1]))
+  # if conf.get('asm') == 1
+  #   conf.set10(check[1], cc.compiles(
+  #     check[0],
+  #     args: ['-x', 'assembler'],
+  #     name: check[1]
+  #   ))
+  # else 
+    conf.set10(check[1], false)
+  # endif
+endforeach
+
+if conf.get('x86') == 1
+  conf.set10('ebx_available', conf.get('ebx_available_1') == 1 and conf.get('ebx_available_2') == 1)
+  message('EBX available: @0@'.format(conf.get('ebx_available')))
+  conf.set10('inline_asm_direct_symbol_refs', conf.get('inline_asm_direct_symbol_refs_1') == 1 or conf.get('inline_asm_direct_symbol_refs_2') == 1)
+  message('Inline assembly direct symbol references available: @0@'.format(conf.get('inline_asm_direct_symbol_refs')))
+endif
+
+if get_option('b_lto')
+  conf.set10('inline_asm_direct_symbol_refs', 0)
+endif
 
 extern_things = [
   ['AVOutputFormat', 'muxer', 'libavformat/allformats.c', 'muxer_list'],
@@ -2004,17 +2184,6 @@ if conf.get('schannel') == 1
   endif
 endif
 
-foreach ext : arch_ext_list_x86_simd
-  inline = '@0@_inline'.format(ext)
-  external = '@0@_external'.format(ext)
-  if not conf.has(inline)
-    conf.set10(inline, conf.get(ext) == 1 and conf.get('inline_asm') == 1)
-  endif
-  if not conf.has(external)
-    conf.set10(external, conf.get(ext) == 1 and conf.get('x86asm') == 1)
-  endif
-endforeach
-
 things_to_print = [
   ['libavcodec/codec_list.c', 'AVCodec', 'codec_list', encoder_list + decoder_list],
   ['libavcodec/parser_list.c', 'AVCodecParser', 'parser_list', parser_list],
@@ -2120,6 +2289,12 @@ foreach built_lib : built_libs
       depends: ffversion_h
     )
   endif
+
+  foreach arch_ext : arch_list
+    if conf.get(arch_ext, 0) == 1
+      sources += get_variable('lib@0@_@1@_sources'.format(built_lib[0], arch_ext), [])
+    endif
+  endforeach
 
   foreach arch_ext : arch_ext_list
     if conf.get(arch_ext, 0) == 1
@@ -2358,9 +2533,8 @@ final_conf.set_quoted('AVCONV_DATADIR', join_paths(get_option('prefix'), get_opt
 final_conf.set_quoted('CC_IDENT', '@0@ @1@'.format(cc.get_id(), cc.version()))
 final_conf.set_quoted('BUILDSUF', '')
 final_conf.set_quoted('SLIBSUF', host_machine.system() == 'windows' ? '.dll' : '.so')
-final_conf.set('HAVE_MMX2', conf.get('mmxext'))
 final_conf.set('SWS_MAX_FILTER_SIZE', 256)
-final_conf.set('EXTERN_ASM', true)
+final_conf.set('EXTERN_ASM', extern_prefix)
 final_conf.set_quoted('EXTERN_PREFIX', extern_prefix)
 
 if not get_option('nonfree').disabled()
@@ -2384,6 +2558,8 @@ if not get_option('version3').disabled()
     conf.set('lgplv3', 1)
   endif
 endif
+
+conf.set('mmx2', conf.get('mmxext'))
 
 foreach restrict_kw : ['restrict', '__restrict__', '__restrict', '']
   if not final_conf.has('av_restrict') and cc.compiles('void foo(char * @0@ p);'.format(restrict_kw))
