@@ -130,6 +130,7 @@ option('libmysofa', type: 'feature', value: 'disabled')
 option('libxavs', type: 'feature', value: 'disabled')
 option('libxavs2', type: 'feature', value: 'disabled')
 option('omx', type: 'feature', value: 'disabled')
+option('vulkan', type: 'feature', value: 'disabled')
 
 #### --- GENERATED EXTERN OPTIONS --- ####
 # Generated muxer options

@@ -819,6 +819,7 @@ check_pkg_config = [
   ['rockchip_mpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'version': '>= 1.3.7'}],
   ['sdl2', ['SDL_events.h'], ['SDL_PollEvent'], {'version': ['>= 2.0.1', '< 3.0.0']}],
   ['vapoursynth', ['VSScript.h'], ['vsscript_init'], {'pkg': 'vapoursynth-script', 'version': '>= 42'}],
+  ['vulkan', ['vulkan/vulkan.h'], ['vkCreateInstance'], {'pkg': 'vulkan', 'version': '>= 1.1.97'}],
 ]
 
 foreach check : check_pkg_config
@@ -1183,6 +1184,7 @@ hwaccel_library_list = hwaccel_library_nonfree_list + [
   'mmal',
   'omx',
   'opencl',
+  'vulkan'
 ]
 
 subsystem_list = [

@@ -183,7 +183,7 @@ libavutil_optional_sources = {
   'vaapi' : files('hwcontext_vaapi.c'),
   'vdpau' : files('hwcontext_vdpau.c'),
   'videotoolbox' : files('hwcontext_videotoolbox.c'),
-  # MANUAL 'vulkan' : files('hwcontext_vulkan.c'),
+  'vulkan' : files('hwcontext_vulkan.c'),
 }
 
 libavutil_x86asm_optional_sources = {
