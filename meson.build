@@ -1249,6 +1249,7 @@ config_extra = [
   'cbs_h265',
   'cbs_mpeg2',
   'dirac_parse',
+  'dnn',
   'dvprofile',
   'exif',
   'faandct',

@@ -68,6 +68,10 @@ def make_to_meson(path):
                 label, ofiles = l.split('+=')
                 label = label.split('CONFIG_')[1].rstrip(' )')
                 source_type = 'c' # arguable ^^
+            elif re.match('DNN-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'c'  # arguable too ^^
             elif re.match('OBJS.*=.*', l):
                 label = ''
                 ofiles = l.split('=')[1]

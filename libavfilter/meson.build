@@ -208,7 +208,7 @@ libavfilter_optional_sources = {
   'dilation_filter' : files('vf_neighbor.c'),
   'dilation_opencl_filter' : files('vf_neighbor_opencl.c','opencl.c','opencl/neighbor.cl'),
   'displace_filter' : files('vf_displace.c','framesync.c'),
-  # MANUAL 'dnn' : files('dnn_filter_common.c'),
+  'dnn' : files('dnn_filter_common.c'),
   'dnn_processing_filter' : files('vf_dnn_processing.c'),
   'doubleweave_filter' : files('vf_weave.c'),
   'drawbox_filter' : files('vf_drawbox.c'),
@@ -548,7 +548,9 @@ languages_map += {
 #### --- END GENERATED --- ####
 subdir('dnn')
 
-libavfilter_optional_sources += libavfilter_dnn_optional_sources
+dnn_sources = libavfilter_optional_sources.get('dnn') + libavfilter_dnn_optional_sources.get('dnn')
+
+libavfilter_optional_sources += {'dnn': dnn_sources}
 
 # Version file
 ver_conf = configuration_data()
