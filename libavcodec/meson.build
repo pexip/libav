@@ -71,6 +71,7 @@ libavcodec_sources = files(
   'pthread.c',
   'pthread_slice.c',
   'pthread_frame.c',
+  'dctref.c',
 )
 
 libavcodec_optional_sources = {
@@ -1108,8 +1109,7 @@ libavcodec_optional_tests = {
     ['cabac', files('tests/cabac.c')],
   ],
   'dct' : [
-    # MANUAL ['avfft', files('tests/avfft.c')],
-    ['avfft', files('tests/avfft.c', 'dctref.c')],
+    ['avfft', files('tests/avfft.c')],
   ],
   'fft' : [
     ['fft', files('tests/fft.c')],
@@ -1125,8 +1125,7 @@ libavcodec_optional_tests = {
     ['h265_levels', files('tests/h265_levels.c')],
   ],
   'idctdsp' : [
-    #MANUAL ['dct', files('tests/dct.c')],
-    ['dct', files('tests/dct.c', 'dctref.c')],
+    ['dct', files('tests/dct.c')],
   ],
   'iirfilter' : [
     ['iirfilter', files('tests/iirfilter.c')],

@@ -100,6 +100,10 @@ def make_to_meson(path):
                 label, ofiles = l.split('+=')
                 label = label.split('HAVE_')[1].rstrip(' )')
                 source_type = 'test-prog'
+            elif re.match('TESTOBJS.*=', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'c'
             elif re.match('TESTPROGS.*=', l):
                 label = ''
                 ofiles = l.split('=')[1]
