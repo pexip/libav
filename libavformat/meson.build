@@ -195,7 +195,6 @@ libavformat_optional_sources = {
   'genh_demuxer' : files('genh.c'),
   'gif_demuxer' : files('gifdec.c'),
   'gif_muxer' : files('gif.c'),
-  'gnutls' : files('tls_gnutls.c'), # MANUAL
   'gophers_protocol' : files('gopher.c'),
   'gopher_protocol' : files('gopher.c'),
   'gsm_demuxer' : files('gsmdec.c'),

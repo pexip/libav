@@ -245,8 +245,7 @@ libavutil_tests = [
 
 libavutil_optional_tests = {
   'lzo1x_999_compress' : [
-    # MANUAL ['lzo', files('tests/lzo.c')],
-    ['lzo', files('tests/lzo.c'), {'extra_libs': ['lzo2']}],
+    ['lzo', files('tests/lzo.c')],
   ],
   'threads' : [
     ['cpu_init', files('tests/cpu_init.c')],
