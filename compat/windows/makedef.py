@@ -80,7 +80,7 @@ if __name__ == '__main__':
         # Take only the third field (split by spaces)
         dump = [x.split()[2] for x in dump]
         # Subst the prefix out
-        dump = [x.replace(prefix, '') for x in dump]
+        dump = [x.replace(f'^{prefix}', '') for x in dump]
 
     else:
         dump = subprocess.run([args.dumpbin, '-linkermember:1', libname],
