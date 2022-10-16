@@ -151,6 +151,21 @@ libavcodec_x86_x86asm_optional_sources = {
   'webp_decoder' : files('vp8dsp.asm'),
 }
 
+libavcodec_x86_armv5te_optional_sources = {
+}
+
+libavcodec_x86_armv6_optional_sources = {
+}
+
+libavcodec_x86_armv8_optional_sources = {
+}
+
+libavcodec_x86_neon_optional_sources = {
+}
+
+libavcodec_x86_vfp_optional_sources = {
+}
+
 libavcodec_x86_mmx_optional_sources = {
   'fdctdsp' : files('fdct.c'),
   'snow_decoder' : files('snowdsp.c'),

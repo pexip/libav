@@ -189,6 +189,21 @@ libavutil_optional_sources = {
 libavutil_x86asm_optional_sources = {
 }
 
+libavutil_armv5te_optional_sources = {
+}
+
+libavutil_armv6_optional_sources = {
+}
+
+libavutil_armv8_optional_sources = {
+}
+
+libavutil_neon_optional_sources = {
+}
+
+libavutil_vfp_optional_sources = {
+}
+
 libavutil_mmx_optional_sources = {
 }
 
@@ -297,4 +312,6 @@ ffversion_h = custom_target('ffversion.h',
   install: true,
 )
 
+subdir('aarch64')
+subdir('arm')
 subdir('x86')

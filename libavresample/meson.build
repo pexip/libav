@@ -29,6 +29,21 @@ libavresample_optional_sources = {
 libavresample_x86asm_optional_sources = {
 }
 
+libavresample_armv5te_optional_sources = {
+}
+
+libavresample_armv6_optional_sources = {
+}
+
+libavresample_armv8_optional_sources = {
+}
+
+libavresample_neon_optional_sources = {
+}
+
+libavresample_vfp_optional_sources = {
+}
+
 libavresample_mmx_optional_sources = {
 }
 
@@ -63,4 +78,6 @@ configure_file(
   configuration: ver_conf,
 )
 
+subdir('aarch64')
+subdir('arm')
 subdir('x86')

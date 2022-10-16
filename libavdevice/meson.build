@@ -59,6 +59,21 @@ libavdevice_optional_sources = {
 libavdevice_x86asm_optional_sources = {
 }
 
+libavdevice_armv5te_optional_sources = {
+}
+
+libavdevice_armv6_optional_sources = {
+}
+
+libavdevice_armv8_optional_sources = {
+}
+
+libavdevice_neon_optional_sources = {
+}
+
+libavdevice_vfp_optional_sources = {
+}
+
 libavdevice_mmx_optional_sources = {
 }
 

@@ -29,6 +29,21 @@ libswresample_optional_sources = {
 libswresample_x86asm_optional_sources = {
 }
 
+libswresample_armv5te_optional_sources = {
+}
+
+libswresample_armv6_optional_sources = {
+}
+
+libswresample_armv8_optional_sources = {
+}
+
+libswresample_neon_optional_sources = {
+}
+
+libswresample_vfp_optional_sources = {
+}
+
 libswresample_mmx_optional_sources = {
 }
 
@@ -63,4 +78,6 @@ configure_file(
   configuration: ver_conf,
 )
 
+subdir('aarch64')
+subdir('arm')
 subdir('x86')

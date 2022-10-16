@@ -35,6 +35,21 @@ libswscale_optional_sources = {
 libswscale_x86asm_optional_sources = {
 }
 
+libswscale_armv5te_optional_sources = {
+}
+
+libswscale_armv6_optional_sources = {
+}
+
+libswscale_armv8_optional_sources = {
+}
+
+libswscale_neon_optional_sources = {
+}
+
+libswscale_vfp_optional_sources = {
+}
+
 libswscale_mmx_optional_sources = {
 }
 
@@ -72,4 +87,6 @@ configure_file(
   configuration: ver_conf,
 )
 
+subdir('aarch64')
+subdir('arm')
 subdir('x86')

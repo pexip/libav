@@ -582,6 +582,21 @@ libavformat_optional_sources = {
 libavformat_x86asm_optional_sources = {
 }
 
+libavformat_armv5te_optional_sources = {
+}
+
+libavformat_armv6_optional_sources = {
+}
+
+libavformat_armv8_optional_sources = {
+}
+
+libavformat_neon_optional_sources = {
+}
+
+libavformat_vfp_optional_sources = {
+}
+
 libavformat_mmx_optional_sources = {
 }
 

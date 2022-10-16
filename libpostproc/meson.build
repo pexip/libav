@@ -20,6 +20,21 @@ libpostproc_optional_sources = {
 libpostproc_x86asm_optional_sources = {
 }
 
+libpostproc_armv5te_optional_sources = {
+}
+
+libpostproc_armv6_optional_sources = {
+}
+
+libpostproc_armv8_optional_sources = {
+}
+
+libpostproc_neon_optional_sources = {
+}
+
+libpostproc_vfp_optional_sources = {
+}
+
 libpostproc_mmx_optional_sources = {
 }
 

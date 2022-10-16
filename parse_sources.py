@@ -28,6 +28,11 @@ ASM_EXTS = ['asm', 'S', 'c']
 SOURCE_TYPE_EXTS_MAP = {
     'c': ['c', 'cpp', 'm', 'cl', 'S'],
     'asm': ASM_EXTS,
+    'armv5te': ASM_EXTS,
+    'armv6': ASM_EXTS,
+    'armv8': ASM_EXTS,
+    'vfp': ASM_EXTS,
+    'neon': ASM_EXTS,
     'test-prog': ['c'],
     'mmx': ['c']}
 SOURCE_TYPE_DIRS = {'test-prog': 'tests'}
@@ -50,6 +55,11 @@ def make_to_meson(path):
     source_maps = {
       'c': defaultdict(list),
       'asm': defaultdict(list),
+      'armv5te': defaultdict(list),
+      'armv6': defaultdict(list),
+      'armv8': defaultdict(list),
+      'vfp': defaultdict(list),
+      'neon': defaultdict(list),
       'test-prog': defaultdict(list),
       'mmx': defaultdict(list),
     }
@@ -101,6 +111,66 @@ def make_to_meson(path):
                 label = ''
                 ofiles = l.split('=')[1]
                 source_type = 'mmx'
+            elif re.match('ARMV5TE-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'armv5te'
+            elif re.match('ARMV5TE-OBJS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'armv5te'
+            elif re.match('ARMV5TE-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'armv5te'
+            elif re.match('ARMV6-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'armv6'
+            elif re.match('ARMV6-OBJS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'armv6'
+            elif re.match('ARMV6-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'armv6'
+            elif re.match('ARMV8-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'armv8'
+            elif re.match('ARMV8-OBJS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'armv8'
+            elif re.match('ARMV8-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'armv8'
+            elif re.match('VFP-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'vfp'
+            elif re.match('VFP-OBJS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'vfp'
+            elif re.match('VFP-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'vfp'
+            elif re.match('NEON-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'neon'
+            elif re.match('NEON-OBJS-.*HAVE.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('HAVE_')[1].rstrip(' )')
+                source_type = 'neon'
+            elif re.match('NEON-OBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'neon'
             elif re.match('TESTPROGS-.*CONFIG.*\+\=.*', l):
                 label, ofiles = l.split('+=')
                 label = label.split('CONFIG_')[1].rstrip(' )')
@@ -174,6 +244,11 @@ def make_to_meson(path):
     source_types = (
         ('', source_maps['c']),
         ('x86asm_', source_maps['asm']),
+        ('armv5te_', source_maps['armv5te']),
+        ('armv6_', source_maps['armv6']),
+        ('armv8_', source_maps['armv8']),
+        ('neon_', source_maps['neon']),
+        ('vfp_', source_maps['vfp']),
         ('mmx_', source_maps['mmx'])
     )
 
@@ -264,16 +339,25 @@ paths = [
         'libavutil/arm',
         'libavutil/x86',
         'libswscale',
+        'libswscale/aarch64',
+        'libswscale/arm',
         'libswscale/x86',
         'libavcodec',
+        'libavcodec/aarch64',
+        'libavcodec/arm',
         'libavcodec/x86',
         'libswresample',
+        'libswresample/aarch64',
+        'libswresample/arm',
         'libswresample/x86',
         'libavfilter',
+        'libavfilter/aarch64',
         'libavfilter/x86',
         'libavfilter/dnn',
         'libavdevice',
         'libavresample',
+        'libavresample/aarch64',
+        'libavresample/arm',
         'libavresample/x86',
         'libpostproc',
 ]

@@ -1505,6 +1505,19 @@ elif cpu == 'x86_64'
   conf.set('x86', 1)
   conf.set('i686', 1)
   conf.set('x86_64', 1)
+elif cpu == 'aarch64'
+  # FIXME: Implement assembly support for MSVC
+  # It relies on Meson adding support for armasm and MASM,
+  # see foreach check : asm_as_checks below.
+  if cc.get_id() == 'msvc'
+    warning('Using aarch64 assembly on MSVC is not yet supported by Meson.')
+  else
+    arch = 'aarch64'
+    conf.set('aarch64', 1)
+  endif
+elif cpu == 'arm'
+  arch = 'arm'
+  conf.set('arm', 1)
 endif
 
 foreach feature : arch_features
@@ -1909,16 +1922,73 @@ if conf.get('x86') == 1
     ['"pabsw %xmm0, %xmm0"', 'ssse3_inline'],
     ['"pmaxub %mm0, %mm1"', 'mmxext_inline'],
   ]
-else
-  x86asm = disabler()
-endif
+elif conf.get('aarch64') == 1
+  asm_insn_checks += [
+    ['prfm   pldl1strm, [x0]', 'armv8'],
+    ['ext   v0.8B, v0.8B, v1.8B, #1', 'neon'],
+    ['fmadd d0,    d0,    d1,    d2', 'vfp'],
+  ]
+elif conf.get('arm') == 1
+  if cc.get_id() == 'msvc'
+    conf.set10('thumb', cc.has_header_symbol('stddef.h', '_M_ARMT'))
+  endif
+  if cc.has_header_symbol('stddef.h', '__thumb__')
+    conf.set10('thumb', cc.compiles(
+      'float func(float a, float b){ return a+b; }',
+      name: 'weak_thumb'))
+  endif
+  if conf.get('thumb', 0) == 1
+    if cc.has_argument('-mthumb')
+      project_c_args += ['-mthumb']
+    elif cc.has_argument('-marm')
+      project_c_args += ['-marm']
+    endif
+  endif
 
-if host_machine.system() == 'windows'
-  asm_format = conf.get('x86_64') == 1 ? 'win64' : 'win32'
-elif host_machine.system() == 'darwin'
-  asm_format = conf.get('x86_64') == 1 ? 'macho64' : 'macho32'
-else
-  asm_format = conf.get('x86_64') == 1 ? 'elf64' : 'elf32'
+  if cc.has_header_symbol('stddef.h', '__ARM_PCS_VFP')
+    conf.set('vfp_args', 1)
+  elif cc.links(cpp_cond.format('stddef.h', 'defined _M_ARM_FP && _M_ARM_FP >= 30'), name: 'vfp_args_fp')
+    conf.set('vfp_args', 1)
+  elif not cc.links(cpp_cond.format('stddef.h', 'defined __ARM_PCS || defined __SOFTFP__'), name: 'arm_pcs_or_softfp') and host_machine.system() != 'darwin'
+    if not cc.has_header_symbol('stddef.h', '__SOFTFP__')
+      conf.set('vfp_args', 1)
+      conf.set('fpabi', 'vfp')
+    elif cc.links('__asm__ (".eabi_attribute 28, 1"); int main(void) { return 0; }', name: 'vfp_abi_check')
+      conf.set('vfp_args', 1)
+      conf.set('fpabi', 'vfp')
+    else
+      conf.set('fpabi', 'soft')
+    endif
+
+    message('Floating point ABI: @0@'.format(conf.get('fpabi')))
+  endif
+
+  asm_insn_checks += [
+    ['qadd r0, r0, r0', 'armv5te'],
+    ['sadd16 r0, r0, r0', 'armv6'],
+    ['movt r0, #0', 'armv6t2'],
+    ['vadd.i16 q0, q0, q0', 'neon'],
+    ['fadds s0, s0, s0', 'vfp'],
+    ['vmov.f32 s0, #1.0', 'vfpv3'],
+    ['setend be', 'setend']
+  ]
+
+  asm_inline_checks += [
+    ['"add r0, %Q0, %R0" :: "r"((long long)0)', 'asm_mod_q']
+  ]
+
+  asm_as_checks += [
+    ['.arch armv7-a', 'as_arch_directive'],
+    ['ra .dn d0.i16', 'as_dn_directive'],
+    ['.fpu neon', 'as_fpu_directive']
+  ]
+
+  # llvm's integrated assembler supports .object_arch from llvm 3.5
+  if asm_format == 'elf32' or asm_format == 'elf64'
+    asm_as_checks += [
+      ['.object_arch armv4', 'as_object_arch']
+    ]
+  endif
 endif
 
 asm_args = ['-DPIC']
@@ -2000,6 +2070,29 @@ foreach check: asm_inline_checks
   endif
 endforeach
 
+if (conf.get('arm', 0) == 1 or conf.get('aarch64', 0) == 1) and cc.get_id() != 'msvc'
+  asm_as_checks += [
+    ['''
+    .macro m n, y:vararg=0
+    .int \y
+    .endm
+    m x
+    ''', 'vararg'],
+  ]
+
+  if conf.get('arm', 0) == 1
+    asm_as_checks += [
+      ['.altmacro', 'gnu_as']
+    ]
+  endif
+
+  asm_as_checks += [
+    ['''.func test
+      .endfunc''', 'as_func']
+  ]
+endif
+
+
 # FIXME: this won't work until Meson detects and
 # exposes the underlying assembler.
 # These checks cannot be done with run_command either
@@ -2027,6 +2120,16 @@ if conf.get('x86') == 1
   conf.set10('inline_asm_direct_symbol_refs', conf.get('inline_asm_direct_symbol_refs_1') == 1 or conf.get('inline_asm_direct_symbol_refs_2') == 1)
   message('Inline assembly direct symbol references available: @0@'.format(conf.get('inline_asm_direct_symbol_refs')))
 endif
+
+arm_skip_checks = conf.get('arm', 0) == 1 and (host_machine.system() == 'linux' or host_machine.system() == 'android')
+
+foreach ext : arch_ext_list_arm
+  inline = '@0@_inline'.format(ext)
+  external = '@0@_external'.format(ext)
+  if not arm_skip_checks
+    conf.set10(ext, conf.get(inline, 0) == 1 or conf.get(external, 0) == 1)
+  endif
+endforeach
 
 if get_option('b_lto')
   conf.set10('inline_asm_direct_symbol_refs', 0)
