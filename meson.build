@@ -66,12 +66,6 @@ project('FFmpeg', 'c',
 # * Continue going over the configure script and importing various
 #   bits of logic
 
-# Work around meson subprojects ignoring default_options
-# https://github.com/mesonbuild/meson/issues/1889#issuecomment-1275991958
-if meson.is_subproject() and not meson.version().version_compare('>=0.63')
-  project_c_args += ['-std=c99']
-endif
-
 common_incs = [include_directories('.')]
 
 python3 = import('python').find_installation()
@@ -119,6 +113,12 @@ project_c_args = [
   '-Wno-incompatible-pointer-types',
   '-Wno-address',
 ]
+
+# Work around meson subprojects ignoring default_options
+# https://github.com/mesonbuild/meson/issues/1889#issuecomment-1275991958
+if meson.is_subproject() and meson.version().version_compare('< 0.63')
+  project_c_args += ['-std=c99']
+endif
 
 project_c_args = cc.get_supported_arguments(project_c_args)
 
