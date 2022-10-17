@@ -1,5 +1,7 @@
 include:
-  - remote: "https://gitlab.freedesktop.org/freedesktop/ci-templates/-/raw/e9a461877f8c7f9fed9fff5491067ec3c3472559/templates/debian.yml"
+  - project: 'freedesktop/ci-templates'
+    ref: 'e9a461877f8c7f9fed9fff5491067ec3c3472559'
+    file: '/templates/debian.yml'
 
 default:
   interruptible: true
