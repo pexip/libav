@@ -151,6 +151,12 @@ vs2019:
   variables:
     ARCH: 'amd64'
 
+vs2019 no-optimization debug:
+  extends: '.build windows'
+  variables:
+    ARCH: 'amd64'
+    MESON_ARGS: '--optimization=0 --debug'
+
 vs2019 x86:
   extends: '.build windows'
   stage: 'build'
