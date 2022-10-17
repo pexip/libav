@@ -1,6 +1,9 @@
 include:
   - remote: "https://gitlab.freedesktop.org/freedesktop/ci-templates/-/raw/e9a461877f8c7f9fed9fff5491067ec3c3472559/templates/debian.yml"
 
+default:
+  interruptible: true
+
 # Is it worth making an image with ffmpeg git repo and packages installed?
 stages:
   - 'image-build'
