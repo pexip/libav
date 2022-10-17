@@ -1,0 +1,14 @@
+[host_machine]
+system = 'windows'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[properties]
+needs_exe_wrapper = true
+
+[binaries]
+ar        = 'lib'
+c         = 'cl'
+cpp       = 'cl'
+pkgconfig = 'false'

@@ -152,6 +152,13 @@ vs2019 x86:
   variables:
     ARCH: 'x86'
 
+vs2019 arm64 cross:
+  extends: '.build windows'
+  stage: 'build'
+  variables:
+    ARCH: 'arm64'
+    MESON_ARGS: '--cross-file ci/vs-arm64-cross-file.txt'
+
 macOS:
   stage: 'build'
   tags:
