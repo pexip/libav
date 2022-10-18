@@ -1563,6 +1563,18 @@ elif cc.get_id() == 'msvc'
   if conf.get('x86_32') == 1
     conf.set('aligned_stack', 0)
   endif
+  # the new SSA optimzer in VS2015 U3 is mis-optimizing some parts of the code
+  # Issue has been fixed in MSVC v19.00.24218.
+  if cc.links(cpp_cond.format('windows.h', '_MSC_FULL_VER < 190024218'))
+    project_c_args += cc.get_supported_arguments([
+      'd2SSAOptimizer-'
+    ])
+  endif
+  if conf.get('x86_32') == 1 and (get_option('buildtype') == 'debug' or get_option('optimization') == '0')
+    project_c_args += cc.get_supported_arguments([
+      '-Oy-'
+    ])
+  endif
 endif
 
 conf.set10('shared', get_option('default_library') != 'static')
@@ -2705,3 +2717,9 @@ configure_file(
   output_format: 'nasm',
   configuration: final_conf,
 )
+
+# Put this at the end so people see it
+if conf.get('x86_32') == 1 and conf.get('asm') == 1 and cc.get_id() == 'msvc' and cc.version().version_compare('<19.30')
+  # -Dasm=enabled seems to hang reliably on some Visual Studio 2019 installations, ask users to report back to us
+  warning('Using VS 2019 x86 with `asm` enabled: if you see a hang while linking, please report an issue at https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg/-/issues')
+endif
