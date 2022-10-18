@@ -1404,6 +1404,10 @@ avformat_components = [
 
 component_list = avcodec_components + avdevice_components + avfilter_components + avformat_components
 
+foreach component : component_list
+  conf.set10(component, get_option(component).allowed())
+endforeach
+
 config_list = (
   document_list +
   example_list +
@@ -1567,6 +1571,8 @@ conf.set('w32threads', 0)
 conf.set('os2threads', 0)
 conf.set10('bigendian', host_machine.endian() == 'big')
 conf.set10('fast_unaligned', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_machine.cpu_family()))
+
+conf.set('frame_thread_encoder', 1)
 
 if ['linux', 'darwin', 'android'].contains(host_machine.system())
   conf.set10('pthreads', thread_dep.found())
