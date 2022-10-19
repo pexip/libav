@@ -13,7 +13,7 @@ stages:
 
 .container.debian@common:
   variables:
-    FDO_DISTRIBUTION_VERSION: "sid-slim"
+    FDO_DISTRIBUTION_VERSION: "bookworm-slim"
     FDO_UPSTREAM_REPO: "gstreamer/meson-ports/ffmpeg"
     FDO_DISTRIBUTION_PACKAGES: >-
       meson
@@ -25,14 +25,14 @@ stages:
 .container.debian@common.minimum:
   extends: '.container.debian@common'
   variables:
-    FDO_DISTRIBUTION_TAG: "2022-10-19.2-meson-4.4-minimum"
+    FDO_DISTRIBUTION_TAG: "2022-10-19.3-meson-4.4-minimum"
 
 .container.debian@common.full:
   extends: '.container.debian@common'
   variables:
-    FDO_DISTRIBUTION_TAG: "2022-10-19.2-meson-4.4-full"
+    FDO_DISTRIBUTION_TAG: "2022-10-19.3-meson-4.4-full"
     FDO_DISTRIBUTION_EXEC: >-
-      sed -i -e 's/Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources &&
+      echo "deb-src http://deb.debian.org/debian bookworm main" >> /etc/apt/sources.list &&
       apt-get update &&
       apt-get build-dep --yes ffmpeg
 
@@ -89,7 +89,7 @@ with deps yasm:
   extends: '.build withdepsnoyasm'
 
 .build@i386.common:
-  image: 'i386/debian:sid'
+  image: 'i386/debian:bookworm'
   variables:
     DEPENDENCIES: >-
       meson
@@ -111,7 +111,7 @@ with deps@i386:
     - '.build withdeps'
     - '.build@i386.common'
   before_script:
-    - 'sed -i -e "s/Types: deb$/Types: deb deb-src/" /etc/apt/sources.list.d/debian.sources'
+    - echo "deb-src http://deb.debian.org/debian bookworm main" >> /etc/apt/sources.list
     - apt-get update
     - apt-get build-dep --yes ffmpeg
     - apt-get install --yes ${DEPENDENCIES}
