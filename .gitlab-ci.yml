@@ -1,6 +1,6 @@
 include:
   - project: 'freedesktop/ci-templates'
-    ref: 'e9a461877f8c7f9fed9fff5491067ec3c3472559'
+    ref: 'master'
     file: '/templates/debian.yml'
 
 default:
@@ -25,15 +25,15 @@ stages:
 .container.debian@common.minimum:
   extends: '.container.debian@common'
   variables:
-    FDO_DISTRIBUTION_TAG: "2022-08-08.1-meson-4.4-minimum"
+    FDO_DISTRIBUTION_TAG: "2022-10-19.2-meson-4.4-minimum"
 
 .container.debian@common.full:
   extends: '.container.debian@common'
   variables:
-    FDO_DISTRIBUTION_TAG: "2022-08-08.1-meson-4.4-full"
+    FDO_DISTRIBUTION_TAG: "2022-10-19.2-meson-4.4-full"
     FDO_DISTRIBUTION_EXEC: >-
-      echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
-      apt-get update
+      sed -i -e 's/Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources &&
+      apt-get update &&
       apt-get build-dep --yes ffmpeg
 
 debian-container-build@x86_64@minimum:
@@ -111,7 +111,7 @@ with deps@i386:
     - '.build withdeps'
     - '.build@i386.common'
   before_script:
-    - echo "deb-src http://deb.debian.org/debian sid main" >> /etc/apt/sources.list
+    - 'sed -i -e "s/Types: deb$/Types: deb deb-src/" /etc/apt/sources.list.d/debian.sources'
     - apt-get update
     - apt-get build-dep --yes ffmpeg
     - apt-get install --yes ${DEPENDENCIES}
