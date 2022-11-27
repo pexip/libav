@@ -71,7 +71,7 @@ if __name__ == '__main__':
     if args.nm is not None:
         # Use eval, since NM="nm -g"
         s = subprocess.run([args.nm, '--defined-only',
-                            '-g', libname], capture_output=True, text=True, check=True)
+                            '-g', libname], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=True)
         dump = s.stdout.splitlines()
         # Exclude lines with ':' (object name)
         dump = [x for x in dump if ":" not in x]
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     else:
         dump = subprocess.run([args.dumpbin, '-linkermember:1', libname],
-                              capture_output=True, text=True).stdout.splitlines()
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True).stdout.splitlines()
         # Find the index of the first line with
         # "public symbols", keep the rest
         # Then the line with " Summary",
