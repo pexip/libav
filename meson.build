@@ -2524,10 +2524,22 @@ foreach built_lib : built_libs
 
   link_args = cc.get_supported_link_arguments([vflag])
 
+  static_link_args = []
+
+  if cc.get_id() == 'msvc'
+    message('Applying MSVC link workaround for Debug mode and static libraries.')
+    static_link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
+
+    if get_option('buildtype') == 'debug' or get_option('optimization') == '0'
+      link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
+    endif
+  endif
+
   static_lib = static_library('@0@-static'.format(built_lib[0]), sources + gen_objects,
     dependencies: deps,
     include_directories: common_incs,
     link_with: link_with,
+    link_args: static_link_args,
     c_args: c_args,
     implicit_include_directories : false,
   )
@@ -2577,6 +2589,7 @@ foreach built_lib : built_libs
         c_args: c_args,
         dependencies: test_deps,
         include_directories: common_incs,
+        link_args: static_link_args,
         link_with: [static_lib] + link_with,
         implicit_include_directories : false)
 
