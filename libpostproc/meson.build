@@ -1,8 +1,10 @@
-libpostproc_majorver = '55'
-minorver = '3'
-microver = '100'
+kwargs = {'prefix': '#include "libpostproc/version.h"'} + get_version_define_kwargs
 
-libpostproc_version = libpostproc_majorver + '.' + minorver + '.' + microver
+libpostproc_majorver = cc.get_define('LIBPOSTPROC_VERSION_MAJOR', kwargs: kwargs)
+minorver = cc.get_define('LIBPOSTPROC_VERSION_MINOR', kwargs: kwargs)
+microver = cc.get_define('LIBPOSTPROC_VERSION_MICRO', kwargs: kwargs)
+
+libpostproc_version = f'{libpostproc_majorver}.{minorver}.{microver}'
 
 libpostproc_headers = files(
   'postprocess.h',

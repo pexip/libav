@@ -1,8 +1,10 @@
-libavutil_majorver = '56'
-minorver = '51'
-microver = '100'
+kwargs = {'prefix': '#include "libavutil/version.h"'} + get_version_define_kwargs
 
-libavutil_version = libavutil_majorver + '.' + minorver + '.' + microver
+libavutil_majorver = cc.get_define('LIBAVUTIL_VERSION_MAJOR', kwargs: kwargs)
+minorver = cc.get_define('LIBAVUTIL_VERSION_MINOR', kwargs: kwargs)
+microver = cc.get_define('LIBAVUTIL_VERSION_MICRO', kwargs: kwargs)
+
+libavutil_version = f'{libavutil_majorver}.{minorver}.{microver}'
 
 libavutil_headers = files(
   'adler32.h',

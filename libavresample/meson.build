@@ -1,8 +1,10 @@
-libavresample_majorver = '4'
-minorver = '0'
-microver = '0'
+kwargs = {'prefix': '#include "libavresample/version.h"'} + get_version_define_kwargs
 
-libavresample_version = libavresample_majorver + '.' + minorver + '.' + microver
+libavresample_majorver = cc.get_define('LIBAVRESAMPLE_VERSION_MAJOR', kwargs: kwargs)
+minorver = cc.get_define('LIBAVRESAMPLE_VERSION_MINOR', kwargs: kwargs)
+microver = cc.get_define('LIBAVRESAMPLE_VERSION_MICRO', kwargs: kwargs)
+
+libavresample_version = f'{libavresample_majorver}.{minorver}.{microver}'
 
 cc = meson.get_compiler('c')
 

@@ -1,8 +1,10 @@
-libavcodec_majorver = '58'
-minorver = '134'
-microver = '100'
+kwargs = {'prefix': '#include "libavcodec/version.h"'} + get_version_define_kwargs
 
-libavcodec_version = libavcodec_majorver + '.' + minorver + '.' + microver
+libavcodec_majorver = cc.get_define('LIBAVCODEC_VERSION_MAJOR', kwargs: kwargs)
+minorver = cc.get_define('LIBAVCODEC_VERSION_MINOR', kwargs: kwargs)
+microver = cc.get_define('LIBAVCODEC_VERSION_MICRO', kwargs: kwargs)
+
+libavcodec_version = f'{libavcodec_majorver}.{minorver}.{microver}'
 
 cc = meson.get_compiler('c')
 

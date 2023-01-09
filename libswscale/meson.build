@@ -1,8 +1,10 @@
-libswscale_majorver = '5'
-minorver = '7'
-microver = '100'
+kwargs = {'prefix': '#include "libswscale/version.h"'} + get_version_define_kwargs
 
-libswscale_version = libswscale_majorver + '.' + minorver + '.' + microver
+libswscale_majorver = cc.get_define('LIBSWSCALE_VERSION_MAJOR', kwargs: kwargs)
+minorver = cc.get_define('LIBSWSCALE_VERSION_MINOR', kwargs: kwargs)
+microver = cc.get_define('LIBSWSCALE_VERSION_MICRO', kwargs: kwargs)
+
+libswscale_version = f'{libswscale_majorver}.{minorver}.{microver}'
 
 libswscale_headers = files(
   'swscale.h',

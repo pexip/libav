@@ -65,8 +65,9 @@ project('FFmpeg', 'c',
 # * Porting the FATE test suite
 # * Continue going over the configure script and importing various
 #   bits of logic
-
-common_incs = [include_directories('.')]
+ffmpeg_toplevel_builddir = meson.current_build_dir()
+ffmpeg_toplevel_inc = include_directories('.')
+common_incs = [ffmpeg_toplevel_inc]
 
 python3 = import('python').find_installation()
 
@@ -2289,6 +2290,11 @@ endforeach
 foreach comp : avformat_components_list
   avformat_flattened_deps += get_variable('@0@_flattened_deps'.format(comp), [])
 endforeach
+
+get_version_define_kwargs = {
+  'include_directories': ffmpeg_toplevel_inc,
+  'args': '-I' + ffmpeg_toplevel_builddir,
+}
 
 subdir('libavutil')
 subdir('libpostproc')
