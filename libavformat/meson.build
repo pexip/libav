@@ -4,7 +4,7 @@ libavformat_majorver = cc.get_define('LIBAVFORMAT_VERSION_MAJOR', kwargs: kwargs
 minorver = cc.get_define('LIBAVFORMAT_VERSION_MINOR', kwargs: kwargs)
 microver = cc.get_define('LIBAVFORMAT_VERSION_MICRO', kwargs: kwargs)
 
-libavformat_version = f'{libavformat_majorver}.{minorver}.{microver}'
+libavformat_version = f'@libavformat_majorver@.@minorver@.@microver@'
 
 cc = meson.get_compiler('c')
 

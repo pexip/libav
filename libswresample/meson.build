@@ -4,7 +4,7 @@ libswresample_majorver = cc.get_define('LIBSWRESAMPLE_VERSION_MAJOR', kwargs: kw
 minorver = cc.get_define('LIBSWRESAMPLE_VERSION_MINOR', kwargs: kwargs)
 microver = cc.get_define('LIBSWRESAMPLE_VERSION_MICRO', kwargs: kwargs)
 
-libswresample_version = f'{libswresample_majorver}.{minorver}.{microver}'
+libswresample_version = f'@libswresample_majorver@.@minorver@.@microver@'
 
 libswresample_headers = files(
   'swresample.h',

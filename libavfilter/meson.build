@@ -4,7 +4,7 @@ libavfilter_majorver = cc.get_define('LIBAVFILTER_VERSION_MAJOR', kwargs: kwargs
 minorver = cc.get_define('LIBAVFILTER_VERSION_MINOR', kwargs: kwargs)
 microver = cc.get_define('LIBAVFILTER_VERSION_MICRO', kwargs: kwargs)
 
-libavfilter_version = f'{libavfilter_majorver}.{minorver}.{microver}'
+libavfilter_version = f'@libavfilter_majorver@.@minorver@.@microver@'
 
 cc = meson.get_compiler('c')
 
