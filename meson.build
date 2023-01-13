@@ -871,6 +871,8 @@ check_pkg_config = [
   ['libzimg', ['zimg.h'], ['zimg_get_api_version'], {'pkg': 'zimg', 'version': '>= 2.7.0'}],
   ['libzmq', ['zmq.h'], ['zmq_ctx_new'], {}],
   ['libzvbi', ['libzvbi.h'], ['vbi_decoder_new'], {'pkg': 'zvbi-0.2'}],
+  ['mbedtls', ['mbedtls/x509_crt.h'], ['mbedtls_x509_crt_init'], {'pkg': 'mbedtls'}],
+  ['mbedtls', ['mbedtls/ssl.h'], ['mbedtls_ssl_init'], {'pkg': 'mbedtls'}],
   ['openal', ['AL/al.h'], ['alGetError'], {'pkg': 'openal', 'version': '>= 1.1'}],
   ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl'], {'pkg': 'openssl', 'version': '>= 3.0.0'}],
   ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl', 'SSL_library_init'], {'has_any_func': true}],
@@ -955,6 +957,7 @@ check_components = [
   ['libxvid', ['xvid.h'], ['xvid_global'], ['xvidcore']],
   ['linux_fb_h', ['linux/fb.h'], [], []],
   ['lzma', ['lzma.h'], ['lzma_version_number'], ['lzma']],
+  ['mbedtls', ['mbedtls/ssl.h'], ['mbedtls_ssl_init'], ['mbedtls', 'mbedx509', 'mbedcrypto']],
   ['mediafoundation', ['mfapi.h'], ['MFCreateAlignedMemoryBuffer'], ['mfplat', 'mfuuid', 'ole32', 'strmiids'], {'defines': ['mftransform_h']}],
   ['mediandk', ['stdint.h', 'media/NdkImage.h'], ['AImage_delete'], ['mediandk']],
   ['mmal', ['interface/mmal/mmal.h'], ['mmal_port_connect'], ['mmal_core', 'mmal_util', 'mmal_vc_client', 'bcm_host']],
@@ -1958,8 +1961,15 @@ if conf.get('pthreads') == 0 and conf.get('w32threads') == 0 and conf.get('os2th
 endif
 
 if conf.get('gnutls') == 1 and conf.get('openssl') == 1
-  # Simply picking one for now
-  conf.set('openssl', 0)
+  error('GnuTLS and OpenSSL must not be enabled at the same time.')
+endif
+
+if conf.get('gnutls') == 1 and conf.get('mbedtls') == 1
+  error('GnuTLS and mbedTLS must not be enabled at the same time.')
+endif
+
+if conf.get('openssl') == 1 and conf.get('mbedtls') == 1
+  error('OpenSSL and mbedTLS must not be enabled at the same time.')
 endif
 
 # Manual check for OpenSSL
