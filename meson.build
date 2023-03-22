@@ -1263,6 +1263,7 @@ config_extra = [
   'bswapdsp',
   'cabac',
   'cbs',
+  'cbs_av1',
   'cbs_h264',
   'cbs_h265',
   'cbs_mpeg2',
