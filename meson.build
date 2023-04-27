@@ -2678,7 +2678,13 @@ endforeach
 
 final_conf = configuration_data()
 
-final_conf.set_quoted('FFMPEG_CONFIGURATION', '') # FIXME
+if meson.version().version_compare('>=1.1.0')
+  ffmpeg_configuration = meson.build_options().strip()
+else
+  extractor = find_program('capture_build_options.py', required: true)
+  ffmpeg_configuration = run_command(extractor, check: true).stdout().strip()
+endif
+final_conf.set_quoted('FFMPEG_CONFIGURATION', ffmpeg_configuration)
 final_conf.set('CONFIG_THIS_YEAR', 2022)
 final_conf.set_quoted('FFMPEG_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 final_conf.set_quoted('AVCONV_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
