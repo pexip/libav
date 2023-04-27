@@ -2589,7 +2589,11 @@ foreach built_lib : built_libs
 
       extra_libs = opts.get('extra_libs', [])
       foreach libname: extra_libs
-        test_deps += [cc.find_library(libname)]
+        if libname == 'threads' and thread_dep.found()
+          test_deps += test_deps
+        else
+          test_deps += [cc.find_library(libname)]
+        endif
       endforeach
 
       exe = executable('test_@0@_@1@'.format(built_lib[0], test_name), test_sources,

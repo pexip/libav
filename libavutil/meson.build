@@ -261,11 +261,16 @@ libavutil_tests = [
 ]
 
 libavutil_optional_tests = {
-  'lzo1x_999_compress' : [
-    ['lzo', files('tests/lzo.c')],
-  ],
+  # This test is meant to be run manually (it uses argv unchecked)
+  # 'lzo1x_999_compress' : [
+  #   ['lzo', files('tests/lzo.c'), {
+  #     'extra_libs': ['lzo2'], # MANUAL
+  #   }],
+  # ],
   'threads' : [
-    ['cpu_init', files('tests/cpu_init.c')],
+    ['cpu_init', files('tests/cpu_init.c'), {
+      'extra_libs': ['threads'],  # MANUAL
+    }],
   ],
 }
 
