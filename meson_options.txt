@@ -2178,12 +2178,7 @@ option('version3', type: 'feature', value: 'disabled',
 option('nonfree', type: 'feature', value: 'disabled',
   description: 'Allow use of nonfree code, the resulting libs and binaries will be unredistributable')
 
-# other options
-# cli is disabled by default to speed up the build since it links statically
-option('cli', type: 'feature', value: 'disabled')
-option('tests', type : 'feature', value : 'auto', description : 'Build tests', yield : true)
-option('asm', type: 'feature', value: 'enabled', description: 'Enable assembly optimizations')
-option('inline_asm', type: 'feature', value: 'enabled', description: 'Enable inline assembly optimizations')
+# FFmpeg libraries to build
 option('avcodec', type: 'feature', value: 'enabled', description: 'Build libavcodec')
 option('avdevice', type: 'feature', value: 'enabled', description: 'Build libavdevice')
 option('avfilter', type: 'feature', value: 'enabled', description: 'Build libavfilder')
@@ -2193,6 +2188,17 @@ option('avutil', type: 'feature', value: 'enabled', description: 'Build libavuti
 option('swresample', type: 'feature', value: 'enabled', description: 'Build libswresample')
 option('swscale', type: 'feature', value: 'enabled', description: 'Build libswscale')
 option('postproc', type: 'feature', value: 'enabled', description: 'Build libpostproc')
+
+# Tools
 option('ffmpeg', type: 'feature', value: 'enabled', description: 'Build ffmpeg')
 option('ffplay', type: 'feature', value: 'enabled', description: 'Build ffplay')
 option('ffprobe', type: 'feature', value: 'enabled', description: 'Build ffprobe')
+
+# ASM options
+option('asm', type: 'feature', value: 'enabled', description: 'Enable assembly optimizations')
+option('inline_asm', type: 'feature', value: 'enabled', description: 'Enable inline assembly optimizations')
+
+# other options
+# cli is disabled by default to speed up the build since it links statically
+option('cli', type: 'feature', value: 'disabled')
+option('tests', type : 'feature', value : 'auto', description : 'Build tests', yield : true)
