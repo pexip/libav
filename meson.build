@@ -529,7 +529,7 @@ inline_asm = get_option('inline_asm')
 conf.set10('asm', asm.allowed())
 
 if inline_asm.allowed()
-  conf.set10('inline_asm', 
+  conf.set10('inline_asm',
     cc.compiles(
       'void foo(void){ __asm__ volatile(@0@); }'.format('"" ::'),
       name: 'inline_asm'
@@ -1630,7 +1630,7 @@ foreach feature : arch_features
   conf.set10(name, have)
 endforeach
 
-if cc.get_id() == 'clang' 
+if cc.get_id() == 'clang'
   if conf.get('x86_32') == 1
     # Clang doesn't support maintaining alignment without assuming the
     # same alignment in every function. If 16 byte alignment would be
@@ -1930,7 +1930,7 @@ if conf.get('w32threads') == 0 and conf.get('pthreads') == 0
   conf.set10('w32threads', cc.has_function('_beginthreadex', prefix: '#include <process.h>')
     and cc.has_type('CONDITION_VARIABLE', prefix : '#include <windows.h>')
     and cc.has_type('INIT_ONCE', prefix : '#include <windows.h>'))
-  
+
   if conf.get('w32threads') == 0 and conf.get('winrt') == 1
     conf.set10('w32threads', cc.has_function('CreateThread', prefix: '#include <windows.h>') )
   endif
@@ -2422,7 +2422,7 @@ foreach check : asm_as_checks
       args: ['-x', 'assembler'],
       name: check[1]
     ))
-  else 
+  else
     conf.set10(check[1], false)
   endif
 endforeach
