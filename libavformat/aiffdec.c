@@ -218,7 +218,7 @@ static int aiff_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     AVStream * st;
     AIFFInputContext *aiff = s->priv_data;
-    ID3v2ExtraMeta *id3v2_extra_meta = NULL;
+    ID3v2ExtraMeta *id3v2_extra_meta;
 
     /* check FORM header */
     filesize = get_tag(pb, &tag);
@@ -305,7 +305,7 @@ static int aiff_read_header(AVFormatContext *s)
             break;
         case MKTAG('w', 'a', 'v', 'e'):
             if ((uint64_t)size > (1<<30))
-                return -1;
+                return AVERROR_INVALIDDATA;
             if ((ret = ff_get_extradata(s, st->codecpar, pb, size)) < 0)
                 return ret;
             if (   (st->codecpar->codec_id == AV_CODEC_ID_QDMC || st->codecpar->codec_id == AV_CODEC_ID_QDM2)
@@ -367,7 +367,7 @@ got_sound:
         st->codecpar->block_align = 35;
     } else if (st->codecpar->block_align <= 0) {
         av_log(s, AV_LOG_ERROR, "could not find COMM tag or invalid block_align value\n");
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
     if (aiff->block_duration < 0)
         return AVERROR_INVALIDDATA;
@@ -429,7 +429,7 @@ static int aiff_read_packet(AVFormatContext *s,
     return 0;
 }
 
-AVInputFormat ff_aiff_demuxer = {
+const AVInputFormat ff_aiff_demuxer = {
     .name           = "aiff",
     .long_name      = NULL_IF_CONFIG_SMALL("Audio IFF"),
     .priv_data_size = sizeof(AIFFInputContext),

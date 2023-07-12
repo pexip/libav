@@ -276,7 +276,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_mvdv_decoder = {
+const AVCodec ff_mvdv_decoder = {
     .name           = "mvdv",
     .long_name      = NULL_IF_CONFIG_SMALL("MidiVid VQ"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -287,5 +287,5 @@ AVCodec ff_mvdv_decoder = {
     .flush          = decode_flush,
     .close          = decode_close,
     .capabilities   = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

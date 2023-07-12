@@ -2,6 +2,7 @@
 *.o
 *.o.*
 *.d
+*.def
 *.dll
 *.dylib
 *.exe
@@ -18,8 +19,12 @@
 *.swp
 *.ver
 *.version
+*.metal.air
+*.metallib
+*.metallib.c
 *.ptx
 *.ptx.c
+*.ptx.gz
 *_g
 \#*
 .\#*
