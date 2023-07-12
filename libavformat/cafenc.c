@@ -23,6 +23,7 @@
 #include "caf.h"
 #include "isom.h"
 #include "avio_internal.h"
+#include "mux.h"
 #include "libavutil/intfloat.h"
 #include "libavutil/dict.h"
 
@@ -54,7 +55,7 @@ static uint32_t codec_flags(enum AVCodecID codec_id) {
 
 static uint32_t samples_per_packet(const AVCodecParameters *par) {
     enum AVCodecID codec_id = par->codec_id;
-    int channels = par->channels, block_align = par->block_align;
+    int channels = par->ch_layout.nb_channels, block_align = par->block_align;
     int frame_size = par->frame_size, sample_rate = par->sample_rate;
 
     switch (codec_id) {
@@ -128,7 +129,7 @@ static int caf_write_header(AVFormatContext *s)
         return AVERROR_PATCHWELCOME;
     }
 
-    if (par->codec_id == AV_CODEC_ID_OPUS && par->channels > 2) {
+    if (par->codec_id == AV_CODEC_ID_OPUS && par->ch_layout.nb_channels > 2) {
         av_log(s, AV_LOG_ERROR, "Only mono and stereo are supported for Opus\n");
         return AVERROR_INVALIDDATA;
     }
@@ -160,13 +161,13 @@ static int caf_write_header(AVFormatContext *s)
     avio_wb32(pb, codec_flags(par->codec_id));        //< mFormatFlags
     avio_wb32(pb, par->block_align);                  //< mBytesPerPacket
     avio_wb32(pb, frame_size);                        //< mFramesPerPacket
-    avio_wb32(pb, par->channels);                     //< mChannelsPerFrame
+    avio_wb32(pb, par->ch_layout.nb_channels);        //< mChannelsPerFrame
     avio_wb32(pb, av_get_bits_per_sample(par->codec_id)); //< mBitsPerChannel
 
-    if (par->channel_layout) {
+    if (par->ch_layout.order == AV_CHANNEL_ORDER_NATIVE) {
         ffio_wfourcc(pb, "chan");
         avio_wb64(pb, 12);
-        ff_mov_write_chan(pb, par->channel_layout);
+        ff_mov_write_chan(pb, par->ch_layout.u.mask);
     }
 
     if (par->codec_id == AV_CODEC_ID_ALAC) {
