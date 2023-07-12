@@ -35,6 +35,12 @@ libswscale_arm_vfp_optional_sources = {
 libswscale_arm_mmx_optional_sources = {
 }
 
+libswscale_arm_shlib_optional_sources = {
+}
+
+libswscale_arm_slib_optional_sources = {
+}
+
 libswscale_arm_optional_tests = {
 }
 

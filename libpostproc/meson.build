@@ -40,6 +40,12 @@ libpostproc_vfp_optional_sources = {
 libpostproc_mmx_optional_sources = {
 }
 
+libpostproc_shlib_optional_sources = {
+}
+
+libpostproc_slib_optional_sources = {
+}
+
 libpostproc_optional_tests = {
 }
 
@@ -50,14 +56,6 @@ ver_conf = configuration_data()
 ver_conf.set('majorver', libpostproc_majorver)
 ver_conf.set('minorver', minorver)
 ver_conf.set('microver', microver)
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
-  install_dir: join_paths(get_option('includedir'), 'libpostproc'),
-  install: true,
-)
 
 install_headers(libpostproc_headers, subdir: 'libpostproc')
 

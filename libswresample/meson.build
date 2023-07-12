@@ -25,7 +25,6 @@ libswresample_sources = files(
 
 libswresample_optional_sources = {
   'libsoxr' : files('soxr_resample.c'),
-  'shared' : files('log2_tab.c'),
 }
 
 libswresample_x86asm_optional_sources = {
@@ -49,6 +48,16 @@ libswresample_vfp_optional_sources = {
 libswresample_mmx_optional_sources = {
 }
 
+libswresample_shlib_sources = files(
+  'log2_tab.c',
+)
+
+libswresample_shlib_optional_sources = {
+}
+
+libswresample_slib_optional_sources = {
+}
+
 libswresample_tests = [
   ['swresample', files('tests/swresample.c')],
 ]
@@ -63,14 +72,6 @@ ver_conf = configuration_data()
 ver_conf.set('majorver', libswresample_majorver)
 ver_conf.set('minorver', minorver)
 ver_conf.set('microver', microver)
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
-  install_dir: join_paths(get_option('includedir'), 'libswresample'),
-  install: true,
-)
 
 install_headers(libswresample_headers, subdir: 'libswresample')
 

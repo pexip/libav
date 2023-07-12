@@ -173,6 +173,12 @@ libavcodec_x86_mmx_optional_sources = {
   'vc1dsp' : files('vc1dsp_mmx.c'),
 }
 
+libavcodec_x86_shlib_optional_sources = {
+}
+
+libavcodec_x86_slib_optional_sources = {
+}
+
 libavcodec_x86_optional_tests = {
 }
 

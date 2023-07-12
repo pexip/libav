@@ -34,7 +34,10 @@ SOURCE_TYPE_EXTS_MAP = {
     'vfp': ASM_EXTS,
     'neon': ASM_EXTS,
     'test-prog': ['c'],
-    'mmx': ['c']}
+    'mmx': ['c'],
+    'shlib': ['c'],
+    'slib': ['c'],
+}
 SOURCE_TYPE_DIRS = {'test-prog': 'tests'}
 
 
@@ -62,6 +65,8 @@ def make_to_meson(path):
       'neon': defaultdict(list),
       'test-prog': defaultdict(list),
       'mmx': defaultdict(list),
+      'shlib': defaultdict(list),
+      'slib': defaultdict(list),
     }
 
     skipped = set()
@@ -99,6 +104,22 @@ def make_to_meson(path):
                 label = ''
                 ofiles = l.split('=')[1]
                 source_type = 'asm'
+            elif re.match('SLIBOBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'slib'
+            elif re.match('SHLIBOBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'shlib'
+            elif re.match('SLIBOBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'slib'
+            elif re.match('SHLIBOBJS.*=.*', l):
+                label = ''
+                ofiles = l.split('=')[1]
+                source_type = 'shlib'
             elif re.match('MMX-OBJS-.*CONFIG.*\+\=.*', l):
                 label, ofiles = l.split('+=')
                 label = label.split('CONFIG_')[1].rstrip(' )')
@@ -203,7 +224,7 @@ def make_to_meson(path):
                         ifiles.append(tmpf)
                         add_language(languages_map, ext, label)
                         break
-                    if os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), os.path.basename(tmpf))):
+                    elif os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), os.path.basename(tmpf))):
                         ifiles.append(tmpf)
                         add_language(languages_map, ext, label)
                         break
@@ -249,7 +270,9 @@ def make_to_meson(path):
         ('armv8_', source_maps['armv8']),
         ('neon_', source_maps['neon']),
         ('vfp_', source_maps['vfp']),
-        ('mmx_', source_maps['mmx'])
+        ('mmx_', source_maps['mmx']),
+        ('shlib_', source_maps['shlib']),
+        ('slib_', source_maps['slib'])
     )
 
     for source_type, map_ in source_types:
@@ -345,6 +368,7 @@ paths = [
         'libavcodec',
         'libavcodec/aarch64',
         'libavcodec/arm',
+        'libavcodec/neon',
         'libavcodec/x86',
         'libswresample',
         'libswresample/aarch64',
@@ -354,11 +378,6 @@ paths = [
         'libavfilter/aarch64',
         'libavfilter/x86',
         'libavfilter/dnn',
-        'libavdevice',
-        'libavresample',
-        'libavresample/aarch64',
-        'libavresample/arm',
-        'libavresample/x86',
         'libpostproc',
 ]
 

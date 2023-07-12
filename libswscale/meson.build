@@ -31,7 +31,6 @@ libswscale_sources = files(
 )
 
 libswscale_optional_sources = {
-  'shared' : files('log2_tab.c'),
 }
 
 libswscale_x86asm_optional_sources = {
@@ -55,6 +54,16 @@ libswscale_vfp_optional_sources = {
 libswscale_mmx_optional_sources = {
 }
 
+libswscale_shlib_sources = files(
+  'log2_tab.c',
+)
+
+libswscale_shlib_optional_sources = {
+}
+
+libswscale_slib_optional_sources = {
+}
+
 libswscale_tests = [
   ['colorspace', files('tests/colorspace.c')],
   ['floatimg_cmp', files('tests/floatimg_cmp.c')],
@@ -72,14 +81,6 @@ ver_conf = configuration_data()
 ver_conf.set('majorver', libswscale_majorver)
 ver_conf.set('minorver', minorver)
 ver_conf.set('microver', microver)
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
-  install_dir: join_paths(get_option('includedir'), 'libswscale'),
-  install: true,
-)
 
 install_headers(libswscale_headers, subdir: 'libswscale')
 

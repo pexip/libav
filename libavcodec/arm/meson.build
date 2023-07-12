@@ -108,6 +108,12 @@ libavcodec_arm_vfp_optional_sources = {
 libavcodec_arm_mmx_optional_sources = {
 }
 
+libavcodec_arm_shlib_optional_sources = {
+}
+
+libavcodec_arm_slib_optional_sources = {
+}
+
 libavcodec_arm_optional_tests = {
 }
 

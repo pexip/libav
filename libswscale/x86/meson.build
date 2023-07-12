@@ -12,6 +12,7 @@ libswscale_x86_x86asm_sources = files(
   'input.asm',
   'output.asm',
   'scale.asm',
+  'scale_avx2.asm',
   'rgb_2_rgb.asm',
   'yuv_2_rgb.asm',
   'yuv2yuvX.asm',
@@ -40,6 +41,12 @@ libswscale_x86_mmx_sources = files(
 )
 
 libswscale_x86_mmx_optional_sources = {
+}
+
+libswscale_x86_shlib_optional_sources = {
+}
+
+libswscale_x86_slib_optional_sources = {
 }
 
 libswscale_x86_optional_tests = {

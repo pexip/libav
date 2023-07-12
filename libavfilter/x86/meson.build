@@ -16,8 +16,10 @@ libavfilter_x86_optional_sources = {
   'idet_filter' : files('vf_idet_init.c'),
   'interlace_filter' : files('vf_tinterlace_init.c'),
   'limiter_filter' : files('vf_limiter_init.c'),
+  'lut3d_filter' : files('vf_lut3d_init.c'),
   'maskedclamp_filter' : files('vf_maskedclamp_init.c'),
   'maskedmerge_filter' : files('vf_maskedmerge_init.c'),
+  'nlmeans_filter' : files('vf_nlmeans_init.c'),
   'noise_filter' : files('vf_noise.c'),
   'overlay_filter' : files('vf_overlay_init.c'),
   'pp7_filter' : files('vf_pp7_init.c'),
@@ -57,8 +59,10 @@ libavfilter_x86_x86asm_optional_sources = {
   'idet_filter' : files('vf_idet.asm'),
   'interlace_filter' : files('vf_interlace.asm'),
   'limiter_filter' : files('vf_limiter.asm'),
+  'lut3d_filter' : files('vf_lut3d.asm'),
   'maskedclamp_filter' : files('vf_maskedclamp.asm'),
   'maskedmerge_filter' : files('vf_maskedmerge.asm'),
+  'nlmeans_filter' : files('vf_nlmeans.asm'),
   'overlay_filter' : files('vf_overlay.asm'),
   'pp7_filter' : files('vf_pp7.asm'),
   'psnr_filter' : files('vf_psnr.asm'),
@@ -94,6 +98,12 @@ libavfilter_x86_vfp_optional_sources = {
 }
 
 libavfilter_x86_mmx_optional_sources = {
+}
+
+libavfilter_x86_shlib_optional_sources = {
+}
+
+libavfilter_x86_slib_optional_sources = {
 }
 
 libavfilter_x86_optional_tests = {

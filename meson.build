@@ -1,4 +1,5 @@
 # Copyright (c) 2018 Mathieu Duponchelle <mathieu@centricular.com>
+# Copyright (c) 2023 L. E. Segovia <amy@centricular.com>
 #
 # This file is part of the FFmpeg Meson build
 #
@@ -19,7 +20,7 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.59',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99', 'cpp_std=c++11'],
-  version: '4.4.4',
+  version: '5.0.3',
 )
 
 # HOWTO:
@@ -228,6 +229,8 @@ arch_ext_list_loongson = [
   'loongson2',
   'loongson3',
   'mmi',
+  'lsx',
+  'lasx',
 ]
 
 arch_ext_list = arch_ext_list_arm + arch_ext_list_ppc + arch_ext_list_x86 + arch_ext_list_mips + arch_ext_list_loongson
@@ -448,6 +451,22 @@ toolchain_features = [
 
 types_list = [
   'kCMVideoCodecType_HEVC',
+  'kCMVideoCodecType_HEVCWithAlpha',
+  'kCMVideoCodecType_VP9',
+  'kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange',
+  'kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange',
+  'kCVPixelFormatType_422YpCbCr10BiPlanarVideoRange',
+  'kCVPixelFormatType_422YpCbCr16BiPlanarVideoRange',
+  'kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange',
+  'kCVPixelFormatType_444YpCbCr10BiPlanarVideoRange',
+  'kCVPixelFormatType_444YpCbCr16BiPlanarVideoRange',
+  'kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ',
+  'kCVImageBufferTransferFunction_ITU_R_2100_HLG',
+  'kCVImageBufferTransferFunction_Linear',
+  'kCVImageBufferYCbCrMatrix_ITU_R_2020',
+  'kCVImageBufferColorPrimaries_ITU_R_2020',
+  'kCVImageBufferTransferFunction_ITU_R_2020',
+  'kCVImageBufferTransferFunction_SMPTE_ST_428_1',
   'socklen_t',
   'struct_addrinfo',
   'struct_group_source_req',
@@ -496,6 +515,7 @@ have_list = (arch_ext_list + arch_ext_list_external + arch_ext_list_inline + arc
   builtin_list + complex_funcs + have_list_cmdline +
   have_list_pub + headers_list + intrinsics_list + math_funcs + system_features + system_funcs +
   system_libraries + threads_list + toolchain_features + types_list + [
+  'gzip',
   'makeinfo',
   'makeinfo_html',
   'mmx2',
@@ -508,11 +528,13 @@ have_list = (arch_ext_list + arch_ext_list_external + arch_ext_list_inline + arc
   'perl',
   'pod2man',
   'texi2html',
+  'xmllint',
+  'zlib_gzip'
 ])
 
 arch_features = [
   ['aligned_stack', ['aarch64', 'ppc', 'x86']],
-  ['fast_64bit', ['aarch64', 'alpha', 'ia64', 'mips64', 'parisc64', 'ppc64', 'sparc64', 'x86_64']],
+  ['fast_64bit', ['aarch64', 'alpha', 'ia64', 'mips64', 'parisc64', 'ppc64', 'riscv64', 'sparc64', 'x86_64']],
   ['fast_clz', ['aarch64', 'alpha', 'avr32', 'mips', 'ppc', 'x86']],
   ['fast_unaligned', ['aarch64', 'ppc', 'x86']],
   ['simd_align_16', ['altivec', 'neon', 'sse']],
@@ -529,12 +551,16 @@ arch_list = [
   'avr32_uc',
   'bfin',
   'ia64',
+  'loongarch',
+  'loongarch32',
+  'loongarch64',
   'm68k',
   'mips',
   'mips64',
   'parisc',
   'ppc',
   'ppc64',
+  'riscv',
   's390',
   'sh4',
   'sparc',
@@ -578,24 +604,6 @@ check_structs = [
   ['struct stat', 'st_mtim.tv_nsec', '#include <sys/stat.h>\n#define _BSD_SOURCE'],
 ]
 
-hwaccel_autodetect_library_list = [
-  'amf',
-  'audiotoolbox',
-  'crystalhd',
-  'cuda',
-  'cuvid',
-  'd3d11va',
-  'dxva2',
-  'ffnvcodec',
-  'nvdec',
-  'nvenc',
-  'vaapi',
-  'vdpau',
-  'videotoolbox',
-  'v4l2_m2m',
-  'xvmc',
-]
-
 external_autodetect_library_list = [
   'alsa',
   'appkit',
@@ -609,6 +617,7 @@ external_autodetect_library_list = [
   'libxcb_xfixes',
   'lzma',
   'mediafoundation',
+  'metal',
   'schannel',
   'sdl2',
   'securetransport',
@@ -634,7 +643,6 @@ library_gpl_list = [
 library_nonfree_list = [
   'decklink',
   'libfdk_aac',
-  'openssl',
   'libtls',
 ]
 
@@ -764,7 +772,7 @@ check_pkg_config = [
   ['libaom', ['aom/aom_codec.h'], ['aom_codec_version'], {'pkg': 'aom', 'version': '>= 0.1.0'}],
   ['libaribb24', ['aribb24/aribb24.h'], ['arib_instance_new'], {'pkg': 'aribb24', 'version': '> 1.0.3'}],
   ['lv2', ['lilv-0/lilv/lilv.h'], ['lilv_world_new'], {'pkg': 'lilv-0'}],
-  ['libass', ['ass/ass.h'], ['ass_library_init'], {}],
+  ['libass', ['ass/ass.h'], ['ass_library_init'], {'pkg': 'libass', 'version': '>= 0.11.0'}],
   ['libbluray', ['libbluray/bluray.h'], ['bd_open'], {}],
   ['libbs2b', ['bs2b.h'], ['bs2b_open'], {}],
   ['libcaca', ['caca.h'], ['caca_create_canvas'], {'pkg': 'caca'}],
@@ -794,6 +802,7 @@ check_pkg_config = [
                                                     'c_args': ['-DOPJ_STATIC']}],
   ['libopenmpt', ['libopenmpt/libopenmpt.h'], ['openmpt_module_create'], {'version': '>= 0.2.6557'}],
   ['libopus', ['opus_multistream.h'], ['opus_multistream_decoder_create', 'opus_multistream_surround_encoder_create'], {'pkg': 'opus'}],
+  ['libplacebo', ['libplacebo/vulkan.h'], ['pl_vulkan_create'], {'pkg': 'libplacebo', 'version': '>= 4.192.0'}],
   ['libpulse', ['pulse/pulseaudio.h'], ['pa_context_new'], {}],
   ['librabbitmq', ['amqp.h'], ['amqp_new_connection'], {'pkg': 'librabbitmq', 'version': '>= 0.7.1'}],
   ['librav1e', ['rav1e.h'], ['rav1e_context_new'], {'pkg': 'rav1e', 'version': '>= 0.1.0'}],
@@ -801,6 +810,7 @@ check_pkg_config = [
   ['librsvg', ['librsvg-2.0/librsvg/rsvg.h'], ['rsvg_handle_render_cairo'], {'pkg': 'librsvg-2.0'}],
   ['librtmp', ['librtmp/rtmp.h'], ['RTMP_Socket'], {}],
   ['librubberband', ['rubberband/rubberband-c.h'], ['rubberband_new'], {'pkg': 'rubberband', 'version': '>= 1.8.1'}],
+  ['spirv_compiler', ['shaderc/shaderc.h'], ['shaderc_compiler_initialize'], {'pkg': 'shaderc', 'version': '>= 2019.'}],
   ['libshine', ['shine/layer3.h'], ['shine_encode_buffer'], {'pkg': 'shine'}],
   ['libsmbclient', ['libsmbclient.h'], ['smbc_init'], {'pkg': 'smbclient'}],
   ['libssh', ['libssh/sftp.h'], ['sftp_init'], {}],
@@ -831,13 +841,18 @@ check_pkg_config = [
   ['libzimg', ['zimg.h'], ['zimg_get_api_version'], {'pkg': 'zimg', 'version': '>= 2.7.0'}],
   ['libzmq', ['zmq.h'], ['zmq_ctx_new'], {}],
   ['libzvbi', ['libzvbi.h'], ['vbi_decoder_new'], {'pkg': 'zvbi-0.2'}],
+  ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl'], {'pkg': 'openssl', 'version': '>= 3.0.0'}],
   ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl', 'SSL_library_init'], {'has_any_func': true}],
   ['pocketsphinx', ['pocketsphinx/pocketsphinx.h'], ['ps_init'], {}],
   ['rkmpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'pkg': 'rockchip_mpp'}],
   ['rockchip_mpp', ['rockchip/rk_mpi.h'], ['mpp_create'], {'version': '>= 1.3.7'}],
   ['sdl2', ['SDL_events.h'], ['SDL_PollEvent'], {'version': ['>= 2.0.1', '< 3.0.0']}],
+  ['sndio', ['sndio.h'], ['sio_open'], {'pkg': 'sndio'}],
   ['vapoursynth', ['VSScript.h'], ['vsscript_init'], {'pkg': 'vapoursynth-script', 'version': '>= 42'}],
-  ['vulkan', ['vulkan/vulkan.h'], ['vkCreateInstance'], {'pkg': 'vulkan', 'version': '>= 1.1.97'}],
+  ['vulkan', ['vulkan/vulkan.h'], ['vkCreateInstance'], {'pkg': 'vulkan', 'version': '>= 1.2.189'}],
+  ['xlib_x11', ['X11/Xlib.h'], ['XPending'], {'pkg': 'xlib'}],
+  ['xlib_xext', ['X11/Xlib.h', 'X11/extensions/XShm.h'], ['XShmAttach'], {'pkg': 'xext'}],
+  ['xlib_xv', ['X11/Xlib.h', 'X11/extensions/Xvlib.h'], ['XvGetPortAttribute'], {'pkg': 'xv'}],
 ]
 
 foreach check : check_pkg_config
@@ -864,7 +879,7 @@ check_components = [
   ['clock_gettime', ['time.h'], ['clock_gettime'], ['rt']],
   ['cuda_sdk', ['cuda.h'], ['cuCtxCreate'], ['cuda']],
   ['crystalhd', ['stdint.h', 'libcrystalhd/libcrystalhd_if.h'], ['DtsCrystalHDVersion'], ['crystalhd']],
-  ['frei0r', ['frei0r.h', 'dlfcn.h'], [], []],
+  ['frei0r', ['frei0r.h'], [], []],
   ['libgme', ['gme/gme.h'], ['gme_new_emu'], ['gme', 'stdc++']],
   ['gcrypt', ['gcrypt.h'], ['gcry_mpi_new'], ['gcrypt']],
   ['gmp', ['gmp.h'], ['mpz_export'], ['gmp']],
@@ -884,8 +899,8 @@ check_components = [
   ['libilbc', ['ilbc.h'], ['WebRtcIlbcfix_InitDecode'], ['lbc']],
   ['libm', ['math.h'], ['sin'], ['m'], {'always-check': true}], # always check for libm don't provide an option to disable it
   ['libopenvino', ['c_api/ie_c_api.h'], ['ie_c_api_version'], ['inference_engine_c_api']],
-  ['libnpp', ['npp.h'], ['nppGetLibVersion'], ['nppig', 'nppicc', 'nppc']],
-  ['libnpp', ['npp.h'], ['nppGetLibVersion'], ['nppi', 'nppc']],
+  ['libnpp', ['npp.h'], ['nppGetLibVersion'], ['nppig', 'nppicc', 'nppc', 'nppidei', 'nppif']],
+  ['libnpp', ['npp.h'], ['nppGetLibVersion'], ['nppi', 'nppif', 'nppc', 'nppidei']],
   ['libopencore_amrnb', ['opencore-amrnb/interf_dec.h'], ['Decoder_Interface_init'], ['opencore-amrnb']],
   ['libopencore_amrwb', ['opencore-amrwb/dec_if.h'], ['D_IF_init'], ['opencore-amrwb']],
   ['libopencv', ['opencv2/core/core_c.h'], ['cvCreateImageHeader'], ['opencv_core', 'opencv_imgproc']],
@@ -934,7 +949,7 @@ check_components = [
   ['vaapi_drm', ['va/va.h', 'va/va_drm.h'], ['vaGetDisplayDRM'], ['va', 'va-drm'],
     {'preconditions': ['vaapi']}],
   ['vaapi_x11', ['va/va.h', 'va/va_x11.h'], ['vaGetDisplay'], ['va', 'va-x11', 'X11'],
-    {'preconditions': ['vaapi']}],
+    {'preconditions': ['vaapi', 'xlib_x11']}],
   ['vdpau_x11', ['vdpau/vdpau.h', 'vdpau/vdpau_x11.h'], ['vdp_device_create_x11'], ['vdpau', 'X11'],
     {'preconditions' : ['vdpau']}],
   ['libmfx', ['mfx/mfxvideo.h'], ['MFXInit'], ['libmfx'],
@@ -973,13 +988,11 @@ check_header_funcs = [
   ['Sleep', ['windows.h']],
   ['VirtualAlloc', ['windows.h']],
   ['glob', ['glob.h']],
-  ['XvGetPortAttribute', ['X11/Xlib.h', 'X11/extensions/Xvlib.h'], {'link_with': ['Xv', 'X11', 'Xext']}],
   ['CreateDIBSection', ['windows.h'], {'link_with': ['gdi32']}],
   ['InitializeSecurityContext', ['windows.h', 'security.h'], {'link_with': ['secur32']}],
   ['atomic_cas_ptr', ['atomic.h']],
   ['machine_rw_barrier', ['mbarrier.h'], {'funcs': ['__machine_rw_barrier']}],
   ['MemoryBarrier', ['windows.h']],
-  ['x264_csp_bgr', ['stdint.h', 'x264.h'], {'defines': ['X264_CSP_BGR']}],
   ['posix_memalign', ['stdlib.h']],
   ['sem_timedwait', ['semaphore.h'], {'preconditions': ['pthreads'], 'extra_deps': ['thread_dep']}],
 ]
@@ -1157,12 +1170,14 @@ external_library_list = library_gpl_list + library_nonfree_list + library_versio
   'libopenjpeg',
   'libopenmpt',
   'libopus',
+  'libplacebo',
   'libpulse',
   'librabbitmq',
   'librav1e',
   'librist',
   'librsvg',
   'librtmp',
+  'libshaderc',
   'libshine',
   'libsmbclient',
   'libsnappy',
@@ -1188,8 +1203,28 @@ external_library_list = library_gpl_list + library_nonfree_list + library_versio
   'mediacodec',
   'openal',
   'opengl',
+  'openssl',
   'pocketsphinx',
   'vapoursynth',
+]
+
+hwaccel_autodetect_library_list = [
+  'amf',
+  'audiotoolbox',
+  'crystalhd',
+  'cuda',
+  'cuvid',
+  'd3d11va',
+  'dxva2',
+  'ffnvcodec',
+  'nvdec',
+  'nvenc',
+  'vaapi',
+  'vdpau',
+  'videotoolbox',
+  'vulkan',
+  'v4l2_m2m',
+  'xvmc',
 ]
 
 hwaccel_library_nonfree_list = [
@@ -1202,7 +1237,6 @@ hwaccel_library_list = hwaccel_library_nonfree_list + [
   'mmal',
   'omx',
   'opencl',
-  'vulkan'
 ]
 
 subsystem_list = [
@@ -1269,6 +1303,7 @@ config_extra = [
   'cbs_mpeg2',
   'dirac_parse',
   'dnn',
+  'dovi_rpu',
   'dvprofile',
   'exif',
   'faandct',
@@ -1310,6 +1345,7 @@ config_extra = [
   'mpegaudio',
   'mpegaudiodsp',
   'mpegaudioheader',
+  'mpeg4audio',
   'mpegvideo',
   'mpegvideoenc',
   'mss34dsp',
@@ -1354,7 +1390,6 @@ library_list = [
   'avdevice',
   'avfilter',
   'avformat',
-  'avresample',
   'avutil',
   'postproc',
   'swresample',
@@ -1375,6 +1410,7 @@ apple_frameworks = [
   'AudioToolbox',
   'AVFoundation',
   'CoreImage',
+  'Metal',
   'VideoToolbox',
   'CoreGraphics',
   'CoreServices',
@@ -1427,9 +1463,11 @@ config_list = (
     'fontconfig',
     'linux_perf',
     'memory_poisoning',
+    'macos_kperf',
     'neon_clobber_test',
     'ossfuzz',
     'pic',
+    'ptx_compression',
     'thumb',
     'valgrind_backtrace',
     'xmm_clobber_test',
@@ -1587,6 +1625,12 @@ conf.set10('bigendian', host_machine.endian() == 'big')
 conf.set10('fast_unaligned', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_machine.cpu_family()))
 
 conf.set('frame_thread_encoder', 1)
+
+# these filters depend on removed avcodec APIs
+# they are kept disabled for now, but will be removed if
+# nobody updates and re-enables them
+conf.set('mcdeint_filter', 0)
+conf.set('uspp_filter', 0)
 
 if ['linux', 'darwin', 'android'].contains(host_machine.system())
   conf.set10('pthreads', thread_dep.found())
@@ -1828,6 +1872,22 @@ endforeach
 if conf.get('gnutls') == 1 and conf.get('openssl') == 1
   # Simply picking one for now
   conf.set('openssl', 0)
+endif
+
+# Manual check for OpenSSL
+if conf.get('openssl') == 1
+  test_openssl_dep = dependency('openssl', required: false, version: '>= 3.0.0')
+  if test_openssl_dep.found()
+    is_blocked_by_license = not get_option('version3').disabled() or get_option('gpl').disabled() or not get_option('nonfree').disabled()
+    if is_blocked_by_license
+      error('OpenSSL >=3.0.0 requires -Dversion3=enabled')
+    endif
+  else
+    is_blocked_by_license = not get_option('gpl').disabled() and  get_option('nonfree').disabled()
+    if is_blocked_by_license
+      error('OpenSSL <3.0.0 is incompatible with the gpl')
+    endif
+  endif
 endif
 
 if conf.get('opengl') == 1 and not cc.has_header('GL/glext.h')
@@ -2305,7 +2365,6 @@ subdir('libavcodec')
 subdir('libavformat')
 subdir('libavfilter')
 subdir('libavdevice')
-subdir('libavresample')
 subdir('fftools')
 
 util_list = ['cuda', 'd3d11va', 'dxva2', 'libdrm', 'lzo', 'mediacodec', 'opencl', 'qsv', 'vaapi', 'vdpau', 'videotoolbox']
@@ -2375,7 +2434,6 @@ endif
 add_project_arguments(project_c_args, language: 'c')
 
 libavutil_optional_deps = [vaapi_drm_extra_deps + vaapi_x11_extra_deps + vdpau_x11_extra_deps]
-libavdevice_extra_deps = [xvgetportattribute_extra_deps]
 libswresample_optional_deps = [libsoxr_extra_deps]
 
 common_deps += libm_extra_deps
@@ -2387,8 +2445,7 @@ built_libs = [
   ['swscale', ['libavutil']],
   ['avcodec', ['libavutil', 'libswresample']],
   ['avformat', ['libavutil', 'libavcodec']],
-  ['avresample', ['libavutil']],
-  ['avfilter', ['libavutil', 'libavcodec', 'libavformat', 'libswscale', 'libswresample', 'libavresample', 'libpostproc']],
+  ['avfilter', ['libavutil', 'libavcodec', 'libavformat', 'libswscale', 'libswresample', 'libpostproc']],
   ['avdevice', ['libavutil', 'libavformat', 'libavfilter', 'libavcodec']],
 ]
 
@@ -2416,6 +2473,14 @@ foreach built_lib : built_libs
   optional_deps = get_variable('lib@0@_optional_deps'.format(built_lib[0]), [])
 
   sources += get_variable('lib@0@_@1@_sources'.format(built_lib[0], arch), [])
+
+  if conf.get('shared', 0) == 1
+    sources += get_variable('lib@0@_shlib_sources'.format(built_lib[0]), [])
+    sources += get_variable('lib@0@_@1@_shlib_sources'.format(built_lib[0], arch), [])
+  else
+    sources += get_variable('lib@0@_slib_sources'.format(built_lib[0]), [])
+    sources += get_variable('lib@0@_@1@_slib_sources'.format(built_lib[0], arch), [])
+  endif
 
   if host_machine.system() == 'windows'
     sources += windows.compile_resources(
@@ -2453,6 +2518,17 @@ foreach built_lib : built_libs
       foreach lang: languages_map[comp_name]
         add_languages(languages_map[comp_name], required: get_option(comp_name).enabled(), native: false)
       endforeach
+    endif
+  endforeach
+
+  if conf.get('shared', 0) == 1
+    optional_sources = get_variable('lib@0@_shlib_optional_sources'.format(built_lib[0]), {})
+  else
+    optional_sources = get_variable('lib@0@_slib_optional_sources'.format(built_lib[0]), {})
+  endif
+  foreach comp_name, comp_sources : optional_sources
+    if conf.get(comp_name, 0) == 1
+      sources += comp_sources
     endif
   endforeach
 
@@ -2646,7 +2722,7 @@ foreach built_exe : built_exe_list
     install: true,
     dependencies: deps,
     include_directories: common_incs,
-    link_with: [libavutil, libavcodec, libavfilter, libavdevice, libavformat, libavresample, libswscale, libswresample, libpostproc],
+    link_with: [libavutil, libavcodec, libavfilter, libavdevice, libavformat, libswscale, libswresample, libpostproc],
     implicit_include_directories : false,
   )
 
@@ -2664,7 +2740,6 @@ pkg_infos = [
   ['Multimedia formats', 'libavformat'],
   ['Media device handling', 'libavdevice'],
   ['Audio/video filtering library', 'libavfilter'],
-  ['Libav audio resampling library', 'libavresample'],
 ]
 
 foreach pkg_info : pkg_infos

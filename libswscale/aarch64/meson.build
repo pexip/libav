@@ -35,6 +35,12 @@ libswscale_aarch64_vfp_optional_sources = {
 libswscale_aarch64_mmx_optional_sources = {
 }
 
+libswscale_aarch64_shlib_optional_sources = {
+}
+
+libswscale_aarch64_slib_optional_sources = {
+}
+
 libswscale_aarch64_optional_tests = {
 }
 

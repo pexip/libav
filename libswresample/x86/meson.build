@@ -35,6 +35,12 @@ libswresample_x86_vfp_optional_sources = {
 libswresample_x86_mmx_optional_sources = {
 }
 
+libswresample_x86_shlib_optional_sources = {
+}
+
+libswresample_x86_slib_optional_sources = {
+}
+
 libswresample_x86_optional_tests = {
 }
 

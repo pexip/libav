@@ -27,9 +27,9 @@ def list_components(infile, full):
     for line in infile:
         if not full:
             matches = re.match(
-                r'^[^#]*extern AVFilter\s*ff_[^_]*_(.*);', line.strip())
+                r'^extern\s+(?:const\s+)?AVFilter\s*ff_[^_]*_(.*);', line.strip())
         else:
-            matches = re.match(r'^[^#]*extern AVFilter\s*ff_(.*_.*);', line.strip())
+            matches = re.match(r'extern\s+(?:const\s+)?AVFilter\s*ff_(.*_.*);', line.strip())
         if (matches):
             if not args.full:
                 things.append(('%s_filter' % matches.group(1).strip()))

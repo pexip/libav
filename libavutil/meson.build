@@ -1,11 +1,3 @@
-kwargs = {'prefix': '#include "libavutil/version.h"'} + get_version_define_kwargs
-
-libavutil_majorver = cc.get_define('LIBAVUTIL_VERSION_MAJOR', kwargs: kwargs)
-minorver = cc.get_define('LIBAVUTIL_VERSION_MINOR', kwargs: kwargs)
-microver = cc.get_define('LIBAVUTIL_VERSION_MICRO', kwargs: kwargs)
-
-libavutil_version = f'@libavutil_majorver@.@minorver@.@microver@'
-
 libavutil_headers = files(
   'adler32.h',
   'aes.h',
@@ -112,6 +104,7 @@ libavutil_sources = files(
   'cpu.c',
   'crc.c',
   'des.c',
+  'detection_bbox.c',
   'dict.c',
   'display.c',
   'dovi_meta.c',
@@ -179,6 +172,7 @@ libavutil_optional_sources = {
   'dxva2' : files('hwcontext_dxva2.c'),
   'libdrm' : files('hwcontext_drm.c'),
   'lzo' : files('lzo.c'),
+  'macos_kperf' : files('macos_kperf.c'),
   'mediacodec' : files('hwcontext_mediacodec.c'),
   'opencl' : files('hwcontext_opencl.c'),
   'qsv' : files('hwcontext_qsv.c'),
@@ -207,6 +201,12 @@ libavutil_vfp_optional_sources = {
 }
 
 libavutil_mmx_optional_sources = {
+}
+
+libavutil_shlib_optional_sources = {
+}
+
+libavutil_slib_optional_sources = {
 }
 
 libavutil_tests = [
@@ -276,20 +276,6 @@ libavutil_optional_tests = {
 
 #### --- END GENERATED --- ####
 
-# Version file
-ver_conf = configuration_data()
-ver_conf.set('majorver', libavutil_majorver)
-ver_conf.set('minorver', minorver)
-ver_conf.set('microver', microver)
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
-  install_dir: join_paths(get_option('includedir'), 'libavutil'),
-  install: true,
-)
-
 install_headers(libavutil_headers, subdir: 'libavutil')
 
 # Lavu configuration file
@@ -303,6 +289,20 @@ configure_file(
   install_dir: join_paths(get_option('includedir'), 'libavutil'),
   install: true,
 )
+
+kwargs = {'prefix': '#include "libavutil/version.h"'} + get_version_define_kwargs
+
+libavutil_majorver = cc.get_define('LIBAVUTIL_VERSION_MAJOR', kwargs: kwargs)
+minorver = cc.get_define('LIBAVUTIL_VERSION_MINOR', kwargs: kwargs)
+microver = cc.get_define('LIBAVUTIL_VERSION_MICRO', kwargs: kwargs)
+
+libavutil_version = f'@libavutil_majorver@.@minorver@.@microver@'
+
+# Version file
+ver_conf = configuration_data()
+ver_conf.set('majorver', libavutil_majorver)
+ver_conf.set('minorver', minorver)
+ver_conf.set('microver', microver)
 
 configure_file(
   input: 'libavutil.v.in',

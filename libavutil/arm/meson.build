@@ -37,6 +37,12 @@ libavutil_arm_vfp_optional_sources = {
 libavutil_arm_mmx_optional_sources = {
 }
 
+libavutil_arm_shlib_optional_sources = {
+}
+
+libavutil_arm_slib_optional_sources = {
+}
+
 libavutil_arm_optional_tests = {
 }
 

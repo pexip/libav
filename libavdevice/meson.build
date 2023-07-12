@@ -48,7 +48,6 @@ libavdevice_optional_sources = {
   'pulse_indev' : files('pulse_audio_dec.c','pulse_audio_common.c','timefilter.c'),
   'pulse_outdev' : files('pulse_audio_enc.c','pulse_audio_common.c'),
   'sdl2_outdev' : files('sdl2.c'),
-  'shared' : files('reverse.c'),
   'sndio_indev' : files('sndio_dec.c','sndio.c'),
   'sndio_outdev' : files('sndio_enc.c','sndio.c'),
   'v4l2_indev' : files('v4l2.c','v4l2-common.c','timefilter.c'),
@@ -98,14 +97,6 @@ ver_conf = configuration_data()
 ver_conf.set('majorver', libavdevice_majorver)
 ver_conf.set('minorver', minorver)
 ver_conf.set('microver', microver)
-
-configure_file(
-  input: 'version.h.in',
-  output: 'version.h',
-  configuration: ver_conf,
-  install_dir: join_paths(get_option('includedir'), 'libavdevice'),
-  install: true,
-)
 
 install_headers(libavdevice_headers, subdir: 'libavdevice')
 
