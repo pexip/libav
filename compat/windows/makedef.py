@@ -70,18 +70,17 @@ if __name__ == '__main__':
 
     if args.nm is not None:
         # Use eval, since NM="nm -g"
+        # Add -j to ensure only symbol names are output (otherwise in macOS
+        # a race condition can occur in the redirection)
         s = subprocess.run([args.nm, '--defined-only',
-                            '-g', libname], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=True)
+                            '-g', '-j', libname], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=True)
         dump = s.stdout.splitlines()
         # Exclude lines with ':' (object name)
         dump = [x for x in dump if ":" not in x]
         # Exclude blank lines
         dump = [x for x in dump if len(x) > 0]
-        # Take only the third field (split by spaces)
-        dump = [x.split()[2] for x in dump]
         # Subst the prefix out
-        dump = [x.replace(f'^{prefix}', '') for x in dump]
-
+        dump = [re.sub(f'^{prefix}', '', x) for x in dump]
     else:
         dump = subprocess.run([args.dumpbin, '-linkermember:1', libname],
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout.splitlines()
