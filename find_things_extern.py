@@ -24,10 +24,10 @@ import re
 EXTERN_THINGS = [
     ['AVOutputFormat', 'muxer', 'libavformat/allformats.c', 'muxer_list'],
     ['AVInputFormat', 'demuxer', 'libavformat/allformats.c', 'demuxer_list'],
-    ['AVCodec', 'encoder', 'libavcodec/allcodecs.c', 'encoder_list'],
-    ['AVCodec', 'decoder', 'libavcodec/allcodecs.c', 'decoder_list'],
+    ['FFCodec', 'encoder', 'libavcodec/allcodecs.c', 'encoder_list'],
+    ['FFCodec', 'decoder', 'libavcodec/allcodecs.c', 'decoder_list'],
     ['AVCodecParser', 'parser', 'libavcodec/parsers.c', 'parser_list'],
-    ['AVBitStreamFilter', 'bsf', 'libavcodec/bitstream_filters.c', 'bsf_list'],
+    ['FFBitStreamFilter', 'bsf', 'libavcodec/bitstream_filters.c', 'bsf_list'],
     ['AVHWAccel', 'hwaccel', 'libavcodec/hwaccels.h', 'hwaccel_list'],
     ['URLProtocol', 'protocol', 'libavformat/protocols.c', 'protocol_list'],
     ['AVOutputFormat', 'muxer', 'libavdevice/alldevices.c', 'outdev_list', 'outdev'],

@@ -21,6 +21,7 @@ libswresample_sources = files(
   'resample_dsp.c',
   'swresample.c',
   'swresample_frame.c',
+  'version.c',
 )
 
 libswresample_optional_sources = {

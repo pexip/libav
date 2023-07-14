@@ -26,6 +26,7 @@ libswscale_sources = files(
   'swscale.c',
   'swscale_unscaled.c',
   'utils.c',
+  'version.c',
   'yuv2rgb.c',
   'vscale.c',
 )

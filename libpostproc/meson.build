@@ -14,6 +14,7 @@ libpostproc_headers = files(
 
 libpostproc_sources = files(
   'postprocess.c',
+  'version.c',
 )
 
 libpostproc_optional_sources = {

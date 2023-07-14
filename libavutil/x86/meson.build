@@ -4,11 +4,11 @@ libavutil_x86_sources = files(
   'float_dsp_init.c',
   'imgutils_init.c',
   'lls_init.c',
-  'tx_float_init.c',
 )
 
 libavutil_x86_optional_sources = {
   'pixelutils' : files('pixelutils_init.c'),
+  'x86asm' : files('tx_float_init.c'),
 }
 
 libavutil_x86_x86asm_sources = files(

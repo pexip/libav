@@ -103,6 +103,7 @@ libavutil_sources = files(
   'color_utils.c',
   'cpu.c',
   'crc.c',
+  'csp.c',
   'des.c',
   'detection_bbox.c',
   'dict.c',
@@ -120,6 +121,7 @@ libavutil_sources = files(
   'frame.c',
   'hash.c',
   'hdr_dynamic_metadata.c',
+  'hdr_dynamic_vivid_metadata.c',
   'hmac.c',
   'hwcontext.c',
   'imgutils.c',
@@ -129,6 +131,7 @@ libavutil_sources = files(
   'lls.c',
   'log.c',
   'log2_tab.c',
+  'lzo.c',
   'mathematics.c',
   'mastering_display_metadata.c',
   'md5.c',
@@ -162,6 +165,8 @@ libavutil_sources = files(
   'tx_float.c',
   'tx_double.c',
   'tx_int32.c',
+  'uuid.c',
+  'version.c',
   'video_enc_params.c',
   'film_grain_params.c',
 )
@@ -171,7 +176,6 @@ libavutil_optional_sources = {
   'd3d11va' : files('hwcontext_d3d11va.c'),
   'dxva2' : files('hwcontext_dxva2.c'),
   'libdrm' : files('hwcontext_drm.c'),
-  'lzo' : files('lzo.c'),
   'macos_kperf' : files('macos_kperf.c'),
   'mediacodec' : files('hwcontext_mediacodec.c'),
   'opencl' : files('hwcontext_opencl.c'),
@@ -179,7 +183,7 @@ libavutil_optional_sources = {
   'vaapi' : files('hwcontext_vaapi.c'),
   'vdpau' : files('hwcontext_vdpau.c'),
   'videotoolbox' : files('hwcontext_videotoolbox.c'),
-  'vulkan' : files('hwcontext_vulkan.c'),
+  'vulkan' : files('hwcontext_vulkan.c','hwcontext_stub.c'),
 }
 
 libavutil_x86asm_optional_sources = {
@@ -220,6 +224,7 @@ libavutil_tests = [
   ['bprint', files('tests/bprint.c')],
   ['cast5', files('tests/cast5.c')],
   ['camellia', files('tests/camellia.c')],
+  ['channel_layout', files('tests/channel_layout.c')],
   ['color_utils', files('tests/color_utils.c')],
   ['cpu', files('tests/cpu.c')],
   ['crc', files('tests/crc.c')],
@@ -256,6 +261,7 @@ libavutil_tests = [
   ['tree', files('tests/tree.c')],
   ['twofish', files('tests/twofish.c')],
   # MANUAL ['utf8', files('tests/utf8.c')],
+  ['uuid', files('tests/uuid.c')],
   ['xtea', files('tests/xtea.c')],
   ['tea', files('tests/tea.c')],
 ]
@@ -280,8 +286,9 @@ install_headers(libavutil_headers, subdir: 'libavutil')
 
 # Lavu configuration file
 lavu_conf = configuration_data()
-lavu_conf.set10('AV_HAVE_BIGENDIAN', host_machine.endian() == 'big')
-lavu_conf.set10('HAVE_FAST_UNALIGNED', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_machine.cpu_family()))
+foreach config: have_list_pub
+  lavu_conf.set('AV_HAVE_@0@'.format(config.to_upper()), conf.get(config.to_lower()))
+endforeach
 
 configure_file(
   output: 'avconfig.h',
