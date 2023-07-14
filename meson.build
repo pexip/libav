@@ -1946,7 +1946,12 @@ if conf.get('x86') == 1
 
   conf.set('local_aligned', 1)
 
-  if conf.get('asm', 0) == 1
+  # Manual: the configure script never checks if x86asm is enabled outside
+  # of an x86 context. So I fix those semantics here.
+  conf.set10('x86asm', get_option('x86asm').allowed())
+
+  if (conf.get('asm', 1) == 1) and (conf.get('mmx', 1) == 1) and (conf.get('x86asm', 1) == 1)
+    conf.set('x86asm', 0)
     nasm_version = '>=0'
     if host_machine.system() == 'windows'
       nasm_version = '>=2.12'

@@ -2253,6 +2253,7 @@ option('ffprobe', type: 'feature', value: 'enabled', description: 'Build ffprobe
 
 # ASM options
 option('asm', type: 'feature', value: 'enabled', description: 'Enable assembly optimizations')
+option('x86asm', type: 'feature', value: 'auto', description: 'Enable use of standalone x86 assembly')
 option('inline_asm', type: 'feature', value: 'enabled', description: 'Enable inline assembly optimizations')
 
 # other options
