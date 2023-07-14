@@ -53,12 +53,15 @@ debian-container-build@x86_64@full:
   stage: 'build'
   script:
     - meson ${MESON_OPTIONS} build/
+    - stat build/build.ninja
     - ninja -C build/
     - ninja -C build/ test
     - ninja -C build/ install
   artifacts:
+    when: on_failure
     paths:
       - build/meson-logs/
+      - build/*.build
 
 .build nodeps:
   extends:
