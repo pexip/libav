@@ -1,3 +1,5 @@
+#### --- GENERATED --- ####
+
 libavcodec_x86_sources = files(
   'constants.c',
 )
@@ -110,7 +112,7 @@ libavcodec_x86_x86asm_optional_sources = {
   'hpeldsp' : files('fpel.asm','hpeldsp.asm'),
   'huffyuvdsp' : files('huffyuvdsp.asm'),
   'huffyuvencdsp' : files('huffyuvencdsp.asm'),
-  'idctdsp' : files('idctdsp.asm','simple_idct10.asm','simple_idct.asm'),
+  'idctdsp' : files('idctdsp.asm','simple_idct10.asm'),
   'jpeg2000_decoder' : files('jpeg2000dsp.asm'),
   'llauddsp' : files('lossless_audiodsp.asm'),
   'llviddsp' : files('lossless_videodsp.asm'),
@@ -181,4 +183,15 @@ libavcodec_x86_slib_optional_sources = {
 
 libavcodec_x86_optional_tests = {
 }
+
+#### --- END GENERATED --- ####
+
+# This file results in empty codegen and empty PDB generation otherwise.
+# https://bugzilla.nasm.us/show_bug.cgi?id=3392738
+# https://developercommunity.visualstudio.com/t/MSVC-Hangs-when-compiling-ffmpeg-When-l/10233953
+if conf.get('x86_32', 0) == 1
+  libavcodec_x86_x86asm_optional_sources += {
+    'idctdsp': libavcodec_x86_x86asm_optional_sources ['idctdsp'] + files('simple_idct.asm')
+  }
+endif
 

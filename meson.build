@@ -2261,7 +2261,11 @@ asm_args = ['-DPIC']
 #
 # nasm and yasm don't support DWARF in the PE format (Windows)
 if asm_format.startswith('win')
-  debug_format = 'null'
+  if cc.get_define('_MSC_FULL_VER') != ''
+    debug_format = 'cv8'
+  else
+    debug_format = 'null'
+  endif
 else
   # Supported on Linux, BSD, macOS
   debug_format = 'dwarf'
@@ -2270,12 +2274,16 @@ endif
 if x86asm_type == 'yasm'
   if debug_format == 'dwarf'
     asm_args += ['-g', 'dwarf2']
+  elif debug_format == 'cv8'
+    asm_args += ['-g', 'cv8']
   else
     asm_args += ['-g', 'null']
   endif
 elif x86asm_type == 'nasm'
   if debug_format == 'dwarf'
     asm_args += ['-g', '-F', 'dwarf']
+  else
+    asm_args += ['-g']
   endif
 endif
 
@@ -2778,7 +2786,7 @@ foreach built_lib : built_libs
     endforeach
 
     asm_gen = generator(x86asm,
-      output : '@BASENAME@.o',
+      output : '@BASENAME@.asm.o',
       arguments : asm_args + [
         '-f', asm_format,
         '-i', meson.current_source_dir() + '/',
