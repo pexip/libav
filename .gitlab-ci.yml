@@ -95,6 +95,7 @@ with deps yasm:
 
 .build@i386.common:
   image: 'i386/debian:bookworm'
+  tags: ['gstreamer']
   variables:
     DEPENDENCIES: >-
       meson
