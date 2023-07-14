@@ -18,6 +18,7 @@ libswscale_sources = files(
   'hscale.c',
   'hscale_fast_bilinear.c',
   'gamma.c',
+  'half2float.c',
   'input.c',
   'options.c',
   'output.c',

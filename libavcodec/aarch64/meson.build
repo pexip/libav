@@ -44,7 +44,7 @@ libavcodec_aarch64_neon_optional_sources = {
   'h264dsp' : files('h264dsp_neon.S','h264idct_neon.S'),
   'h264pred' : files('h264pred_neon.S'),
   'h264qpel' : files('h264qpel_neon.S','hpeldsp_neon.S'),
-  'hevc_decoder' : files('hevcdsp_idct_neon.S','hevcdsp_init_aarch64.c','hevcdsp_sao_neon.S'),
+  'hevc_decoder' : files('hevcdsp_idct_neon.S','hevcdsp_init_aarch64.c','hevcdsp_qpel_neon.S','hevcdsp_sao_neon.S'),
   'hpeldsp' : files('hpeldsp_neon.S'),
   'idctdsp' : files('idctdsp_neon.S','simple_idct_neon.S'),
   'mdct' : files('mdct_neon.S'),

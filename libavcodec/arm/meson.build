@@ -5,7 +5,7 @@ libavcodec_arm_optional_sources = {
   'blockdsp' : files('blockdsp_init_arm.c'),
   'dca_decoder' : files('synth_filter_init_arm.c'),
   'fft' : files('fft_init_arm.c'),
-  'flacdsp' : files('flacdsp_init_arm.c','flacdsp_arm.S'),
+  'flac_decoder' : files('flacdsp_init_arm.c','flacdsp_arm.S'),
   'fmtconvert' : files('fmtconvert_init_arm.c'),
   'g722dsp' : files('g722dsp_init_arm.c'),
   'h264chroma' : files('h264chroma_init_arm.c'),

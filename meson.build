@@ -20,7 +20,7 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.59',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99', 'cpp_std=c++11'],
-  version: '5.1.3',
+  version: '6.0.0',
 )
 
 # HOWTO:
@@ -145,29 +145,30 @@ document_list = [
 ]
 
 example_list = [
-  'avio_dir_cmd_example',
-  'avio_reading_example',
+  'avio_http_serve_files_example',
+  'avio_list_dir_example',
+  'avio_read_callback_example',
   'decode_audio_example',
+  'decode_filter_audio_example',
+  'decode_filter_video_example',
   'decode_video_example',
-  'demuxing_decoding_example',
+  'demux_decode_example',
   'encode_audio_example',
   'encode_video_example',
   'extract_mvs_example',
   'filter_audio_example',
-  'filtering_audio_example',
-  'filtering_video_example',
-  'http_multiclient_example',
   'hw_decode_example',
-  'metadata_example',
-  'muxing_example',
-  'qsvdec_example',
-  'remuxing_example',
-  'resampling_audio_example',
-  'scaling_video_example',
+  'mux_example',
+  'qsv_decode_example',
+  'remux_example',
+  'resample_audio_example',
+  'scale_video_example',
+  'show_metadata_example',
   'transcode_aac_example',
-  'transcoding_example',
+  'transcode_example',
   'vaapi_encode_example',
   'vaapi_transcode_example',
+  'qsv_transcode_example',
 ]
 
 arch_list = [
@@ -274,6 +275,7 @@ arch_features = [
   'fast_64bit',
   'fast_clz',
   'fast_cmov',
+  'fast_float16',
   'local_aligned',
   'simd_align_16',
   'simd_align_32',
@@ -345,11 +347,6 @@ headers_list = [
 
 intrinsics_list = [
   'intrinsics_neon',
-]
-
-complex_funcs = [
-  'cabs',
-  'cexp',
 ]
 
 math_funcs = [
@@ -433,6 +430,7 @@ system_funcs = [
   'nanosleep',
   'PeekNamedPipe',
   'posix_memalign',
+  'prctl',
   'pthread_cancel',
   'sched_getaffinity',
   'SecItemImport',
@@ -489,6 +487,8 @@ toolchain_features = [
 ]
 
 types_list = [
+  'DPI_AWARENESS_CONTEXT',
+  'IDXGIOutput5',
   'kCMVideoCodecType_HEVC',
   'kCMVideoCodecType_HEVCWithAlpha',
   'kCMVideoCodecType_VP9',
@@ -551,7 +551,7 @@ foreach arch_ext : arch_ext_list
 endforeach
 
 have_list = (arch_ext_list + arch_ext_list_external + arch_ext_list_inline + arch_features +
-  builtin_list + complex_funcs + have_list_cmdline +
+  builtin_list + have_list_cmdline +
   have_list_pub + headers_list + intrinsics_list + math_funcs + system_features + system_funcs +
   system_libraries + threads_list + toolchain_features + types_list + [
   'gzip',
@@ -779,6 +779,8 @@ if not cc.has_function('localtime_r', prefix: '#include <time.h>', args: project
   endif
 endif
 
+conf.set10('float16', cc.has_type('_Float16', args: project_c_args))
+
 if libc_type != ''
   conf.set('libc_@0@'.format(libc_type), 1)
 endif
@@ -789,8 +791,9 @@ conf.set10('winrt', cc.links(cpp_cond.format('windows.h', '!WINAPI_FAMILY_PARTIT
 
 check_pkg_config = [
   ['alsa', ['alsa/asoundlib.h'], ['snd_pcm_htimestamp'], {}],
+  ['chromaprint', ['chromaprint.h'], ['chromaprint_get_version'], {'pkg': 'chromaprint'}],
   ['ffnvcodec', ['ffnvcodec/nvEncodeAPI.h', 'ffnvcodec/dynlink_cuda.h', 'ffnvcodec/dynlink_cuviddec.h', 'ffnvcodec/dynlink_nvcuvid.h'],
-    [], {'versions': ['>= 9.1.23.1', ['>= 9.0.18.3', '< 9.1'], ['>= 8.2.15.10', '< 8.3'], ['>= 8.1.24.11', '< 8.2']]}],
+    [], {'versions': ['>= 12.0.16.0', ['>= 11.1.5.2', '< 12.0'], ['>= 11.0.10.2', '< 11.1'], ['>= 8.1.24.11', '< 8.2']]}],
   ['libgme', ['gme/gme.h'], ['gme_new_emu'], {}],
   ['gnutls', ['gnutls/gnutls.h'], ['gnutls_global_init'], {}],
   ['lcms2', ['lcms2.h'], ['cmsCreateContext'], {'pkg': 'lcms2', 'version': '>= 2.13'}],
@@ -815,7 +818,7 @@ check_pkg_config = [
   ['libklvanc', ['libklvanc/vanc.h'], ['klvanc_context_create'], {}],
   ['libkvazaar', ['kvazaar.h'], ['kvz_api_get'], {'pkg': 'kvazaar', 'version': '>= 0.8.1'}],
   ['liblensfun', ['lensfun.h'], ['lf_db_new'], {'pkg': 'lensfun'}],
-  ['libmfx', ['mfx/mfxvideo.h'], ['MFXInit'], {'pkg': 'libmfx', 'version': '>= 1.28'}],
+  ['libmfx', ['mfx/mfxvideo.h'], ['MFXInit'], {'pkg': 'libmfx', 'version': ['>= 1.28', '< 2.0']}],
   ['libmodplug', ['libmodplug/modplug.h'], ['ModPlug_Load'], {}],
   ['libopencv', ['opencv2/core/core_c.h'], ['cvCreateImageHeader'], {'pkg': 'opencv'}],
   ['libopencv', ['opencv/cxcore.h'], ['cvCreateImageHeader'], {'pkg': 'opencv'}],
@@ -831,7 +834,7 @@ check_pkg_config = [
   ['libplacebo', ['libplacebo/vulkan.h'], ['pl_vulkan_create'], {'pkg': 'libplacebo', 'version': '>= 4.192.0'}],
   ['libpulse', ['pulse/pulseaudio.h'], ['pa_context_new'], {}],
   ['librabbitmq', ['amqp.h'], ['amqp_new_connection'], {'pkg': 'librabbitmq', 'version': '>= 0.7.1'}],
-  ['librav1e', ['rav1e.h'], ['rav1e_context_new'], {'pkg': 'rav1e', 'version': '>= 0.1.0'}],
+  ['librav1e', ['rav1e.h'], ['rav1e_context_new'], {'pkg': 'rav1e', 'version': '>= 0.5.0'}],
   ['librist', ['librist/librist.h'], ['rist_receiver_create'], {'pkg': 'rist', 'version': '>= 0.2.7'}],
   ['librsvg', ['librsvg-2.0/librsvg/rsvg.h'], ['rsvg_handle_render_cairo'], {'pkg': 'librsvg-2.0'}],
   ['librtmp', ['librtmp/rtmp.h'], ['RTMP_Socket'], {}],
@@ -850,6 +853,7 @@ check_pkg_config = [
   ['libvmaf', ['libvmaf.h'], ['compute_vmaf'], {'version': '>= 2.0.0'}],
   ['libvorbis', ['vorbis/codec.h'], ['vorbis_info_init'], {'pkg': 'vorbis'}],
   ['libvorbisenc', ['vorbis/vorbisenc.h'], ['vorbis_encode_init'], {'pkg': 'vorbisenc'}],
+  ['libvpl', ['mfxvideo.h', 'mfxdispatcher.h'], ['MFXLoad'], {'pkg': 'vpl', 'version': '>= 2.6'}],
   ['libvpx', ['vpx/vpx_decoder.h', 'vpx/vpx_encoder.h'], [], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
   ['libvpx_vp8_decoder', ['vpx/vpx_decoder.h', 'vpx/vp8dx.h'], ['vpx_codec_vp8_dx'], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
   ['libvpx_vp8_encoder', ['vpx/vpx_encoder.h', 'vpx/vp8cx.h'], ['vpx_codec_vp8_cx'], {'pkg': 'vpx', 'version': '>= 1.4.0'}],
@@ -867,6 +871,7 @@ check_pkg_config = [
   ['libzimg', ['zimg.h'], ['zimg_get_api_version'], {'pkg': 'zimg', 'version': '>= 2.7.0'}],
   ['libzmq', ['zmq.h'], ['zmq_ctx_new'], {}],
   ['libzvbi', ['libzvbi.h'], ['vbi_decoder_new'], {'pkg': 'zvbi-0.2'}],
+  ['openal', ['AL/al.h'], ['alGetError'], {'pkg': 'openal', 'version': '>= 1.1'}],
   ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl'], {'pkg': 'openssl', 'version': '>= 3.0.0'}],
   ['openssl', ['openssl/ssl.h'], ['OPENSSL_init_ssl', 'SSL_library_init'], {'has_any_func': true}],
   ['pocketsphinx', ['pocketsphinx/pocketsphinx.h'], ['ps_init'], {}],
@@ -904,7 +909,8 @@ check_components = [
   ['clock_gettime', ['time.h'], ['clock_gettime'], []],
   ['clock_gettime', ['time.h'], ['clock_gettime'], ['rt']],
   ['cuda_sdk', ['cuda.h'], ['cuCtxCreate'], ['cuda']],
-  ['crystalhd', ['stdint.h', 'libcrystalhd/libcrystalhd_if.h'], ['DtsCrystalHDVersion'], ['crystalhd']],
+  # FFmpeg deprecated CrystalHD in 6.0
+  # ['crystalhd', ['stdint.h', 'libcrystalhd/libcrystalhd_if.h'], ['DtsCrystalHDVersion'], ['crystalhd']],
   ['frei0r', ['frei0r.h'], [], []],
   ['libgme', ['gme/gme.h'], ['gme_new_emu'], ['gme', 'stdc++']],
   ['gcrypt', ['gcrypt.h'], ['gcry_mpi_new'], ['gcrypt']],
@@ -1023,11 +1029,8 @@ check_header_funcs = [
   ['MemoryBarrier', ['windows.h']],
   ['posix_memalign', ['stdlib.h']],
   ['sem_timedwait', ['semaphore.h'], {'preconditions': ['pthreads'], 'extra_deps': ['thread_dep']}],
+  ['prctl', ['sys/prctl.h']],
 ]
-
-foreach func : complex_funcs
-  check_header_funcs += [[func, ['complex.h', 'math.h']]]
-endforeach
 
 foreach func : math_funcs
   check_header_funcs += [[func, ['math.h'], {'extra_deps': ['libm_extra_deps']}]]
@@ -1065,8 +1068,12 @@ check_funcs = [
 check_types = [
   ['DXVA_PicParams_HEVC', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
   ['DXVA_PicParams_VP9', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
+  ['DXGI_OUTDUPL_FRAME_INFO', ['windows.h', 'dxgi1_2.h']],
+  ['IDXGIOutput1', ['windows.h', 'dxgi1_2.h']],
+  ['IDXGIOutput5', ['windows.h', 'dxgi1_5.h']],
   ['ID3D11VideoDecoder', ['windows.h', 'd3d11.h']],
   ['ID3D11VideoContext', ['windows.h', 'd3d11.h']],
+  ['DPI_AWARENESS_CONTEXT', ['windows.h'], {'c_args': ['-D_WIN32_WINNT=0x0A00']}],
   ['DXVA2_ConfigPictureDecode', ['d3d9.h', 'dxva2api.h'], {'c_args': ['-D_WIN32_WINNT=0x0602']}],
   ['VAPictureParameterBufferHEVC', ['va/va.h', 'va/va_dec_hevc.h']],
   ['VAPictureParameterBufferVP8', ['va/va.h', 'va/va_dec_vp8.h']],
@@ -1275,6 +1282,7 @@ hwaccel_library_nonfree_list = [
 
 hwaccel_library_list = hwaccel_library_nonfree_list + [
   'libmfx',
+  'libvpl',
   'mmal',
   'omx',
   'opencl',
@@ -1340,7 +1348,6 @@ config_extra = [
   'faandct',
   'faanidct',
   'fdctdsp',
-  'flacdsp',
   'fmtconvert',
   'frame_thread_encoder',
   'g722dsp',
@@ -1352,14 +1359,15 @@ config_extra = [
   'h264parse',
   'h264pred',
   'h264qpel',
+  'h264_sei',
   'hevcparse',
+  'hevc_sei',
   'hpeldsp',
   'huffman',
   'huffyuvdsp',
   'huffyuvencdsp',
   'idctdsp',
   'iirfilter',
-  'mdct15',
   'inflate_wrapper',
   'intrax8',
   'iso_media',
@@ -1381,6 +1389,8 @@ config_extra = [
   'mpegvideo',
   'mpegvideodec',
   'mpegvideoenc',
+  'msmpeg4dec',
+  'msmpeg4enc',
   'mss34dsp',
   'pixblockdsp',
   'qpeldsp',
@@ -1661,6 +1671,15 @@ conf.set10('shared', get_option('default_library') != 'static')
 
 conf.set10('bigendian', host_machine.endian() == 'big')
 conf.set10('fast_unaligned', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_machine.cpu_family()))
+
+if conf.get('float16') == 1
+  if conf.get('x86') == 1
+    # https://developercommunity.visualstudio.com/t/AVX512F-does-not-allow-detecting-the-F16/10345004
+    conf.set10('fast_float16', cc.links(cpp_cond.format('stddef.h', 'defined(__F16C__) || defined(__AVX2__)')))
+  elif conf.get('arm') == 1 or conf.get('aarch64') == 1
+    conf.set10('fast_float16', 1)
+  endif
+endif
 
 conf.set('frame_thread_encoder', 1)
 
@@ -1968,22 +1987,32 @@ endif
 
 # Manual check for libmfx
 if conf.get('libmfx') == 1
-  if not cc.links(cpp_cond.format('mfx/mfxdefs.h', 'MFX_VERSION >= 1028'), name: 'libmfx version')
-    error('libmfx version must be >= 1.28')
+  if not cc.links(cpp_cond.format('mfx/mfxdefs.h', 'MFX_VERSION >= 1028 && MFX_VERSION < 2000'), name: 'libmfx version')
+    error('libmfx version must be >= 1.28 and < 2.0')
+  else
+    warning('build FFmpeg against libmfx 1.x, obsolete features of libmfx such as OPAQUE memory,')
+    warning('multi-frame encode, user plugins and LA_EXT rate control mode are enabled')
   endif
+  conf.set10('MFX_CODEC_VP9'.to_lower(), cc.has_header_symbol('mfxstructures.h', 'MFX_CODEC_VP9'))
 endif
 
 # Manual check for libx264
 if conf.get('libx264') == 1
   if cc.get_define('_MSC_VER') != ''
-    if not cc.links(cpp_cond.format('x264.h', 'X264_BUILD >= 118'), name: 'libx264 version')
-      warning('libx264 version must be >= 1.18')
+    if not cc.links(cpp_cond.format('x264.h', 'X264_BUILD >= 122'), name: 'libx264 version')
+      warning('libx264 version must be >= 1.22')
+      conf.set('libx264', 0)
     endif
   else
     if not cc.links(cpp_cond.format('x264.h', 'X264_BUILD >= 158'), name: 'libx264 version')
       warning('libx264 version must be >= 1.58')
+      conf.set('libx264', 0)
     endif
   endif
+endif
+
+if conf.get('libmfx') == 1 and conf.get('libvpl') == 1
+  error('can not use libmfx and libvpl together')
 endif
 
 if conf.get('opengl') == 1 and not cc.has_header('GL/glext.h')
@@ -1991,16 +2020,9 @@ if conf.get('opengl') == 1 and not cc.has_header('GL/glext.h')
 endif
 
 if conf.get('libx265') == 1
-  x265_build = cc.get_define('X265_BUILD', prefix: '#include <x265.h>', dependencies: libx265_extra_deps)
-
-  if x265_build == ''
-    message ('X265_BUILD not found, disabling')
+  if not cc.links(cpp_cond.format('x265.h', 'X265_BUILD >= 89'), name: 'libx265 version')
+    warning('X265_BUILD too old, disabling')
     conf.set('libx265', 0)
-  elif x265_build.to_int() < 68
-    message ('X265_BUILD too old, disabling')
-    conf.set('libx265', 0)
-  else
-    message ('X265_BUILD >= 68, keeping enabled')
   endif
 endif
 
@@ -2191,6 +2213,10 @@ elif conf.get('aarch64') == 1
     ['fmadd d0,    d0,    d1,    d2', 'vfp'],
   ]
 elif conf.get('arm') == 1
+  if cc.has_argument('-mfp16-format=ieee')
+    project_c_args += ['-mfp16-format=ieee']
+  endif
+
   if cc.get_id() == 'msvc'
     conf.set10('thumb', cc.has_header_symbol('stddef.h', '_M_ARMT'))
   endif
@@ -2413,7 +2439,7 @@ if get_option('b_lto')
 endif
 
 extern_things = [
-  ['AVOutputFormat', 'muxer', 'libavformat/allformats.c', 'muxer_list'],
+  ['FFOutputFormat', 'muxer', 'libavformat/allformats.c', 'muxer_list'],
   ['AVInputFormat', 'demuxer', 'libavformat/allformats.c', 'demuxer_list'],
   ['FFCodec', 'encoder', 'libavcodec/allcodecs.c', 'encoder_list'],
   ['FFCodec', 'decoder', 'libavcodec/allcodecs.c', 'decoder_list'],
@@ -2421,7 +2447,7 @@ extern_things = [
   ['FFBitStreamFilter', 'bsf', 'libavcodec/bitstream_filters.c', 'bsf_list'],
   ['AVHWAccel', 'hwaccel', 'libavcodec/hwaccels.h', 'hwaccel_list'],
   ['URLProtocol', 'protocol', 'libavformat/protocols.c', 'protocol_list'],
-  ['AVOutputFormat', 'muxer', 'libavdevice/alldevices.c', 'outdev_list', 'outdev'],
+  ['FFOutputFormat', 'muxer', 'libavdevice/alldevices.c', 'outdev_list', 'outdev'],
   ['AVInputFormat', 'demuxer', 'libavdevice/alldevices.c', 'indev_list', 'indev'],
 ]
 
@@ -2572,10 +2598,10 @@ things_to_print = [
   ['libavcodec/codec_list.c', 'FFCodec', 'codec_list', encoder_list + decoder_list],
   ['libavcodec/parser_list.c', 'AVCodecParser', 'parser_list', parser_list],
   ['libavcodec/bsf_list.c', 'FFBitStreamFilter', 'bitstream_filters', bsf_list],
-  ['libavformat/muxer_list.c', 'AVOutputFormat', 'muxer_list', muxer_list],
+  ['libavformat/muxer_list.c', 'FFOutputFormat', 'muxer_list', muxer_list],
   ['libavformat/demuxer_list.c', 'AVInputFormat', 'demuxer_list', demuxer_list],
   ['libavformat/protocol_list.c', 'URLProtocol', 'url_protocols', protocol_list],
-  ['libavdevice/outdev_list.c', 'AVOutputFormat', 'outdev_list', outdev_list],
+  ['libavdevice/outdev_list.c', 'FFOutputFormat', 'outdev_list', outdev_list],
   ['libavdevice/indev_list.c', 'AVInputFormat', 'indev_list', indev_list],
   ['libavfilter/filter_list.c', 'AVFilter', 'filter_list', filter_list],
 ]
