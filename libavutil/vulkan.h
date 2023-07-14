@@ -122,11 +122,7 @@ typedef struct FFVulkanPipeline {
     VkDescriptorSetLayout         *desc_layout;
     VkDescriptorPool               desc_pool;
     VkDescriptorSet               *desc_set;
-#if VK_USE_64_BIT_PTR_DEFINES == 1
     void                         **desc_staging;
-#else
-    uint64_t                      *desc_staging;
-#endif
     VkDescriptorSetLayoutBinding **desc_binding;
     VkDescriptorUpdateTemplate    *desc_template;
     int                           *desc_set_initialized;

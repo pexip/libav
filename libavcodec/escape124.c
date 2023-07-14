@@ -22,8 +22,8 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 
 typedef union MacroBlock {
     uint16_t pixels[4];
@@ -89,6 +89,11 @@ static CodeBook unpack_codebook(GetBitContext* gb, unsigned depth,
     unsigned i, j;
     CodeBook cb = { 0 };
 
+    if (size >= INT_MAX / 34 || get_bits_left(gb) < size * 34)
+        return cb;
+
+    if (size >= INT_MAX / sizeof(MacroBlock))
+        return cb;
     cb.blocks = av_malloc(size ? size * sizeof(MacroBlock) : 1);
     if (!cb.blocks)
         return cb;
@@ -173,8 +178,8 @@ static void insert_mb_into_sb(SuperBlock* sb, MacroBlock mb, unsigned index) {
    dst[4] = mb.pixels32[1];
 }
 
-static void copy_superblock(uint16_t* dest, unsigned dest_stride,
-                            uint16_t* src, unsigned src_stride)
+static void copy_superblock(uint16_t* dest, ptrdiff_t dest_stride,
+                            uint16_t* src,  ptrdiff_t src_stride)
 {
     unsigned y;
     if (src)
@@ -206,7 +211,7 @@ static int escape124_decode_frame(AVCodecContext *avctx, AVFrame *frame,
              superblocks_per_row = avctx->width / 8, skip = -1;
 
     uint16_t* old_frame_data, *new_frame_data;
-    unsigned old_stride, new_stride;
+    ptrdiff_t old_stride, new_stride;
 
     int ret;
 
@@ -220,7 +225,7 @@ static int escape124_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     // represent a lower bound of the space needed for skipped superblocks. Non
     // skipped SBs need more space.
     if (get_bits_left(&gb) < 64 + s->num_superblocks * 23LL / 4320)
-        return AVERROR_INVALIDDATA;
+        return -1;
 
     frame_flags = get_bits_long(&gb, 32);
     frame_size  = get_bits_long(&gb, 32);
@@ -271,14 +276,9 @@ static int escape124_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             }
 
             av_freep(&s->codebooks[i].blocks);
-            if (cb_size >= INT_MAX / 34 || get_bits_left(&gb) < (int)cb_size * 34)
-                return AVERROR_INVALIDDATA;
-
-            if (cb_size >= INT_MAX / sizeof(MacroBlock))
-                return AVERROR_INVALIDDATA;
             s->codebooks[i] = unpack_codebook(&gb, cb_depth, cb_size);
             if (!s->codebooks[i].blocks)
-                return AVERROR(ENOMEM);
+                return -1;
         }
     }
 
@@ -377,7 +377,7 @@ static int escape124_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_escape124_decoder = {
     .p.name         = "escape124",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Escape 124"),
+    CODEC_LONG_NAME("Escape 124"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_ESCAPE124,
     .priv_data_size = sizeof(Escape124Context),
@@ -385,5 +385,4 @@ const FFCodec ff_escape124_decoder = {
     .close          = escape124_decode_close,
     FF_CODEC_DECODE_CB(escape124_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
