@@ -134,6 +134,8 @@ endif
 
 conf = configuration_data()
 
+compat_objs = []
+
 document_list = [
   'doc',
   'htmlpages',
@@ -701,7 +703,8 @@ elif cc.links(cpp_cond.format('newlib.h', 'defined _NEWLIB_VERSION'))
 elif cc.links(cpp_cond.format('_mingw.h', 'defined __MINGW64_VERSION_MAJOR'))
   libc_type = 'mingw64'
   if cc.links(cpp_cond.format('_mingw.h', '__MINGW64_VERSION_MAJOR < 3'))
-    # FIXME compat
+    compat_objs += files('compat/msvcrt/snprintf.c')
+    project_c_args += ['-include', meson.current_source_dir() / 'compat/msvcrt/snprintf.h']
   endif
   project_c_args += ['-U__STRICT_ANSI__', '-D__USE_MINGW_ANSI_STDIO=1']
   if cc.get_id() == 'gcc'
@@ -729,7 +732,14 @@ elif (cc.links(cpp_cond.format('_mingw.h', 'defined __MINGW_VERSION')) or
 elif cc.links(cpp_cond.format('crtversion.h', 'defined _VC_CRT_MAJOR_VERSION'))
   libc_type = 'msvcrt'
   if cc.links(cpp_cond.format('crtversion.h', '_VC_CRT_MAJOR_VERSION < 14'))
-    # FIXME compat
+    compat_objs += files('compat/strtod.c')
+    project_c_args += ['-Dstrtod=avpriv_strtod']
+    compat_objs += files('compat/snprintf.c')
+    project_c_args += [
+      '-Dsnprintf=avpriv_snprintf',
+      '-D_snprintf=avpriv_snprintf',
+      '-Dvsnprintf=avpriv_vsnprintf',
+    ]
   endif
   project_c_args += ['-D_USE_MATH_DEFINES', '-D_CRT_SECURE_NO_WARNINGS', '-D_CRT_NONSTDC_NO_WARNINGS']
   if (cc.links(cpp_cond.format('stdlib.h', 'defined(_WIN32_WINNT)')) or
@@ -746,6 +756,12 @@ elif cc.links(cpp_cond.format('stddef.h', 'defined __KLIBC__'))
   libc_type = 'klibc'
 elif cc.links(cpp_cond.format('stddef.h', 'defined __BIONIC__'))
   libc_type = 'bionic'
+
+  # hacks for compiler/libc/os combinations
+  compat_objs += files('compat/strtod.c')
+  project_c_args += [
+    '-Dstrtod=avpriv_strtod',
+  ]
 elif cc.links(cpp_cond.format('sys/brand.h', 'defined LABELED_BRAND_NAME'))
   libc_type = 'solaris'
   project_c_args += ['-D__EXTENSIONS__', '-D_XOPEN_SOURCE=600']
@@ -2428,11 +2444,18 @@ foreach thing : things_to_print
     list, check: true)
 endforeach
 
-if not cc.check_header('stdatomic.h') and thread_dep.found()
-  if host_machine.system() == 'windows'
-    common_incs += [include_directories('compat/atomics/win32')]
-  elif cc.get_id() == 'gcc'
+if conf.get('stdatomic') == 0
+  if conf.get('atomics_gcc', 0) == 1
     common_incs += [include_directories('compat/atomics/gcc')]
+  elif conf.get('atomics_win32', 0) == 1
+    common_incs += [include_directories('compat/atomics/win32')]
+  elif conf.get('pthreads', 0) == 1
+    compat_objs += files('compat/atomics/pthread/stdatomic.c')
+    common_incs += [include_directories('compat/atomics/pthread')]
+  elif conf.get('threads', 0) == 1
+    error('Threading is enabled, but no atomics are available')
+  else
+    common_incs += [include_directories('compat/atomics/dummy')]
   endif
 endif
 

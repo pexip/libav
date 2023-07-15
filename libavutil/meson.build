@@ -322,3 +322,5 @@ ffversion_h = custom_target('ffversion.h',
 subdir('aarch64')
 subdir('arm')
 subdir('x86')
+
+libavutil_sources += compat_objs
