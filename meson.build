@@ -1675,7 +1675,7 @@ conf.set10('fast_unaligned', ['x86', 'x86_64', 'aarch', 'ppc'].contains(host_mac
 if conf.get('float16') == 1
   if conf.get('x86') == 1
     # https://developercommunity.visualstudio.com/t/AVX512F-does-not-allow-detecting-the-F16/10345004
-    conf.set10('fast_float16', cc.links(cpp_cond.format('stddef.h', 'defined(__F16C__) || defined(__AVX2__)')))
+    conf.set10('fast_float16', cc.links(cpp_cond.format('stddef.h', 'defined(__F16C__) || defined(__AVX2__)'), args: project_c_args))
   elif conf.get('arm') == 1 or conf.get('aarch64') == 1
     conf.set10('fast_float16', 1)
   endif
