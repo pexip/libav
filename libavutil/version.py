@@ -20,11 +20,13 @@
 import argparse
 import subprocess
 import os
+import pathlib
 import re
 import sys
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--git', type=pathlib.Path, help='Path to the Git executable', default='git')
     parser.add_argument('rootdir')
     parser.add_argument('output')
     parser.add_argument('extraversion')
@@ -40,14 +42,14 @@ if __name__=='__main__':
             is_release = False
 
     if is_release:
-        res = subprocess.run(['git', 'describe', '--tags', '--always'], stdout=subprocess.PIPE)
+        res = subprocess.run([args.git, 'describe', '--tags', '--always'], stdout=subprocess.PIPE)
     else:
-        res = subprocess.run(['git', 'describe', '--tags', '--match', 'N'], stdout=subprocess.PIPE)
+        res = subprocess.run([args.git, 'describe', '--tags', '--match', 'N'], stdout=subprocess.PIPE)
 
     revision = res.stdout.decode()
 
     if not revision:
-        res = subprocess.run(['git', 'log' , '-1', '--pretty=format:git-%cd-%h', '--date=short'], stdout=subprocess.PIPE)
+        res = subprocess.run([args.git, 'log' , '-1', '--pretty=format:git-%cd-%h', '--date=short'], stdout=subprocess.PIPE)
         revision = res.stdout.decode()
 
     git_hash = ''
