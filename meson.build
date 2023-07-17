@@ -1957,6 +1957,82 @@ x86asm = disabler()
 conf.set('x86asm', 0)
 
 if conf.get('x86') == 1
+  # Manual: check for binutils enforcing value ranges
+  # https://sourceware.org/bugzilla/show_bug.cgi?id=30578
+  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108941
+  if conf.get('inline_asm') == 1
+    _binutils_bug_args = []
+    if get_option('optimization') != '0'
+      _binutils_bug_args += ['-O@0@'.format(get_option('optimization'))]
+    endif
+    if not cc.compiles(
+      '''
+      #include <stdint.h>
+      #include <string.h>
+
+      typedef struct GetBitContext {
+          const uint8_t *buffer;
+          int index;
+      } GetBitContext;
+
+      union unaligned_32 { uint32_t l; } __attribute__((packed)) __attribute__((may_alias));
+
+      static __attribute__((always_inline)) inline __attribute__((const)) uint32_t av_bswap32(uint32_t x)
+      {
+          return ((((x) << 8 & 0xff00) | ((x) >> 8 & 0x00ff)) << 16 | ((((x) >> 16) << 8 & 0xff00) | (((x) >> 16) >> 8 & 0x00ff)));
+      }
+
+      static inline uint32_t NEG_USR32(uint32_t a, int8_t s){
+          __asm__ ("shrl %1, %0\n\t"
+              : "+r" (a)
+              : "ic" ((uint8_t)(-s))
+          );
+          return a;
+      }
+
+      static inline unsigned int get_bits(GetBitContext *s, int n)
+      {
+          register unsigned int tmp;
+          unsigned int re_index = (s)->index; unsigned int __attribute__((unused)) re_cache;
+          ((void)0);
+          re_cache = av_bswap32((((const union unaligned_32 *) ((s)->buffer + (re_index >> 3)))->l)) << (re_index & 7);
+          tmp = NEG_USR32(re_cache, n);
+          return tmp;
+      }
+
+      typedef struct AC3HeaderInfo {
+          uint8_t sr_code;
+      } AC3HeaderInfo;
+
+      typedef enum {
+          AAC_AC3_PARSE_ERROR_SAMPLE_RATE = -0x3030c0a,
+      } AACAC3ParseError;
+
+      int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr)
+      {
+          hdr->sr_code = get_bits(gbc, 2);
+          return 0;
+      }
+
+      ''',
+      name: 'binutils has a working shrl instruction, Sourceware #30578, GCC # 108941',
+      args: _binutils_bug_args
+    )
+      warning('''Your version of binutils rejects undefined behaviour which
+      FFmpeg relies on, when optimization levels are set to higher than -O0.
+      Please contact the developers and forward these references:
+
+      https://sourceware.org/bugzilla/show_bug.cgi?id=30578
+      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108941
+
+      and the included test case.
+
+      Disabling inline assembly now, there may be a performance hit.
+      ''')
+      conf.set('inline_asm', 0)
+    endif
+  endif
+
   conf.set10('rdtsc', cc.has_function('__rdtsc', prefix: '#include <intrin.h>'))
   conf.set10('mm_empty', cc.has_function('_mm_empty', prefix: '#include <mmintrin.h>'))
 
