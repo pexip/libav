@@ -2050,12 +2050,9 @@ if conf.get('x86') == 1
     endif
     x86asm = find_program('nasm', version: nasm_version, required: false)
     x86asm_type = 'nasm'
-    if not x86asm.found() and host_machine.system() == 'windows'
-      # Note that on Windows we require NASM because when optimizations are
-      # disabled, the Windows linker does not optimize out functions with
-      # EXTERNAL_* SIMD calls and errors out with unresolved symbols
+    if not x86asm.found()
       subproject('win-nasm')
-      x86asm = find_program('nasm', version: nasm_version)
+      x86asm = find_program('nasm', version: nasm_version, required: false)
     endif
     if not x86asm.found()
       x86asm = find_program('yasm', required: false)
