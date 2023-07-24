@@ -2736,7 +2736,7 @@ foreach built_lib : built_libs
   endforeach
 
   if conf.get('x86asm') == 1
-    x86asm_sources += get_variable('lib@0@_@1@_x86asm_sources'.format(built_lib[0], arch), [])
+    x86asm_sources += get_variable('lib@0@_x86_x86asm_sources'.format(built_lib[0]), [])
   endif
 
   optional_sources = get_variable('lib@0@_optional_sources'.format(built_lib[0]), {})
@@ -3035,8 +3035,8 @@ foreach restrict_kw : ['restrict', '__restrict__', '__restrict', '']
   endif
 endforeach
 
-foreach arch: arch_list
-  final_conf.set('ARCH_@0@'.format(arch.to_upper()), conf.get(arch.to_lower()))
+foreach a: arch_list
+  final_conf.set('ARCH_@0@'.format(a.to_upper()), conf.get(a.to_lower()))
 endforeach
 
 foreach have: have_list
