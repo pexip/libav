@@ -250,7 +250,7 @@ libavutil_tests = [
   ['pca', files('tests/pca.c')],
   ['parseutils', files('tests/parseutils.c')],
   ['pixdesc', files('tests/pixdesc.c')],
-  ['pixelutils', files('tests/pixelutils.c')],
+  # MANUAL ['pixelutils', files('tests/pixelutils.c')],
   ['pixfmt_best', files('tests/pixfmt_best.c')],
   ['random_seed', files('tests/random_seed.c')],
   ['rational', files('tests/rational.c')],
@@ -277,6 +277,9 @@ libavutil_optional_tests = {
     ['cpu_init', files('tests/cpu_init.c'), {
       'extra_libs': ['threads'],  # MANUAL
     }],
+  ],
+  'pixelutils': [
+    ['pixelutils', files('tests/pixelutils.c'), {}] # MANUAL
   ],
 }
 
