@@ -2781,6 +2781,8 @@ config_components_h = configure_file(
   configuration: components_conf,
 )
 
+rc = find_program('rc_workaround.py', required: host_machine.system() == 'windows')
+
 foreach built_lib : built_libs
   sources = get_variable('lib@0@_sources'.format(built_lib[0])) + [ffversion_h]
   x86asm_sources = []
@@ -2799,9 +2801,20 @@ foreach built_lib : built_libs
   endif
 
   if host_machine.system() == 'windows'
+    # In subproject mode, the file that will be read (if present)
+    # is the config.h of the *root* project, instead of our config.h.
+    # This is because -I folder take effect *after* the .rc
+    # file's directory, and *after* Ninja's build directory.
+    rc_tgt = custom_target(
+      '@0@res.rc'.format(built_lib[0]),
+      input : ['lib@0@/@0@res.rc'.format(built_lib[0])],
+      output : ['@PLAINNAME@'],
+      command : [rc, '@INPUT@', meson.current_build_dir()],
+      capture: true
+    )
     sources += windows.compile_resources(
-      'lib@0@/@1@res.rc'.format(built_lib[0], built_lib[0]),
-      include_directories: common_incs,
+      rc_tgt,
+      include_directories: ffmpeg_toplevel_inc,
       depends: ffversion_h,
     )
   endif
