@@ -92,6 +92,10 @@ def make_to_meson(path):
                 label, ofiles = l.split('+=')
                 label = label.split('HAVE_')[1].rstrip(' )')
                 source_type = 'c'
+            elif re.match('OBJS-ffmpeg\s+\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('OBJS-')[1]
+                source_type = 'c' # arguable ^^
             elif re.match('DNN-OBJS-.*CONFIG.*\+\=.*', l):
                 label, ofiles = l.split('+=')
                 label = label.split('CONFIG_')[1].rstrip(' )')
@@ -360,6 +364,8 @@ def make_to_meson(path):
         meson_file.write(content)
 
 paths = [
+        'fftools',
+        'libavdevice',
         'libavformat',
         'libavutil',
         'libavutil/aarch64',

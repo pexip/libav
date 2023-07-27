@@ -72,6 +72,8 @@ common_incs = [ffmpeg_toplevel_inc]
 
 python3 = import('python').find_installation()
 
+windows = import('windows')
+
 cc = meson.get_compiler('c')
 
 languages_map = {}
@@ -2682,8 +2684,6 @@ built_libs = [
   ['avdevice', ['libavutil', 'libavformat', 'libavfilter', 'libavcodec']],
 ]
 
-windows = import('windows')
-
 makedef = find_program('compat/windows/makedef.py')
 
 makedef_args = [makedef]
@@ -3027,7 +3027,9 @@ if not get_option('cli').disabled()
 endif
 
 foreach built_exe : built_exe_list
-  sources = get_variable('@0@_sources'.format(built_exe)) + [ffversion_h]
+  sources = get_variable('fftools_sources', []) + [ffversion_h]
+  sources += get_variable('fftools_optional_sources', {}).get(built_exe, [])
+  sources += get_variable('@0@_sources'.format(built_exe), [])
   optional_deps = []
 
   message('Checking @0@ dependencies'.format(built_exe))
