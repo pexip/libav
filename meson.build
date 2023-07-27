@@ -2688,7 +2688,7 @@ makedef = find_program('compat/windows/makedef.py')
 
 makedef_args = [makedef]
 
-if cc.get_id() != 'msvc'
+if cc.get_define('_MSC_VER') == ''
   nm = find_program('nm', required: true)
   makedef_args += ['--nm', nm]
 else
