@@ -2504,7 +2504,11 @@ filters_allowed = get_option('filters').allowed()
 
 foreach filter : filter_list
   opt = get_option(filter)
+  if conf.get(filter, 1) == 1
   conf.set(filter, (opt.enabled() or (opt.allowed() and filters_allowed)).to_int())
+  else
+    message('Skipping @0@ because of manual disabling'.format(filter))
+  endif
 endforeach
 
 foreach program : program_list
