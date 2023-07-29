@@ -96,7 +96,7 @@ GRAPH = {'aac_adtstoasc_bsf': {'select': ['adts_header', 'mpeg4audio']},
  'atomics_suncc': {'if': ['atomic_cas_ptr', 'machine_rw_barrier']},
  'atomics_win32': {'if': ['memorybarrier']},
  'atrac1_decoder': {'select': ['sinewin']},
- 'audiotoolbox_outdev': {'deps': ['audiotoolbox', 'pthreads']},
+ 'audiotoolbox_outdev': {'deps': ['audiotoolbox', 'pthreads', 'coreaudio']}, # MANUAL https://ffmpeg.org/pipermail/ffmpeg-devel/2023-July/312785.html
  'av1_amf_encoder': {'deps': ['amf']},
  'av1_cuvid_decoder': {'deps': ['cuvid', 'cuvidav1picparams']},
  'av1_d3d11va2_hwaccel': {'deps': ['d3d11va', 'dxva_picparams_av1'],
