@@ -1002,10 +1002,6 @@ check_components = [
     {'preconditions': ['libm'], 'extra_deps': ['libm_extra_deps']}],
 ]
 
-foreach check : check_components
-  all_checks += [['component', check]]
-endforeach
-
 check_header_funcs = [
   ['aligned_malloc', ['malloc.h'], {'funcs': ['_aligned_malloc']}],
   ['arc4random', ['stdlib.h']],
@@ -1136,18 +1132,6 @@ elif cc.has_header('winsock2.h')
   ]
 endif
 
-foreach check : check_funcs
-  all_checks += [['func', check]]
-endforeach
-
-foreach check : check_header_funcs
-  all_checks += [['header-func', check]]
-endforeach
-
-foreach check : check_types
-  all_checks += [['type', check]]
-endforeach
-
 check_headers = [
   ['direct.h'],
   ['dirent.h'],
@@ -1171,6 +1155,22 @@ if host_machine.system() == 'darwin'
 elif host_machine.system() == 'android'
   check_headers += [['jni.h']]
 endif
+
+foreach check : check_components
+  all_checks += [['component', check]]
+endforeach
+
+foreach check : check_funcs
+  all_checks += [['func', check]]
+endforeach
+
+foreach check : check_header_funcs
+  all_checks += [['header-func', check]]
+endforeach
+
+foreach check : check_types
+  all_checks += [['type', check]]
+endforeach
 
 foreach check : check_headers
   all_checks += [['header', check]]
@@ -1921,9 +1921,9 @@ foreach check : all_checks
     endforeach
 
     if found
-      set_variable('@0@_extra_deps'.format(name.to_lower().underscorify()), extra_deps)
+      set_variable('@0@_extra_deps'.format(name.underscorify().to_lower()), extra_deps)
     else
-      set_variable('@0@_extra_deps'.format(name.to_lower().underscorify()), [])
+      set_variable('@0@_extra_deps'.format(name.underscorify().to_lower()), [])
     endif
   endif
 endforeach
