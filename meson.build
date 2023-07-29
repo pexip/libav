@@ -961,6 +961,7 @@ check_components = [
   # FFmpeg deprecated CrystalHD in 6.0
   # ['crystalhd', ['stdint.h', 'libcrystalhd/libcrystalhd_if.h'], ['DtsCrystalHDVersion'], ['crystalhd']],
   ['frei0r', ['frei0r.h'], [], []],
+  ['iconv', ['iconv.h'], ['iconv'], ['iconv']],
   ['libgme', ['gme/gme.h'], ['gme_new_emu'], ['gme', 'stdc++']],
   ['gcrypt', ['gcrypt.h'], ['gcry_mpi_new'], ['gcrypt']],
   ['gmp', ['gmp.h'], ['mpz_export'], ['gmp']],
@@ -1097,6 +1098,7 @@ check_header_funcs = [
   ['posix_memalign', ['stdlib.h']],
   ['sem_timedwait', ['semaphore.h'], {'preconditions': ['pthreads'], 'extra_deps': ['thread_dep']}],
   ['prctl', ['sys/prctl.h']],
+  ['iconv', ['iconv.h']],
 ]
 
 foreach func : math_funcs
@@ -2811,6 +2813,7 @@ endif
 
 add_project_arguments(project_c_args, language: 'c')
 
+libavcodec_optional_deps = [iconv_extra_deps]
 libavutil_optional_deps = [vaapi_drm_extra_deps + vaapi_x11_extra_deps + vdpau_x11_extra_deps]
 libswresample_optional_deps = [libsoxr_extra_deps]
 
@@ -3046,7 +3049,7 @@ foreach built_lib : built_libs
   link_with = []
 
   foreach dep : built_lib[1]
-    link_with += [get_variable(dep)]
+    deps += [get_variable('@0@_dep'.format(dep))]
   endforeach
 
   version = get_variable('lib@0@_majorver'.format(built_lib[0]))
