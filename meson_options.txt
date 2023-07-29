@@ -119,6 +119,8 @@ option('openal', type: 'feature', value: 'disabled')
 option('opencl', type: 'feature', value: 'disabled')
 option('opengl', type: 'feature', value: 'disabled')
 option('psapi', type: 'feature', value: 'disabled')
+option('securetransport', type: 'feature', value: 'auto')
+option('schannel', type: 'feature', value: 'auto')
 option('shell32', type: 'feature', value: 'disabled')
 option('spirv_compiler', type: 'feature', value: 'disabled')
 option('pocketsphinx', type: 'feature', value: 'disabled')
@@ -2361,4 +2363,5 @@ option('inline_asm', type: 'feature', value: 'enabled', description: 'Enable inl
 # other options
 # cli is disabled by default to speed up the build since it links statically
 option('cli', type: 'feature', value: 'disabled')
+option('network', type: 'feature', value: 'auto', description: 'Enable network support')
 option('tests', type : 'feature', value : 'auto', description : 'Build tests', yield : true)

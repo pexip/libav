@@ -128,6 +128,10 @@ def make_to_meson(path):
                 label = ''
                 ofiles = l.split('=')[1]
                 source_type = 'shlib'
+            elif re.match('TLS-OBJS-.*CONFIG.*\+\=.*', l):
+                label, ofiles = l.split('+=')
+                label = label.split('CONFIG_')[1].rstrip(' )')
+                source_type = 'c' # arguable ^^
             elif re.match('MMX-OBJS-.*CONFIG.*\+\=.*', l):
                 label, ofiles = l.split('+=')
                 label = label.split('CONFIG_')[1].rstrip(' )')

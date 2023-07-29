@@ -1066,6 +1066,17 @@ check_funcs = [
   ['localtime_r'],
 ]
 
+if get_option('securetransport').allowed()
+  conf.set10('securetransport', false)
+  check_components += [
+    ['securetransport', ['Security/SecureTransport.h', 'Security/Security.h'], ['SSLCreateContext'], [], {'frameworks': ['CoreFoundation', 'Security']}],
+  ]
+  check_funcs += [
+    ['SecIdentityCreate', {'c_args': ['-Wl,-framework,CoreFoundation', '-Wl,-framework,Security']}],
+    ['SecItemImport', {'c_args': ['-Wl,-framework,CoreFoundation', '-Wl,-framework,Security']}],
+  ]
+endif
+
 check_types = [
   ['DXVA_PicParams_HEVC', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
   ['DXVA_PicParams_VP9', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
@@ -1990,6 +2001,17 @@ if conf.get('openssl') == 1
   endif
 endif
 
+schannel_extra_deps = []
+
+if conf.get('schannel') == 1
+  secur32_dep = cc.find_library('secur32', required: false)
+  if cc.links(cpp_cond.format('winerror.h', 'defined(SEC_I_CONTEXT_EXPIRED)'), dependencies: secur32_dep, name: 'schannel dependency works')
+    schannel_extra_deps += [secur32_dep]
+  else
+    conf.set('schannel', 0)
+  endif
+endif
+
 # Manual check for avisynth
 if conf.get('avisynth') == 1
   if not cc.links(cpp_cond.format('avisynth/avs/version.h', 'AVS_MAJOR_VER >= 3 && AVS_MINOR_VER >= 7 && AVS_BUGFIX_VER >= 1 || AVS_MAJOR_VER >= 3 && AVS_MINOR_VER > 7 || AVS_MAJOR_VER > 3'), name: 'avisynth version')
@@ -2515,6 +2537,8 @@ foreach program : program_list
   conf.set(program, get_option(program).allowed().to_int())
 endforeach
 
+conf.set10('network', get_option('network').allowed())
+
 result = run_command(find_things, '--full', files('libavfilter/allfilters.c'), check: true)
 full_filter_list = result.stdout().strip().split('\n')
 
@@ -2601,14 +2625,6 @@ subdir('fftools')
 
 util_list = ['cuda', 'd3d11va', 'dxva2', 'libdrm', 'lzo', 'mediacodec', 'opencl', 'qsv', 'vaapi', 'vdpau', 'videotoolbox']
 
-if conf.get('schannel') == 1
-  secur32_dep = cc.find_library('secur32')
-  if secur32_dep.found()
-    libavformat_optional_deps += [secur32_dep]
-  else
-    conf.set('schannel', 0)
-  endif
-endif
 
 things_to_print = [
   ['libavcodec/codec_list.c', 'FFCodec', 'codec_list', encoder_list + decoder_list],
