@@ -2708,6 +2708,15 @@ avdevice_components_list = indev_list + outdev_list
 avfilter_components_list = filter_list
 avformat_components_list = demuxer_list + muxer_list + protocol_list
 
+if not get_option('devices').allowed()
+  foreach device : indev_list
+    conf.set10(device, false)
+  endforeach
+  foreach device : outdev_list
+    conf.set10(device, false)
+  endforeach
+endif
+
 all_components = avcodec_components_list + avdevice_components_list + avfilter_components_list + avformat_components_list
 
 tmpconfig_h = configure_file(configuration: conf, output: 'tmpconfig.h')

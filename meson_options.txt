@@ -2387,6 +2387,7 @@ option('inline_asm', type: 'feature', value: 'enabled', description: 'Enable inl
 option('cli', type: 'feature', value: 'disabled', deprecated: true)
 option('programs', type: 'feature', value: 'auto', description: 'Build command line programs')
 option('network', type: 'feature', value: 'auto', description: 'Enable network support')
+option('devices', type: 'feature', value: 'auto', description: 'Enable all input/output devices')
 option('pthreads', type: 'feature', value: 'auto', description: 'Enable pthreads')
 option('w32threads', type: 'feature', value: 'auto', description: 'Enable Win32 threads')
 option('os2threads', type: 'feature', value: 'disabled', description: 'Enable OS/2 support')
