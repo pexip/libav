@@ -791,6 +791,25 @@ conf.set10('pic', conf.get('pic', cc.links(cpp_cond.format('stdlib.h', 'defined(
 
 conf.set10('winrt', cc.links(cpp_cond.format('windows.h', '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)')))
 
+d3d11va_extra_deps = []
+
+conf.set10('uwp', cc.compiles('''#ifdef WINAPI_FAMILY
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#error desktop, not uwp
+#else
+// WINAPI_FAMILY_APP, WINAPI_FAMILY_PHONE_APP => UWP
+#endif
+#else
+#error no family set
+#endif''', name: 'is UWP'))
+if conf.get('uwp') == 1
+  d3d11va_extra_deps += [
+    cc.find_library('dxgi'),
+    cc.find_library('d3d11')
+  ]
+endif
+
 check_framework = [
   ['AppKit'],
   ['AudioToolbox'],
@@ -1122,6 +1141,7 @@ if get_option('securetransport').allowed()
 endif
 
 check_types = [
+  ['DXVA_PicParams_AV1', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
   ['DXVA_PicParams_HEVC', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
   ['DXVA_PicParams_VP9', ['windows.h', 'dxva.h'], {'c_args': ['-DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP', '-D_CRT_BUILD_DESKTOP_APP=0']}],
   ['DXGI_OUTDUPL_FRAME_INFO', ['windows.h', 'dxgi1_2.h']],
@@ -1213,6 +1233,8 @@ check_headers = [
   ['direct.h'],
   ['dirent.h'],
   ['dxgidebug.h'],
+  ['dxva.h'],
+  ['dxva2api.h', {'c_args': ['-D_WIN32_WINNT=0x0600']}],
   ['msa.h'],
   ['net/udplite.h'],
   ['sys/param.h'],
