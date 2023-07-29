@@ -1044,6 +1044,9 @@ check_components = [
     {'preconditions': ['libm'], 'extra_deps': ['libm_extra_deps']}],
   ['libxavs', ['stdint.h', 'xavs.h'], ['xavs_encoder_encode'], ['xavs'],
     {'preconditions': ['libm'], 'extra_deps': ['libm_extra_deps']}],
+  ['xlib_x11', ['X11/Xlib.h'], ['XPending'], ['X11']],
+  ['xlib_xext', ['X11/Xlib.h', 'X11/extensions/XShm.h'], ['XShmAttach'], ['Xext']],
+  ['xlib_xv', ['X11/Xlib.h', 'X11/extensions/Xvlib.h'], ['XvGetPortAttribute'], ['Xv']],
 ]
 
 if get_option('avfoundation').allowed()
@@ -2175,6 +2178,13 @@ if conf.get('libzvbi') == 1
     'VBI_VERSION_MAJOR > 0 || VBI_VERSION_MINOR > 2 || VBI_VERSION_MINOR == 2 && VBI_VERSION_MICRO >= 28',
     prefix: '#include <libzvbi.h>', dependencies: libzvbi_extra_deps))
 endif
+
+foreach req : ['xlib_x11', 'xlib_xext', 'xlib_xv']
+  if conf.get(req) == 0
+    conf.set10('xlib', false)
+    break
+  endif
+endforeach
 
 x86asm_type = 'none'
 
