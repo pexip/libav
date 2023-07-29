@@ -791,6 +791,32 @@ conf.set10('pic', conf.get('pic', cc.links(cpp_cond.format('stdlib.h', 'defined(
 
 conf.set10('winrt', cc.links(cpp_cond.format('windows.h', '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)')))
 
+check_framework = [
+  ['AppKit'],
+  ['AudioToolbox'],
+  ['AVFoundation'],
+  ['CoreImage'],
+  ['Metal'],
+  ['VideoToolbox'],
+]
+
+test_check_framework = [
+  'CoreFoundation',
+  'CoreMedia',
+  'CoreVideo',
+  'CoreAudio',
+]
+
+avfoundation_indev_extra_deps = dependency('appleframeworks', modules: 'Foundation', required: get_option('avfoundation_indev').enabled())
+audiotoolbox_outdev_extra_deps = dependency('appleframeworks', modules: ['AudioToolbox', 'CoreAudio'], required: get_option('audiotoolbox_outdev').enabled())
+coreimage_filter_extra_deps = dependency('appleframeworks', modules: 'OpenGL', required: get_option('coreimage_filter').enabled())
+coreimagesrc_filter_extra_deps = dependency('appleframeworks', modules: 'OpenGL', required: get_option('coreimage_filter').enabled())
+videotoolbox_extra_deps = dependency('appleframeworks', modules: 'QuartzCore', required: get_option('videotoolbox').enabled())
+
+foreach check : check_framework
+  all_checks += [['framework', check]]
+endforeach
+
 check_pkg_config = [
   ['alsa', ['alsa/asoundlib.h'], ['snd_pcm_htimestamp'], {}],
   ['chromaprint', ['chromaprint.h'], ['chromaprint_get_version'], {'pkg': 'chromaprint'}],
@@ -1002,6 +1028,24 @@ check_components = [
     {'preconditions': ['libm'], 'extra_deps': ['libm_extra_deps']}],
 ]
 
+if get_option('avfoundation').allowed()
+  conf.set10('coregraphics', false)
+  conf.set10('applicationservices', false)
+
+  check_components += [
+    ['coregraphics', ['CoreGraphics/CoreGraphics.h'], ['CGGetActiveDisplayList'], [], {'frameworks': ['CoreGraphics']}],
+    ['applicationservices', ['ApplicationServices/ApplicationServices.h'], ['CGGetActiveDisplayList'], [], {'frameworks': ['ApplicationServices']}]
+  ]
+endif
+
+if get_option('videotoolbox').allowed()
+  conf.set10('coreservices', false)
+
+  check_components += [
+    ['coreservices', ['CoreServices/CoreServices.h'], ['UTGetOSTypeFromString'], [], {'frameworks': ['CoreServices']}],
+  ]
+endif
+
 check_header_funcs = [
   ['aligned_malloc', ['malloc.h'], {'funcs': ['_aligned_malloc']}],
   ['arc4random', ['stdlib.h']],
@@ -1120,6 +1164,28 @@ check_types = [
   ['VdpPictureInfoVP9', ['vdpau/vdpau.h']],
   ['VdpPictureInfoAV1', ['vdpau/vdpau.h']],
 ]
+
+if get_option('videotoolbox').allowed()
+  check_types += [
+    ['kCMVideoCodecType_HEVC', ['CoreMedia/CMFormatDescription.h'], {'frameworks': ['CoreMedia']}],
+    ['kCMVideoCodecType_HEVCWithAlpha', ['CoreMedia/CMFormatDescription.h'], {'frameworks': ['CoreMedia']}],
+    ['kCMVideoCodecType_VP9', ['CoreMedia/CMFormatDescription.h'], {'frameworks': ['CoreMedia']}],
+    ['kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVPixelFormatType_422YpCbCr10BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVPixelFormatType_422YpCbCr16BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVPixelFormatType_444YpCbCr10BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVPixelFormatType_444YpCbCr16BiPlanarVideoRange', ['CoreVideo/CVPixelBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferTransferFunction_ITU_R_2100_HLG', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferTransferFunction_Linear', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferYCbCrMatrix_ITU_R_2020', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferColorPrimaries_ITU_R_2020', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferTransferFunction_ITU_R_2020', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+    ['kCVImageBufferTransferFunction_SMPTE_ST_428_1', ['CoreVideo/CVImageBuffer.h'], {'frameworks': ['CoreVideo']}],
+  ]
+endif
 
 if cc.has_header('arpa/inet.h')
   conf.set('arpa_inet_h', 1)
@@ -1462,21 +1528,6 @@ program_list = [
   'ffmpeg',
 ]
 
-apple_frameworks = [
-  'CoreFoundation',
-  'CoreMedia',
-  'CoreVideo',
-  'AppKit',
-  'AudioToolbox',
-  'AVFoundation',
-  'CoreImage',
-  'Metal',
-  'VideoToolbox',
-  'CoreGraphics',
-  'CoreServices',
-  'ApplicationServices',
-]
-
 avcodec_components = [
   'bsfs',
   'decoders',
@@ -1714,6 +1765,16 @@ if ['linux', 'openbsd', 'android'].contains(host_machine.system())
   conf.set('section_data_rel_ro', 1)
 endif
 
+foreach f : test_check_framework
+  name = f.underscorify().to_lower()
+  dep = dependency('appleframeworks', modules: f, required: false)
+  conf.set10(name, false)
+  if cc.has_header('@0@/@0@.h'.format(f), dependencies: dep)
+    conf.set10(name, true)
+    common_deps += [dep]
+  endif
+endforeach
+
 # Our option names can't be 1:1 mapping because newer meson versions disallow
 # options with language prefixes i.e. "cuda_sdk" in our case
 options_map = {
@@ -1732,12 +1793,15 @@ foreach check : all_checks
     headers = []
   elif check_type == 'header'
     headers = [name]
+  elif check_type == 'framework'
+    headers = ['@0@/@0@.h'.format(name)]
   else
     headers = check[1]
   endif
 
   opts = {}
   link_withs = []
+  frameworks = []
   funcs = []
   compiles = ''
   links = ''
@@ -1775,6 +1839,9 @@ foreach check : all_checks
       opts = check[2]
     endif
     type = name
+  elif check_type == 'framework'
+    opt_name = name.underscorify().to_lower()
+    frameworks = [name]
   endif
 
   if check_type == 'header-func' or check_type == 'func'
@@ -1786,6 +1853,9 @@ foreach check : all_checks
   if check_type != 'component'
     link_withs = opts.get('link_with', [])
   endif
+  if check_type != 'framework'
+    frameworks = opts.get('frameworks', [])
+  endif
 
   found = false
 
@@ -1796,7 +1866,7 @@ foreach check : all_checks
     extra_deps = []
 
     foreach dep_name : opts.get('extra_deps', [])
-      extra_deps += [get_variable(dep_name)]
+      extra_deps += [get_variable(dep_name, [])]
     endforeach
 
     prefix = ''
@@ -1833,7 +1903,14 @@ foreach check : all_checks
     endif
 
     if found
-      if check_type != 'pkg-config'
+      if check_type == 'framework'
+        foreach f : frameworks
+          req = get_option(opt_name)
+          dep = dependency('appleframeworks', modules : f, required: req)
+          found = found and dep.found()
+          extra_deps += dep
+        endforeach
+      elif check_type != 'pkg-config'
         foreach link_with : link_withs
           if check_type == 'component' and not ('always-check' in opts)
             req = get_option(opt_name)
@@ -1841,6 +1918,16 @@ foreach check : all_checks
             req = false
           endif
           dep = cc.find_library(link_with, required : req)
+          found = found and dep.found()
+          extra_deps += dep
+        endforeach
+        foreach f : frameworks
+          if check_type == 'component' and not ('always-check' in opts)
+            req = get_option(opt_name)
+          else
+            req = false
+          endif
+          dep = dependency('appleframeworks', modules : f, required: req)
           found = found and dep.found()
           extra_deps += dep
         endforeach

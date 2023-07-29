@@ -232,10 +232,13 @@ iOS arm64 cross:
       [properties]
       c_args =      ['-arch', 'arm64', '--sysroot=$(xcrun --sdk iphoneos --show-sdk-path)', '-miphoneos-version-min=11.0']
       c_link_args = ['-arch', 'arm64', '--sysroot=$(xcrun --sdk iphoneos --show-sdk-path)', '-miphoneos-version-min=11.0']
+      objc_args =      ['-arch', 'arm64', '--sysroot=$(xcrun --sdk iphoneos --show-sdk-path)', '-miphoneos-version-min=11.0']
+      objc_link_args = ['-arch', 'arm64', '--sysroot=$(xcrun --sdk iphoneos --show-sdk-path)', '-miphoneos-version-min=11.0']
 
       [binaries]
       ar        = '$(xcrun --find --sdk iphoneos ar)'
       c         = '$(xcrun --find --sdk iphoneos clang)'
+      objc         = '$(xcrun --find --sdk iphoneos clang)'
       cpp       = '$(xcrun --find --sdk iphoneos clang++)'
       ranlib    = '$(xcrun --find --sdk iphoneos ranlib)'
       strip     = '$(xcrun --find --sdk iphoneos strip)'
