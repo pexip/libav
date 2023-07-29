@@ -17,7 +17,7 @@
 # License along with this library; if not, see <http://www.gnu.org/licenses/>.
 
 project('FFmpeg', 'c',
-  meson_version: '>= 0.59',
+  meson_version: '>= 0.60',
   license: 'LGPL2.1+',
   default_options: [ 'buildtype=debugoptimized', 'c_std=c99', 'cpp_std=c++11'],
   version: '6.0.0',
@@ -25,7 +25,7 @@ project('FFmpeg', 'c',
 
 # HOWTO:
 #
-# Get meson >= 0.59 from pip or your distro's package manager then:
+# Get meson >= 0.60 from pip or your distro's package manager then:
 #
 # meson build && ninja -C build
 
@@ -2653,8 +2653,11 @@ foreach filter : filter_list
   endif
 endforeach
 
+old_cli = get_option('cli')
+new_programs = get_option('programs').disable_auto_if(old_cli.disabled())
+
 foreach program : program_list
-  conf.set(program, get_option(program).allowed().to_int())
+  conf.set10(program, new_programs.allowed() and get_option(program).allowed())
 endforeach
 
 conf.set10('network', get_option('network').allowed())
@@ -3158,13 +3161,11 @@ endforeach
 
 built_exe_list = []
 
-if not get_option('cli').disabled()
-  foreach program : program_list
-    if conf.get(program) == 1
-      built_exe_list += program
-    endif
-  endforeach
-endif
+foreach program : program_list
+  if conf.get(program) == 1
+    built_exe_list += program
+  endif
+endforeach
 
 foreach built_exe : built_exe_list
   sources = get_variable('fftools_sources', []) + [ffversion_h]

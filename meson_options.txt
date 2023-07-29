@@ -2373,6 +2373,7 @@ option('inline_asm', type: 'feature', value: 'enabled', description: 'Enable inl
 
 # other options
 # cli is disabled by default to speed up the build since it links statically
-option('cli', type: 'feature', value: 'disabled')
+option('cli', type: 'feature', value: 'disabled', deprecated: true)
+option('programs', type: 'feature', value: 'auto', description: 'Build command line programs')
 option('network', type: 'feature', value: 'auto', description: 'Enable network support')
 option('tests', type : 'feature', value : 'auto', description : 'Build tests', yield : true)
