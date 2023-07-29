@@ -524,11 +524,17 @@ types_list = [
   'struct_v4l2_frmivalenum_discrete',
 ]
 
-conf.set('runtime_cpudetect', 1)
 asm = get_option('asm')
 inline_asm = get_option('inline_asm')
 
 conf.set10('asm', asm.allowed())
+conf.set10('faan', true)
+conf.set10('faandct', true)
+conf.set10('faanidct', true)
+conf.set10('optimizations', get_option('optimization') != '0')
+conf.set10('runtime_cpudetect', true)
+conf.set10('safe_bitstream_reader', true)
+conf.set10('swscale_alpha', true)
 
 if inline_asm.allowed()
   conf.set10('inline_asm',
@@ -1378,6 +1384,12 @@ hwaccel_autodetect_library_list = [
   'v4l2_m2m',
 ]
 
+autodetect_libs = (
+  external_autodetect_library_list + 
+  hwaccel_autodetect_library_list + 
+  threads_list
+)
+
 # catchall list of things that require external libs to link
 extralibs_list = [
   'cpu_init',
@@ -1660,10 +1672,6 @@ foreach lib : threads_list
   conf.set(lib, 0)
 endforeach
 
-foreach lib : hwaccel_autodetect_library_list
-  conf.set(lib, 0)
-endforeach
-
 foreach check_struct : check_structs
   conf_name = '@0@_@1@'.format(check_struct[0].underscorify(), check_struct[1].underscorify())
 
@@ -1772,7 +1780,7 @@ if conf.get('float16') == 1
     # https://developercommunity.visualstudio.com/t/AVX512F-does-not-allow-detecting-the-F16/10345004
     conf.set10('fast_float16', cc.links(cpp_cond.format('stddef.h', 'defined(__F16C__) || defined(__AVX2__)'), args: project_c_args))
   elif conf.get('arm') == 1 or conf.get('aarch64') == 1
-    conf.set10('fast_float16', 1)
+    conf.set10('fast_float16', true)
   endif
 endif
 
@@ -1806,9 +1814,18 @@ endforeach
 # Our option names can't be 1:1 mapping because newer meson versions disallow
 # options with language prefixes i.e. "cuda_sdk" in our case
 options_map = {
+  'cuda_llvm' : 'ff_cuda_llvm',
   'cuda_sdk' : 'ff_cuda_sdk',
   'linux_fb_h' : 'linux_fbdev',
 }
+
+# Mark specifically enabled, but normally autodetected libraries as requested.
+foreach component : autodetect_libs
+  opt_name = options_map.get(component, component)
+  if get_option(opt_name).enabled()
+    conf.set10(component, true)
+  endif
+endforeach
 
 foreach check : all_checks
   check_type = check[0]
@@ -1904,7 +1921,16 @@ foreach check : all_checks
     preconditions = opts.get('preconditions', [])
 
     foreach precondition : preconditions
-      found = found and conf.get(precondition) == 1
+      if precondition in autodetect_libs
+        opt_name = options_map.get(precondition, precondition)
+        if get_option(opt_name).allowed()
+          found = found and conf.get(precondition, 1) == 1
+        else
+          found = found and conf.get(precondition, 0) == 1
+        endif
+      else
+        found = found and conf.get(precondition) == 1
+      endif
     endforeach
 
     # FIXME: or should these just be preconditions in the list above instead?
@@ -2051,6 +2077,16 @@ foreach check : all_checks
     else
       set_variable('@0@_extra_deps'.format(name.underscorify().to_lower()), [])
     endif
+  endif
+endforeach
+
+# MANUAL: Mathieu already treats all enables as enable_weak. But they can
+# only be enabled if the check is missing (ie. they're placeholders)
+# or they've already passed
+foreach component : external_autodetect_library_list + hwaccel_autodetect_library_list
+  opt_name = options_map.get(component, component)
+  if conf.get(component, 1) == 1
+    conf.set10(component, get_option(opt_name).allowed())
   endif
 endforeach
 
