@@ -112,7 +112,7 @@ libavcodec_x86_x86asm_optional_sources = {
   'hpeldsp' : files('fpel.asm','hpeldsp.asm'),
   'huffyuvdsp' : files('huffyuvdsp.asm'),
   'huffyuvencdsp' : files('huffyuvencdsp.asm'),
-  'idctdsp' : files('idctdsp.asm','simple_idct10.asm'),
+  'idctdsp' : files('idctdsp.asm','simple_idct10.asm'), # MANUAL
   'jpeg2000_decoder' : files('jpeg2000dsp.asm'),
   'llauddsp' : files('lossless_audiodsp.asm'),
   'llviddsp' : files('lossless_videodsp.asm'),

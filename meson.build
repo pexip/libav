@@ -19,7 +19,8 @@
 project('FFmpeg', 'c',
   meson_version: '>= 0.60',
   license: 'LGPL2.1+',
-  default_options: [ 'buildtype=debugoptimized', 'c_std=c99', 'cpp_std=c++11'],
+  # C11 is needed for Metal support
+  default_options: [ 'buildtype=debugoptimized', 'c_std=c11', 'cpp_std=c++11'],
   version: '6.0.0',
 )
 
@@ -121,7 +122,7 @@ project_c_args = [
 # Work around meson subprojects ignoring default_options
 # https://github.com/mesonbuild/meson/issues/1889#issuecomment-1275991958
 if meson.is_subproject() and meson.version().version_compare('< 0.63')
-  project_c_args += ['-std=c99']
+  project_c_args += ['-std=c11']
 endif
 
 project_c_args = cc.get_supported_arguments(project_c_args)
@@ -2089,6 +2090,49 @@ foreach component : external_autodetect_library_list + hwaccel_autodetect_librar
     conf.set10(component, get_option(opt_name).allowed())
   endif
 endforeach
+
+xcrun = disabler()
+bin2c = disabler()
+metalcc = disabler()
+metallib = disabler()
+
+if conf.get('metal') == 1
+  appleclang_sdk = ''
+  # determine the subsystem
+  is_macos = cc.get_define('TARGET_OS_OSX', prefix: '#include <TargetConditionals.h>')
+  is_ios = cc.get_define('TARGET_OS_IOS', prefix: '#include <TargetConditionals.h>')
+  is_tvos = cc.get_define('TARGET_OS_TV', prefix: '#include <TargetConditionals.h>')
+  if is_ios == '1'
+    appleclang_sdk = 'iphoneos'
+  elif is_tvos == '1'
+    appleclang_sdk = 'tvos'
+  elif is_macos == '1'
+    appleclang_sdk = 'macos'
+  else
+    warning('Unable to detect target OS SDK for Metal, assuming macOS')
+    appleclang_sdk = 'macos'
+  endif
+
+  xcrun = find_program('xcrun', required: true)
+
+  if run_command(xcrun, '-sdk', appleclang_sdk, 'metal', '-v', check: false).returncode() == 0
+    metalcc = generator(xcrun, 
+      output : '@BASENAME@.metalair',
+      arguments: ['-sdk', 'macosx', 'metal', '@INPUT@', '-o', '@OUTPUT@']
+    )
+    metallib = generator(xcrun,
+      output : '@BASENAME@.metallib',
+      arguments: ['-sdk', 'macosx', 'metallib', '--split-module-without-linking', '@INPUT@', '-o', '@OUTPUT@']
+    )
+    bin2c_exe = find_program('ffbuild/bin2c.py', required: get_option('metal'))
+    bin2c = generator(bin2c_exe,
+      output : '@BASENAME@.metallib.c',
+      arguments: ['@INPUT@', '@OUTPUT@']
+    )
+  else
+    conf.set10('metal', false)
+  endif
+endif
 
 if conf.get('w32threads') == 0 and conf.get('pthreads') == 0
   conf.set10('w32threads', cc.has_function('_beginthreadex', prefix: '#include <process.h>')

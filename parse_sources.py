@@ -38,11 +38,14 @@ SOURCE_TYPE_EXTS_MAP = {
     'shlib': ['c'],
     'slib': ['c'],
 }
+SOURCE_TYPE_DOUBLE_EXTS_MAP = {
+    'metallib.o': ['metal']
+}
 SOURCE_TYPE_DIRS = {'test-prog': 'tests'}
 
 
-def add_source(f, source, prefix='', suffix=''):
-    if not source.startswith('opencl/'):
+def add_source(f, source: str, prefix='', suffix=''):
+    if not source.startswith(('opencl/', 'metal/', 'cuda/')):
         source = os.path.basename(source)
     f.write("%s'%s'%s" % (prefix, source, suffix))
 
@@ -229,7 +232,10 @@ def make_to_meson(path):
             exts = SOURCE_TYPE_EXTS_MAP[source_type]
             ifiles = []
             for ofile in ofiles:
-                fname = os.path.splitext(ofile)[0]
+                basename = ofile.split('.')
+                if len(basename) > 2:
+                    exts = SOURCE_TYPE_DOUBLE_EXTS_MAP.get('.'.join(basename[1:]), [])
+                fname = basename[0]
                 for ext in exts:
                     tmpf = fname + '.' + ext
                     if os.path.exists(os.path.join(path, SOURCE_TYPE_DIRS.get(source_type, ''), tmpf)):

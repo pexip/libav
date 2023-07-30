@@ -189,7 +189,7 @@ libavfilter_optional_sources = {
   'colorlevels_filter' : files('vf_colorlevels.c'),
   'colormap_filter' : files('vf_colormap.c'),
   'colormatrix_filter' : files('vf_colormatrix.c'),
-  # 'colorspace_cuda_filter' : files('vf_colorspace_cuda.c','load_helper.c'),
+  # 'colorspace_cuda_filter' : files('vf_colorspace_cuda.c','cuda/load_helper.c'),
   'colorspace_filter' : files('vf_colorspace.c','colorspacedsp.c'),
   'colorspectrum_filter' : files('vsrc_testsrc.c'),
   'colortemperature_filter' : files('vf_colortemperature.c'),
@@ -392,7 +392,7 @@ libavfilter_optional_sources = {
   'ocv_filter' : files('vf_libopencv.c'),
   'openclsrc_filter' : files('vf_program_opencl.c','opencl.c'),
   'oscilloscope_filter' : files('vf_datascope.c'),
-  # 'overlay_cuda_filter' : files('vf_overlay_cuda.c','framesync.c','load_helper.c'),
+  # 'overlay_cuda_filter' : files('vf_overlay_cuda.c','framesync.c','cuda/load_helper.c'),
   'overlay_filter' : files('vf_overlay.c','framesync.c'),
   'overlay_opencl_filter' : files('vf_overlay_opencl.c','opencl.c','opencl/overlay.cl','framesync.c'),
   'overlay_qsv_filter' : files('vf_overlay_qsv.c','framesync.c'),
@@ -445,7 +445,7 @@ libavfilter_optional_sources = {
   'sab_filter' : files('vf_sab.c'),
   'scale2ref_filter' : files('vf_scale.c','scale_eval.c'),
   'scale2ref_npp_filter' : files('vf_scale_npp.c','scale_eval.c'),
-  # 'scale_cuda_filter' : files('vf_scale_cuda.c','scale_eval.c','load_helper.c'),
+  # 'scale_cuda_filter' : files('vf_scale_cuda.c','scale_eval.c'),
   'scale_filter' : files('vf_scale.c','scale_eval.c'),
   'scale_npp_filter' : files('vf_scale_npp.c','scale_eval.c'),
   'scale_qsv_filter' : files('vf_vpp_qsv.c'),
@@ -525,7 +525,7 @@ libavfilter_optional_sources = {
   'thistogram_filter' : files('vf_histogram.c'),
   'threads' : files('pthread.c'),
   'threshold_filter' : files('vf_threshold.c','framesync.c'),
-  # 'thumbnail_cuda_filter' : files('vf_thumbnail_cuda.c','load_helper.c'),
+  # 'thumbnail_cuda_filter' : files('vf_thumbnail_cuda.c','cuda/load_helper.c'),
   'thumbnail_filter' : files('vf_thumbnail.c'),
   'tile_filter' : files('vf_tile.c'),
   'tinterlace_filter' : files('vf_tinterlace.c'),
@@ -582,9 +582,9 @@ libavfilter_optional_sources = {
   'xstack_filter' : files('vf_stack.c','framesync.c'),
   'xstack_qsv_filter' : files('vf_stack_qsv.c','framesync.c'),
   'xstack_vaapi_filter' : files('vf_stack_vaapi.c','framesync.c','vaapi_vpp.c'),
-  # 'yadif_cuda_filter' : files('vf_yadif_cuda.c','yadif_common.c','load_helper.c'),
+  # 'yadif_cuda_filter' : files('vf_yadif_cuda.c','yadif_common.c','cuda/load_helper.c'),
   'yadif_filter' : files('vf_yadif.c','yadif_common.c'),
-  # 'yadif_videotoolbox_filter' : files('vf_yadif_videotoolbox.m','utils.m','yadif_common.c'),
+  'yadif_videotoolbox_filter' : files('vf_yadif_videotoolbox.m','metal/utils.m','yadif_common.c'), # MANUAL
   'yaepblur_filter' : files('vf_yaepblur.c'),
   'yuvtestsrc_filter' : files('vsrc_testsrc.c'),
   'zmq_filter' : files('f_zmq.c'),
@@ -654,6 +654,18 @@ subdir('dnn')
 dnn_sources = libavfilter_optional_sources.get('dnn') + libavfilter_dnn_optional_sources.get('dnn')
 
 libavfilter_optional_sources += {'dnn': dnn_sources}
+
+if conf.get('yadif_videotoolbox_filter') == 1
+  gen_objects = []
+  x = metalcc.process(
+        files('metal/vf_yadif_videotoolbox.metal',)
+      )
+  y = metallib.process(x)
+  gen_objects += bin2c.process(y)
+  libavfilter_optional_sources += {
+    'yadif_videotoolbox_filter' : libavfilter_optional_sources['yadif_videotoolbox_filter'] + gen_objects,
+  }
+endif
 
 # Version file
 ver_conf = configuration_data()
