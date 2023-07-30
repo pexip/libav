@@ -213,13 +213,13 @@ macOS x86_64:
   extends: '.build darwin'
   stage: 'build'
   tags:
-    - gst-macos-12.3
+    - gst-macos-13
 
 iOS arm64 cross:
   extends: '.build darwin'
   stage: 'build'
   tags:
-    - gst-ios-15.4
+    - gst-ios-16
   script:
     - |
       cat > ios-cross-file.txt <<EOF
