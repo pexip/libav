@@ -1264,7 +1264,7 @@ check_headers = [
 
 if host_machine.system() == 'darwin'
   check_headers += [['dispatch/dispatch.h']]
-elif host_machine.system() == 'android'
+elif host_machine.system() == 'android' and get_option('jni').allowed()
   check_headers += [['jni.h']]
 endif
 
@@ -2168,6 +2168,12 @@ if conf.get('pthreads') == 0 and conf.get('w32threads') == 0 and conf.get('os2th
   endif
 endif
 
+if host_machine.system() == 'android' and get_option('jni').allowed()
+  if conf.get('jni_h') == 1 and not (conf.get('pthreads') == 1)
+    error('jni not found')
+  endif
+endif
+
 if conf.get('gnutls') == 1 and conf.get('openssl') == 1
   error('GnuTLS and OpenSSL must not be enabled at the same time.')
 endif
@@ -2902,7 +2908,7 @@ endif
 
 add_project_arguments(project_c_args, language: 'c')
 
-libavcodec_optional_deps = [iconv_extra_deps]
+libavcodec_optional_deps = [iconv_extra_deps + android_extra_deps]
 libavutil_optional_deps = [vaapi_drm_extra_deps + vaapi_x11_extra_deps + vdpau_x11_extra_deps]
 libswresample_optional_deps = [libsoxr_extra_deps]
 
