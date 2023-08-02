@@ -2318,6 +2318,16 @@ if conf.get('pic') == 1
 endif
 
 if conf.get('x86') == 1
+  is_broken_android_api = cc.links(cpp_cond.format('android/api-level.h', '__ANDROID_API__ < 24'), name: 'compiling for Android API <24')
+
+  if is_broken_android_api and conf.get('x86_64') == 0
+    # https://stackoverflow.com/questions/34691970/ffmpeg-for-android-neon-build-has-text-relocations/34697703#34697703
+    # https://issuetracker.google.com/issues/37067983
+    # https://trac.ffmpeg.org/ticket/4928
+    warning('Disabling inline assembly due to Google banning non-position independent assembly code.')
+    conf.set10('inline_asm', false)
+  endif
+
   # Manual: check for binutils enforcing value ranges
   # https://sourceware.org/bugzilla/show_bug.cgi?id=30578
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108941
@@ -2483,6 +2493,15 @@ if conf.get('x86') == 1
   # See:
   # - https://github.com/android/ndk/issues/693
   # - https://bugs.llvm.org/show_bug.cgi?id=37542
+  if is_broken_android_api and conf.get('x86_64') == 0
+    warning('''x86 targets prior to Android Nougat (API 24) need
+      -mstackrealign to properly align stack for global constructors.
+      See https://github.com/android-ndk/ndk/issues/635''')
+    project_c_args += ['-mstackrealign']
+
+    # Zero in EBP because the preamble now consumes an additional register.
+    ebp_available = false
+  endif
   conf.set10('ebp_available', conf.get('aligned_stack') == 1 and ebp_available)
 
   asm_inline_checks += [
