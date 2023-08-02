@@ -112,7 +112,7 @@ libavcodec_x86_x86asm_optional_sources = {
   'hpeldsp' : files('fpel.asm','hpeldsp.asm'),
   'huffyuvdsp' : files('huffyuvdsp.asm'),
   'huffyuvencdsp' : files('huffyuvencdsp.asm'),
-  'idctdsp' : files('idctdsp.asm','simple_idct10.asm'), # MANUAL
+  'idctdsp' : files('idctdsp.asm'), # MANUAL
   'jpeg2000_decoder' : files('jpeg2000dsp.asm'),
   'llauddsp' : files('lossless_audiodsp.asm'),
   'llviddsp' : files('lossless_videodsp.asm'),
@@ -193,5 +193,10 @@ if conf.get('x86_32', 0) == 1
   libavcodec_x86_x86asm_optional_sources += {
     'idctdsp': libavcodec_x86_x86asm_optional_sources ['idctdsp'] + files('simple_idct.asm')
   }
+elif conf.get('x86_64', 0) == 1
+  # Alternatively,
+  # panic: ../libavcodec/x86/simple_idct10.asm: assertion cv8_state.source_files != NULL failed at output/codeview.c:512
+  libavcodec_x86_x86asm_optional_sources += {
+    'idctdsp': libavcodec_x86_x86asm_optional_sources ['idctdsp'] + files('simple_idct10.asm')
+  }
 endif
-
