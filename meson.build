@@ -793,7 +793,9 @@ if libc_type != ''
   conf.set('libc_@0@'.format(libc_type), 1)
 endif
 
-conf.set10('pic', conf.get('pic', cc.links(cpp_cond.format('stdlib.h', 'defined(__PIC__) || defined(__pic__) || defined(PIC)'))))
+# PIC is Meson managed, the compiler may not support it by
+# default but can be enabled through b_staticpic
+conf.set10('pic', get_option('b_staticpic'))
 
 conf.set10('winrt', cc.links(cpp_cond.format('windows.h', '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)')))
 
@@ -2309,10 +2311,11 @@ endif
 
 x86asm = disabler()
 conf.set('x86asm', 0)
-asm_args = ['-DPIC']
+asm_args = []
 
 if conf.get('pic') == 1
   project_c_args += ['-DPIC']
+  asm_args += ['-DPIC']
 endif
 
 if conf.get('x86') == 1
@@ -3242,6 +3245,7 @@ foreach built_lib : built_libs
     link_with: link_with,
     link_args: static_link_args,
     c_args: c_args,
+    pic: conf.get('pic') == 1,
     implicit_include_directories : false,
   )
 
@@ -3259,6 +3263,7 @@ foreach built_lib : built_libs
     link_whole: static_lib,
     link_args: link_args,
     c_args: c_args,
+    pic: conf.get('pic') == 1,
     vs_module_defs: vs_module_def,
     implicit_include_directories : false,
     install: true,
@@ -3296,7 +3301,9 @@ foreach built_lib : built_libs
         include_directories: common_incs,
         link_args: static_link_args,
         link_with: [static_lib] + link_with,
-        implicit_include_directories : false)
+        implicit_include_directories : false,
+        pie: get_option('b_pie') and (conf.get('pic') == 1)
+      )
 
       test('@0@_@1@'.format(built_lib[0], test_name), exe,
         timeout: 180,
@@ -3343,6 +3350,7 @@ foreach built_exe : built_exe_list
     include_directories: common_incs,
     link_with: [libavutil, libavcodec, libavfilter, libavdevice, libavformat, libswscale, libswresample, libpostproc],
     implicit_include_directories : false,
+    pie: get_option('b_pie') and (conf.get('pic') == 1)
   )
 
   set_variable('@0@_exe'.format(built_exe[0]), exe)
