@@ -6,14 +6,6 @@ microver = cc.get_define('LIBAVFILTER_VERSION_MICRO', kwargs: kwargs)
 
 libavfilter_version = f'@libavfilter_majorver@.@minorver@.@microver@'
 
-cc = meson.get_compiler('c')
-
-libavfilter_headers = files(
-  'avfilter.h',
-  'buffersink.h',
-  'buffersrc.h',
-)
-
 #### --- GENERATED --- ####
 
 libavfilter_sources = files(
@@ -33,6 +25,14 @@ libavfilter_sources = files(
   'graphparser.c',
   'version.c',
   'video.c',
+)
+
+libavfilter_headers = files(
+  'avfilter.h',
+  'buffersink.h',
+  'buffersrc.h',
+  'version.h',
+  'version_major.h',
 )
 
 libavfilter_optional_sources = {

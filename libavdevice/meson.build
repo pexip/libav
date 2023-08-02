@@ -6,12 +6,6 @@ microver = cc.get_define('LIBAVDEVICE_VERSION_MICRO', kwargs: kwargs)
 
 libavdevice_version = f'@libavdevice_majorver@.@minorver@.@microver@'
 
-cc = meson.get_compiler('c')
-
-libavdevice_headers = files(
-  'avdevice.h',
-)
-
 #### --- GENERATED --- ####
 
 libavdevice_sources = files(
@@ -19,6 +13,12 @@ libavdevice_sources = files(
   'avdevice.c',
   'utils.c',
   'version.c',
+)
+
+libavdevice_headers = files(
+  'avdevice.h',
+  'version.h',
+  'version_major.h',
 )
 
 libavdevice_optional_sources = {

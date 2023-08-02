@@ -27,6 +27,7 @@ ASM_EXTS = ['asm', 'S', 'c']
 
 SOURCE_TYPE_EXTS_MAP = {
     'c': ['c', 'cpp', 'm', 'cl', 'S'],
+    'h': ['h'],
     'asm': ASM_EXTS,
     'armv5te': ASM_EXTS,
     'armv6': ASM_EXTS,
@@ -103,6 +104,10 @@ def make_to_meson(path):
                 label, ofiles = l.split('+=')
                 label = label.split('CONFIG_')[1].rstrip(' )')
                 source_type = 'c'  # arguable too ^^
+            elif re.match('HEADERS.*=.*', l):
+                label = 'headers'
+                ofiles = l.split('=')[1]
+                source_type = 'h'
             elif re.match('OBJS.*=.*', l):
                 label = ''
                 ofiles = l.split('=')[1]
@@ -254,13 +259,13 @@ def make_to_meson(path):
             if accumulate:
                 accum += ifiles
             else:
-                map_ = source_maps[source_type]
+                map_ = source_maps.get(source_type, source_maps['c'])
                 map_[label] += accum + ifiles
                 accum = []
 
         # Makefiles can end with '\' and this is just a porting script ;)
         if accum:
-            map_ = source_maps[source_type]
+            map_ = source_maps.get(source_type, source_maps['c'])
             map_[label] += accum
             accum = []
 
@@ -298,6 +303,17 @@ def make_to_meson(path):
 
         if default_sources:
             f.write('%ssources = files(\n' % '_'.join((path.replace('/', '_'), source_type)))
+            for source in default_sources:
+                if '$' in source:
+                    print ('Warning: skipping %s' % source)
+                    continue
+                add_source(f, source, prefix='  ', suffix=',\n')
+            f.write(')\n\n')
+
+        default_sources = map_.pop('headers', [])
+
+        if default_sources:
+            f.write('%sheaders = files(\n' % '_'.join((path.replace('/', '_'), source_type)))
             for source in default_sources:
                 if '$' in source:
                     print ('Warning: skipping %s' % source)

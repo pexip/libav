@@ -6,11 +6,6 @@ microver = cc.get_define('LIBSWSCALE_VERSION_MICRO', kwargs: kwargs)
 
 libswscale_version = f'@libswscale_majorver@.@minorver@.@microver@'
 
-libswscale_headers = files(
-  'swscale.h',
-)
-
-
 #### --- GENERATED --- ####
 
 libswscale_sources = files(
@@ -30,6 +25,12 @@ libswscale_sources = files(
   'version.c',
   'yuv2rgb.c',
   'vscale.c',
+)
+
+libswscale_headers = files(
+  'swscale.h',
+  'version.h',
+  'version_major.h',
 )
 
 libswscale_optional_sources = {

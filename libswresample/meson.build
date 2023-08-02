@@ -6,10 +6,6 @@ microver = cc.get_define('LIBSWRESAMPLE_VERSION_MICRO', kwargs: kwargs)
 
 libswresample_version = f'@libswresample_majorver@.@minorver@.@microver@'
 
-libswresample_headers = files(
-  'swresample.h',
-)
-
 #### --- GENERATED --- ####
 
 libswresample_sources = files(
@@ -22,6 +18,12 @@ libswresample_sources = files(
   'swresample.c',
   'swresample_frame.c',
   'version.c',
+)
+
+libswresample_headers = files(
+  'swresample.h',
+  'version.h',
+  'version_major.h',
 )
 
 libswresample_optional_sources = {

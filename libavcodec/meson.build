@@ -1,28 +1,3 @@
-libavcodec_headers = files(
-  'ac3_parser.h',
-  'adts_parser.h',
-  'avcodec.h',
-  'avdct.h',
-  'avfft.h',
-  'bsf.h',
-  'codec_desc.h',
-  'codec.h',
-  'codec_id.h',
-  'codec_par.h',
-  'd3d11va.h',
-  'dirac.h',
-  'dv_profile.h',
-  'dxva2.h',
-  'jni.h',
-  'mediacodec.h',
-  'packet.h',
-  'qsv.h',
-  'vdpau.h',
-  'videotoolbox.h',
-  'vorbis_parser.h',
-  'xvmc.h',
-)
-
 #### --- GENERATED --- ####
 
 libavcodec_sources = files(
@@ -60,6 +35,34 @@ libavcodec_sources = files(
   'vorbis_parser.c',
   'xiph.c',
   'dctref.c',
+)
+
+libavcodec_headers = files(
+  'ac3_parser.h',
+  'adts_parser.h',
+  'avcodec.h',
+  'avdct.h',
+  'avfft.h',
+  'bsf.h',
+  'codec.h',
+  'codec_desc.h',
+  'codec_id.h',
+  'codec_par.h',
+  'd3d11va.h',
+  'defs.h',
+  'dirac.h',
+  'dv_profile.h',
+  'dxva2.h',
+  'jni.h',
+  'mediacodec.h',
+  'packet.h',
+  'qsv.h',
+  'vdpau.h',
+  'version.h',
+  'version_major.h',
+  'videotoolbox.h',
+  'vorbis_parser.h',
+  'xvmc.h',
 )
 
 libavcodec_optional_sources = {

@@ -6,13 +6,6 @@ microver = cc.get_define('LIBAVFORMAT_VERSION_MICRO', kwargs: kwargs)
 
 libavformat_version = f'@libavformat_majorver@.@minorver@.@microver@'
 
-cc = meson.get_compiler('c')
-
-libavformat_headers = files(
-  'avformat.h',
-  'avio.h',
-)
-
 #### --- GENERATED --- ####
 
 libavformat_sources = files(
@@ -40,6 +33,13 @@ libavformat_sources = files(
   'url.c',
   'utils.c',
   'version.c',
+)
+
+libavformat_headers = files(
+  'avformat.h',
+  'avio.h',
+  'version.h',
+  'version_major.h',
 )
 
 libavformat_optional_sources = {

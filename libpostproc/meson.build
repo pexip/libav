@@ -6,15 +6,17 @@ microver = cc.get_define('LIBPOSTPROC_VERSION_MICRO', kwargs: kwargs)
 
 libpostproc_version = f'@libpostproc_majorver@.@minorver@.@microver@'
 
-libpostproc_headers = files(
-  'postprocess.h',
-)
-
 #### --- GENERATED --- ####
 
 libpostproc_sources = files(
   'postprocess.c',
   'version.c',
+)
+
+libpostproc_headers = files(
+  'postprocess.h',
+  'version.h',
+  'version_major.h',
 )
 
 libpostproc_optional_sources = {
