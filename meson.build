@@ -2173,6 +2173,17 @@ if host_machine.system() == 'android' and get_option('jni').allowed()
   endif
 endif
 
+# FIXME: the source parser needs a case for the TLS-OBJS
+are_protocols_disabled = get_option('protocols').disabled()
+if get_option('tls_protocol').disable_auto_if(are_protocols_disabled).disabled()
+  conf.set10('gnutls', false)
+  conf.set10('openssl', false)
+  conf.set10('schannel', false)
+  conf.set10('securetransport', false)
+  conf.set10('libtls', false)
+  conf.set10('mbedtls', false)
+endif
+
 if conf.get('gnutls') == 1 and conf.get('openssl') == 1
   error('GnuTLS and OpenSSL must not be enabled at the same time.')
 endif
