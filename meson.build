@@ -2309,7 +2309,6 @@ else
   asm_format = conf.get('x86_64') == 1 ? 'elf64' : 'elf32'
 endif
 
-x86asm = disabler()
 conf.set('x86asm', 0)
 asm_args = []
 
@@ -2402,9 +2401,9 @@ if conf.get('x86') == 1
 
   # Manual: the configure script never checks if x86asm is enabled outside
   # of an x86 context. So I fix those semantics here.
-  conf.set10('x86asm', get_option('x86asm').allowed())
+  conf.set10('x86asm', get_option('asm').allowed() and (conf.get('mmx', 1) == 1) and get_option('x86asm').allowed())
 
-  if (conf.get('asm', 1) == 1) and (conf.get('mmx', 1) == 1) and (conf.get('x86asm', 1) == 1)
+  if conf.get('x86asm') == 1
     conf.set('x86asm', 0)
     nasm_version = '>=0'
     if host_machine.system() == 'windows'
