@@ -2680,12 +2680,14 @@ if (conf.get('arm', 0) == 1 or conf.get('aarch64', 0) == 1) and cc.get_id() != '
   ]
 endif
 
+can_run_asm_checks = false
+
 foreach check : asm_as_checks
   # It is possible to run compile checks on generated files, however,
   # Meson versions earlier than 1.2.0 do not set the lookup path
   # correctly, causing Python to fail opening it.
   # https://github.com/mesonbuild/meson/issues/11983
-  if conf.get('asm') == 1 and meson.version().version_compare('>= 1.2.0')
+  if can_run_asm_checks
     f = configure_file(
       command: [python3, '-c', 'import sys; print(sys.argv[1])', '@0@'.format(check[0])],
       input: 'configure',
@@ -2711,13 +2713,16 @@ endif
 
 arm_skip_checks = conf.get('arm', 0) == 1 and (host_machine.system() == 'linux' or host_machine.system() == 'android')
 
-foreach ext : arch_ext_list_arm
-  inline = '@0@_inline'.format(ext)
-  external = '@0@_external'.format(ext)
-  if not arm_skip_checks
+# If the ASM checks couldn't be run, we need to update the state
+# of ALL Arm instruction sets
+# That's apart from the upstream's linux/android check
+if not arm_skip_checks or not can_run_asm_checks
+  foreach ext : arch_ext_list_arm
+    inline = '@0@_inline'.format(ext)
+    external = '@0@_external'.format(ext)
     conf.set10(ext, conf.get(inline, 0) == 1 or conf.get(external, 0) == 1)
-  endif
-endforeach
+  endforeach
+endif
 
 if get_option('b_lto')
   conf.set10('inline_asm_direct_symbol_refs', false)
