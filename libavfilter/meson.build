@@ -627,7 +627,7 @@ libavfilter_tests = [
   ['drawutils', files('tests/drawutils.c')],
   # MANUAL ['filtfmts', files('tests/filtfmts.c')],
   ['formats', files('tests/formats.c')],
-  ['integral', files('tests/integral.c')],
+  # MANUAL ['integral', files('tests/integral.c')],
 ]
 
 libavfilter_optional_tests = {
@@ -641,6 +641,9 @@ libavfilter_optional_tests = {
     ['dnn-layer-maximum', files('tests/dnn-layer-maximum.c')],
     ['dnn-layer-pad', files('tests/dnn-layer-pad.c')],
   ],
+  'nlmeans_filter': [
+    ['integral', files('tests/integral.c')],
+  ]
 }
 
 languages_map += {
