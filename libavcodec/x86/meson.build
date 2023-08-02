@@ -93,7 +93,7 @@ libavcodec_x86_x86asm_optional_sources = {
   'bswapdsp' : files('bswapdsp.asm'),
   'cavs_decoder' : files('cavsidct.asm'),
   'cfhd_decoder' : files('cfhddsp.asm'),
-  'cfhd_encoder' : files('cfhdencdsp.asm'),
+  'cfhd_encoder' : [], # MANUAL
   'dca_decoder' : files('dcadsp.asm','synth_filter.asm'),
   'dct' : files('dct32.asm'),
   'dirac_decoder' : files('diracdsp.asm','dirac_dwt.asm'),
@@ -120,7 +120,7 @@ libavcodec_x86_x86asm_optional_sources = {
   'lpc' : files('lpc.asm'),
   'lscr_decoder' : files('pngdsp.asm'),
   'me_cmp' : files('me_cmp.asm'),
-  'mlp_decoder' : files('mlpdsp.asm'),
+  'mlp_decoder' : [], # MANUAL 
   'mpeg4_decoder' : files('xvididct.asm'),
   'mpegaudiodsp' : files('imdct36.asm'),
   'mpegvideoenc' : files('mpegvideoencdsp.asm'),
@@ -128,15 +128,15 @@ libavcodec_x86_x86asm_optional_sources = {
   'opus_encoder' : files('celt_pvq_search.asm'),
   'pixblockdsp' : files('pixblockdsp.asm'),
   'png_decoder' : files('pngdsp.asm'),
-  'prores_decoder' : files('proresdsp.asm'),
-  'prores_lgpl_decoder' : files('proresdsp.asm'),
+  'prores_decoder' : [], # MANUAL
+  'prores_lgpl_decoder' : [], # MANUAL
   'qpeldsp' : files('qpeldsp.asm','fpel.asm','qpel.asm'),
   'rv34dsp' : files('rv34dsp.asm'),
   'rv40_decoder' : files('rv40dsp.asm'),
   'sbc_encoder' : files('sbcdsp.asm'),
   'svq1_encoder' : files('svq1enc.asm'),
   'tak_decoder' : files('takdsp.asm'),
-  'truehd_decoder' : files('mlpdsp.asm'),
+  'truehd_decoder' : [], # MANUAL
   'tta_decoder' : files('ttadsp.asm'),
   'tta_encoder' : files('ttaencdsp.asm'),
   'utvideo_decoder' : files('utvideodsp.asm'),
@@ -197,6 +197,11 @@ elif conf.get('x86_64', 0) == 1
   # Alternatively,
   # panic: ../libavcodec/x86/simple_idct10.asm: assertion cv8_state.source_files != NULL failed at output/codeview.c:512
   libavcodec_x86_x86asm_optional_sources += {
-    'idctdsp': libavcodec_x86_x86asm_optional_sources ['idctdsp'] + files('simple_idct10.asm')
+    'idctdsp': libavcodec_x86_x86asm_optional_sources ['idctdsp'] + files('simple_idct10.asm'),
+    'mlp_decoder': libavcodec_x86_x86asm_optional_sources ['mlp_decoder'] + files('mlpdsp.asm'),
+    'cfhd_encoder': libavcodec_x86_x86asm_optional_sources ['cfhd_encoder'] + files('cfhdencdsp.asm'),
+    'prores_decoder': libavcodec_x86_x86asm_optional_sources ['prores_decoder'] + files('proresdsp.asm'),
+    'prores_lgpl_decoder': libavcodec_x86_x86asm_optional_sources ['prores_lgpl_decoder'] + files('proresdsp.asm'),
+    'truehd_decoder': libavcodec_x86_x86asm_optional_sources ['truehd_decoder'] + files('mlpdsp.asm'),
   }
 endif

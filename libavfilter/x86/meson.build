@@ -1,3 +1,5 @@
+#### --- GENERATED --- ####
+
 libavfilter_x86_optional_sources = {
   'afir_filter' : files('af_afir_init.c'),
   'anlmdn_filter' : files('af_anlmdn_init.c'),
@@ -44,7 +46,7 @@ libavfilter_x86_optional_sources = {
 libavfilter_x86_x86asm_optional_sources = {
   'afir_filter' : files('af_afir.asm'),
   'anlmdn_filter' : files('af_anlmdn.asm'),
-  'atadenoise_filter' : files('vf_atadenoise.asm'),
+  'atadenoise_filter' : [], # MANUAL
   'blend_filter' : files('vf_blend.asm'),
   'bwdif_filter' : files('vf_bwdif.asm'),
   'colorspace_filter' : files('colorspacedsp.asm'),
@@ -62,7 +64,7 @@ libavfilter_x86_x86asm_optional_sources = {
   'lut3d_filter' : files('vf_lut3d.asm'),
   'maskedclamp_filter' : files('vf_maskedclamp.asm'),
   'maskedmerge_filter' : files('vf_maskedmerge.asm'),
-  'nlmeans_filter' : files('vf_nlmeans.asm'),
+  'nlmeans_filter' : [], # MANUAL
   'overlay_filter' : files('vf_overlay.asm'),
   'pp7_filter' : files('vf_pp7.asm'),
   'psnr_filter' : files('vf_psnr.asm'),
@@ -109,3 +111,18 @@ libavfilter_x86_slib_optional_sources = {
 libavfilter_x86_optional_tests = {
 }
 
+#### --- END GENERATED --- ####
+
+# This file results in empty codegen and empty PDB generation otherwise.
+# https://bugzilla.nasm.us/show_bug.cgi?id=3392738
+# https://developercommunity.visualstudio.com/t/MSVC-Hangs-when-compiling-ffmpeg-When-l/10233953
+if conf.get('x86_64', 0) == 1
+  # Alternatively,
+  # panic: ../libavcodec/x86/simple_idct10.asm: assertion cv8_state.source_files != NULL failed at output/codeview.c:512
+  libavfilter_x86_x86asm_optional_sources += {
+    'atadenoise_filter': libavfilter_x86_x86asm_optional_sources ['atadenoise_filter'] + files('vf_atadenoise.asm'),
+  }
+  libavfilter_x86_x86asm_optional_sources += {
+    'nlmeans_filter': libavfilter_x86_x86asm_optional_sources ['nlmeans_filter'] + files('vf_nlmeans.asm'),
+  }
+endif
