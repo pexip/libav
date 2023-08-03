@@ -79,7 +79,9 @@ cc = meson.get_compiler('c')
 
 languages_map = {}
 
-if cc.get_id() == 'msvc'
+is_msvc = cc.get_define('_MSC_VER') != ''
+
+if cc.get_argument_syntax() == 'msvc'
   # Ignore several spurious warnings for things FFmpeg does very commonly
   # If a warning is completely useless and spammy, use '/wdXXXX' to suppress it
   # If a warning is harmless but hard to fix, use '/woXXXX' so it's shown once
@@ -2245,7 +2247,7 @@ endif
 
 # Manual check for libx264
 if conf.get('libx264') == 1
-  if cc.get_define('_MSC_VER') != ''
+  if is_msvc
     if not cc.links(cpp_cond.format('x264.h', 'X264_BUILD >= 122'), name: 'libx264 version')
       warning('libx264 version must be >= 1.22')
       conf.set('libx264', 0)
@@ -3006,7 +3008,7 @@ makedef = find_program('compat/windows/makedef.py')
 
 makedef_args = [makedef]
 
-if cc.get_define('_MSC_VER') == ''
+if not is_msvc
   nm = find_program('nm', required: true)
   makedef_args += ['--nm', nm]
 else
@@ -3272,7 +3274,7 @@ foreach built_lib : built_libs
 
   static_link_args = []
 
-  if cc.get_linker_id() == 'msvc' and (get_option('buildtype') == 'debug' or get_option('optimization') == '0')
+  if is_msvc and (get_option('buildtype') == 'debug' or get_option('optimization') == '0')
     message('Applying MSVC link workaround for Debug mode and static libraries.')
     static_link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
     link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
@@ -3424,7 +3426,13 @@ foreach pkg_info : pkg_infos
 endforeach
 
 # Put this at the end so people see it
-if conf.get('x86_32') == 1 and conf.get('asm') == 1 and cc.get_id() == 'msvc' and cc.version().version_compare('<19.30')
+if conf.get('x86_32') == 1 and is_msvc
   # -Dasm=enabled seems to hang reliably on some Visual Studio 2019 installations, ask users to report back to us
-  warning('Using VS 2019 x86 with `asm` enabled: if you see a hang while linking, please report an issue at https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg/-/issues')
+  if conf.get('asm') == 1 and cc.version().version_compare('<19.30')
+    warning('Using VS 2019 x86 with `asm` enabled: if you see a hang while linking, please report an issue at https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg/-/issues')
+  endif
+  # MSVC x86 -> x86 cannot cope with the amount of PDB information
+  if (new_programs.allowed() or build_tests) and conf.get('shared') == 0
+    warning('Using VS x86 with static libraries: if you see a hang while linking, please disable programs and tests, or report an issue at https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg/-/issues')
+  endif
 endif
