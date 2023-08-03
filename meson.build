@@ -3093,6 +3093,20 @@ config_components_h = configure_file(
 
 rc = find_program('rc_workaround.py', required: host_machine.system() == 'windows')
 
+build_tests = get_option('tests').allowed()
+
+# Manual: Skip test building for iOS simulator because of an Apple lld bug
+# ld: warning: ignoring file libavutil.a, building for iOS Simulator-x86_64 but
+# attempting to link with file built for iOS Simulator-x86_64
+is_simulator = false
+if cc.has_header('TargetConditionals.h')
+  is_simulator = cc.get_define('TARGET_OS_SIMULATOR', prefix: '#include <TargetConditionals.h>') == '1'
+endif
+if is_simulator and cc.get_linker_id() == 'ld64'
+  warning('Apple Clang cannot link static libraries for the Simulator, disabling tests.')
+  build_tests = false
+endif
+
 foreach built_lib : built_libs
   sources = get_variable('lib@0@_sources'.format(built_lib[0])) + [ffversion_h]
   x86asm_sources = []
@@ -3297,7 +3311,7 @@ foreach built_lib : built_libs
 
   set_variable('lib@0@_dep'.format(built_lib[0]), declared_dep)
 
-  if not get_option('tests').disabled()
+  if build_tests
     foreach test_ : tests
       test_name = test_[0]
       test_sources = test_[1]
