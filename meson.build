@@ -20,7 +20,8 @@ project('FFmpeg', 'c',
   meson_version: '>= 0.60',
   license: 'LGPL2.1+',
   # C11 is needed for Metal support
-  default_options: [ 'buildtype=debugoptimized', 'c_std=c11', 'cpp_std=c++11'],
+  # Static libraries by default following upstream
+  default_options: [ 'buildtype=debugoptimized', 'c_std=c11', 'cpp_std=c++11', 'default_library=static'],
   version: '6.0.0',
 )
 
@@ -1774,6 +1775,7 @@ elif cc.get_id() == 'msvc'
   endif
 endif
 
+conf.set10('static', get_option('default_library') != 'shared')
 conf.set10('shared', get_option('default_library') != 'static')
 
 conf.set10('bigendian', host_machine.endian() == 'big')
@@ -2414,6 +2416,18 @@ if conf.get('x86') == 1
   # Manual: the configure script never checks if x86asm is enabled outside
   # of an x86 context. So I fix those semantics here.
   conf.set10('x86asm', get_option('asm').allowed() and (conf.get('mmx', 1) == 1) and get_option('x86asm').allowed())
+
+  # Manual: Skip Nasm building for iOS simulator because of an Apple lld bug
+  # ld: warning: ignoring file libavutil.a, building for iOS Simulator-x86_64 but
+  # attempting to link with file built for iOS Simulator-x86_64
+  is_simulator = false
+  if cc.has_header('TargetConditionals.h')
+    is_simulator = cc.get_define('TARGET_OS_SIMULATOR', prefix: '#include <TargetConditionals.h>') == '1'
+  endif
+  if is_simulator
+    warning('Disabling inline assembly because Apple Clang cannot link Nasm assembly for the Simulator.')
+    conf.set10('x86asm', false)
+  endif
 
   if conf.get('x86asm') == 1
     conf.set('x86asm', 0)
@@ -3104,18 +3118,6 @@ rc = find_program('rc_workaround.py', required: host_machine.system() == 'window
 
 build_tests = get_option('tests').allowed()
 
-# Manual: Skip test building for iOS simulator because of an Apple lld bug
-# ld: warning: ignoring file libavutil.a, building for iOS Simulator-x86_64 but
-# attempting to link with file built for iOS Simulator-x86_64
-is_simulator = false
-if cc.has_header('TargetConditionals.h')
-  is_simulator = cc.get_define('TARGET_OS_SIMULATOR', prefix: '#include <TargetConditionals.h>') == '1'
-endif
-if is_simulator and cc.get_linker_id() == 'ld64'
-  warning('Apple Clang cannot link static libraries for the Simulator, disabling tests.')
-  build_tests = false
-endif
-
 foreach built_lib : built_libs
   sources = get_variable('lib@0@_sources'.format(built_lib[0])) + [ffversion_h]
   x86asm_sources = []
@@ -3296,11 +3298,11 @@ foreach built_lib : built_libs
   )
 
   lib = library(built_lib[0],
+    objects: static_lib.extract_all_objects(recursive: true),
     dependencies: deps,
     soversion: version,
     include_directories: common_incs,
     link_with: link_with,
-    link_whole: static_lib,
     link_args: link_args,
     c_args: c_args,
     pic: conf.get('pic') == 1,
