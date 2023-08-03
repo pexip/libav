@@ -1686,7 +1686,7 @@ foreach license : license_list
 endforeach
 
 foreach lib : library_list
-  conf.set(lib, get_option(lib).enabled().to_int())
+  conf.set10(lib, get_option(lib).allowed())
 endforeach
 
 arch = 'c'
@@ -2983,16 +2983,24 @@ libswresample_optional_deps = [libsoxr_extra_deps]
 
 common_deps += libm_extra_deps
 
-built_libs = [
+libs_deps = [
   ['avutil', []],
   ['postproc', ['libavutil']],
   ['swresample', ['libavutil']],
   ['swscale', ['libavutil']],
-  ['avcodec', ['libavutil', 'libswresample']],
+  ['avcodec', ['libavutil']],
   ['avformat', ['libavutil', 'libavcodec']],
-  ['avfilter', ['libavutil', 'libavcodec', 'libavformat', 'libswscale', 'libswresample', 'libpostproc']],
-  ['avdevice', ['libavutil', 'libavformat', 'libavfilter', 'libavcodec']],
+  ['avfilter', ['libavutil']],
+  ['avdevice', ['libavutil', 'libavformat', 'libavcodec']],
 ]
+
+built_libs = []
+
+foreach built_lib : libs_deps
+  if conf.get(built_lib[0]) == 1
+    built_libs += [built_lib]
+  endif
+endforeach
 
 makedef = find_program('compat/windows/makedef.py')
 
@@ -3219,16 +3227,18 @@ foreach built_lib : built_libs
   endforeach
 
   foreach dep_comp_name: get_variable('@0@_flattened_deps'.format(built_lib[0]), [])
+    if dep_comp_name == built_lib[0]
+      continue
+    endif
+    if library_list.contains(dep_comp_name)
+      optional_deps += [get_variable('lib@0@_dep'.format(dep_comp_name))]
+    endif
     optional_deps += get_variable('@0@_extra_deps'.format(dep_comp_name), [])
   endforeach
 
   deps = common_deps + optional_deps
 
   link_with = []
-
-  foreach dep : built_lib[1]
-    deps += [get_variable('@0@_dep'.format(dep))]
-  endforeach
 
   version = get_variable('lib@0@_majorver'.format(built_lib[0]))
 
@@ -3262,13 +3272,10 @@ foreach built_lib : built_libs
 
   static_link_args = []
 
-  if cc.get_id() == 'msvc'
+  if cc.get_linker_id() == 'msvc' and (get_option('buildtype') == 'debug' or get_option('optimization') == '0')
     message('Applying MSVC link workaround for Debug mode and static libraries.')
     static_link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
-
-    if get_option('buildtype') == 'debug' or get_option('optimization') == '0'
-      link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
-    endif
+    link_args += cc.get_supported_link_arguments('/FORCE:UNRESOLVED')
   endif
 
   static_lib = static_library('@0@-static'.format(built_lib[0]), sources + gen_objects + [config_h, config_components_h],
@@ -3321,7 +3328,7 @@ foreach built_lib : built_libs
       extra_libs = opts.get('extra_libs', [])
       foreach libname: extra_libs
         if libname == 'threads' and thread_dep.found()
-          test_deps += test_deps
+          test_deps += [thread_dep]
         else
           test_deps += [cc.find_library(libname)]
         endif
@@ -3376,11 +3383,14 @@ foreach built_exe : built_exe_list
 
   deps = common_deps + optional_deps
 
+  foreach built_lib: built_libs
+    deps += [get_variable('lib@0@_dep'.format(built_lib[0]))]
+  endforeach
+
   exe = executable(built_exe, sources + [config_h, config_components_h],
     install: true,
     dependencies: deps,
     include_directories: common_incs,
-    link_with: [libavutil, libavcodec, libavfilter, libavdevice, libavformat, libswscale, libswresample, libpostproc],
     implicit_include_directories : false,
     pie: get_option('b_pie') and (conf.get('pic') == 1)
   )
@@ -3391,18 +3401,21 @@ endforeach
 pkg = import('pkgconfig')
 
 pkg_infos = [
-  ['Multimedia utilities', 'libavutil'],
-  ['FFmpeg postprocessing library', 'libpostproc'],
-  ['FFmpeg audio resampling library', 'libswresample'],
-  ['FFmpeg image rescaling library', 'libswscale'],
-  ['Multimedia codecs', 'libavcodec'],
-  ['Multimedia formats', 'libavformat'],
-  ['Media device handling', 'libavdevice'],
-  ['Audio/video filtering library', 'libavfilter'],
+  ['Multimedia utilities', 'avutil'],
+  ['FFmpeg postprocessing library', 'postproc'],
+  ['FFmpeg audio resampling library', 'swresample'],
+  ['FFmpeg image rescaling library', 'swscale'],
+  ['Multimedia codecs', 'avcodec'],
+  ['Multimedia formats', 'avformat'],
+  ['Media device handling', 'avdevice'],
+  ['Audio/video filtering library', 'avfilter'],
 ]
 
 foreach pkg_info : pkg_infos
-  libname = pkg_info[1]
+  if conf.get(pkg_info[1]) == 0
+    continue
+  endif
+  libname = 'lib@0@'.format(pkg_info[1])
   pkg.generate(get_variable(libname),
     filebase:  libname,
     description: pkg_info[0],
