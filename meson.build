@@ -3049,7 +3049,6 @@ else
   license = 'LGPL version 2.1 or later'
 endif
 final_conf.set_quoted('FFMPEG_LICENSE', license)
-message('License: ' + license)
 
 if not get_option('version3').disabled()
   if not get_option('gpl').disabled()
@@ -3425,6 +3424,8 @@ foreach pkg_info : pkg_infos
   )
 endforeach
 
+### Summary
+
 # Put this at the end so people see it
 if conf.get('x86_32') == 1 and is_msvc
   # -Dasm=enabled seems to hang reliably on some Visual Studio 2019 installations, ask users to report back to us
@@ -3436,3 +3437,144 @@ if conf.get('x86_32') == 1 and is_msvc
     warning('Using VS x86 with static libraries: if you see a hang while linking, please disable programs and tests, or report an issue at https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg/-/issues')
   endif
 endif
+
+thread_type = ''
+foreach t : threads_list
+  if conf.get(t) == 1
+    thread_type = t
+    break
+  endif
+endforeach
+
+summary({
+  'License': license,
+  'static': conf.get('static').is_odd(),
+  'shared': conf.get('shared').is_odd(),
+  'postprocessing support': conf.get('postproc').is_odd(),
+  'network support': conf.get('network').is_odd(),
+  'threading support': thread_type,
+  'safe bitstream reader': conf.get('safe_bitstream_reader').is_odd(),
+}, section: 'Basics', bool_yn: true)
+
+if conf.get('x86') == 1
+  summary({
+    'standalone assembly': conf.get('x86asm').is_odd(),
+    'x86 assembler': get_variable('x86asm_type', 'none'),
+    'MMX': conf.get('mmx').is_odd(),
+    'MMXEXT': conf.get('mmxext').is_odd(),
+    '3DNow!': conf.get('amd3dnow').is_odd(),
+    '3DNow! extended': conf.get('amd3dnowext').is_odd(),
+    'SSE': conf.get('sse').is_odd(),
+    'SSSE3': conf.get('ssse3').is_odd(),
+    'AESNI': conf.get('aesni').is_odd(),
+    'AVX': conf.get('avx').is_odd(),
+    'AVX2': conf.get('avx2').is_odd(),
+    'AVX-512': conf.get('avx512').is_odd(),
+    'AVX-512ICL': conf.get('avx512icl').is_odd(),
+    'XOP': conf.get('xop').is_odd(),
+    'FMA3': conf.get('fma3').is_odd(),
+    'FMA4': conf.get('fma4').is_odd(),
+    'i686 features': conf.get('i686').is_odd(),
+    'CMOV is fast': conf.get('fast_cmov').is_odd(),
+    'EBX available': conf.get('ebx_available').is_odd(),
+    'EBP available': conf.get('ebp_available').is_odd(),
+  }, section: 'x86', bool_yn: true)
+endif
+if conf.get('aarch64') == 1
+  summary({
+    'NEON': conf.get('neon').is_odd(),
+    'VFP': conf.get('vfp').is_odd(),
+  }, section: 'Arm64', bool_yn: true)
+endif
+if conf.get('arm') == 1
+  summary({
+    'ARMv5TE': conf.get('armv5te').is_odd(),
+    'ARMv6': conf.get('armv6').is_odd(),
+    'ARMv6T2': conf.get('armv6t2').is_odd(),
+    'VFP': conf.get('vfp').is_odd(),
+    'NEON': conf.get('neon').is_odd(),
+    'THUMB': conf.get('thumb').is_odd(),
+  }, section: 'Arm', bool_yn: true)
+endif
+if conf.get('mips') == 1
+  summary({
+    'MIPS FPU': conf.get('mipsfpu').is_odd(),
+    'MIPS DSP R1': conf.get('mipsdsp').is_odd(),
+    'MIPS DSP R2': conf.get('mipsdspr2').is_odd(),
+    'MIPS MSA': conf.get('msa').is_odd(),
+    'LOONGSON MMI': conf.get('mmi').is_odd(),
+  }, section: 'MIPS', bool_yn: true)
+endif
+if conf.get('ppc') == 1
+  summary({
+    'AltiVec': conf.get('altivec').is_odd(),
+    'VSX': conf.get('vsx').is_odd(),
+    'POWER8': conf.get('power8').is_odd(),
+    'PPC 4xx optimizations': conf.get('ppc4xx').is_odd(),
+    'dcbzl available': conf.get('dcbzl').is_odd(),
+  }, section: 'PowerPC', bool_yn: true)
+endif
+if conf.get('loongarch') == 1
+  summary({
+    'LSX': conf.get('lsx').is_odd(),
+    'LASX': conf.get('lasx').is_odd(),
+  }, section: 'Loongson', bool_yn: true)
+endif
+if conf.get('riscv') == 1
+  summary({
+    'RISC-V Vector': conf.get('rvv').is_odd(),
+  }, section: 'RISC-V', bool_yn: true)
+endif
+
+d = {}
+v = []
+foreach lib : external_library_list + external_autodetect_library_list
+  if conf.get(lib) == 1
+    v += [lib]
+  endif
+endforeach
+d += {'External libraries': v}
+
+v = []
+foreach lib : hwaccel_library_list + hwaccel_autodetect_library_list
+  if conf.get(lib) == 1
+    v += [lib]
+  endif
+endforeach
+d += {'External libraries providing hardware acceleration': v}
+
+v = []
+foreach lib : library_list
+  if conf.get(lib) == 1
+    v += [lib]
+  endif
+endforeach
+d += {'Libraries': v}
+
+v = []
+foreach lib : program_list
+  if conf.get(lib) == 1
+    v += [lib]
+  endif
+endforeach
+d += {'Programs': v}
+
+# uncomment if needed
+# foreach type : ['decoder', 'encoder', 'hwaccel', 'parser', 'demuxer', 'muxer', 'protocol', 'filter', 'bsf', 'indev', 'outdev']
+#   k = 'Enabled @0@s'.format(type)
+#   v = []
+#   if type == 'indev'
+#     suffix = '_@0@'.format('demuxer')
+#   elif type == 'outdev'
+#     suffix = '_@0@'.format('muxer')
+#   else
+#     suffix = '_@0@'.format(type)
+#   endif
+#   foreach component : get_variable('@0@_list'.format(type))
+#     if conf.get(component) == 1
+#       v += [component.replace(suffix, '')]
+#     endif
+#   endforeach
+#   d += {k: v}
+# endforeach
+summary(d, section: 'Components', list_sep: ' ')
