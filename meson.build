@@ -1801,6 +1801,8 @@ conf.set('uspp_filter', 0)
 if host_machine.system() == 'windows'
   conf.set('symver', 0)
   conf.set('dos_paths', 1)
+  # https://ffmpeg.org/pipermail/ffmpeg-devel/2023-August/313023.html
+  project_c_args += cc.get_supported_arguments('-DWIN32_LEAN_AND_MEAN', '-wd4005', '-Wp,-w')
 endif
 
 if ['linux', 'openbsd', 'android'].contains(host_machine.system())
