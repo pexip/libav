@@ -3146,12 +3146,12 @@ foreach built_lib : built_libs
       '@0@res.rc'.format(built_lib[0]),
       input : ['lib@0@/@0@res.rc'.format(built_lib[0])],
       output : ['@PLAINNAME@'],
-      command : [rc, '@INPUT@', meson.current_build_dir()],
+      command : [rc, '@INPUT@', meson.current_source_dir()],
       capture: true
     )
     sources += windows.compile_resources(
       rc_tgt,
-      include_directories: ffmpeg_toplevel_inc,
+      include_directories: common_incs,
       depends: ffversion_h,
     )
   endif
