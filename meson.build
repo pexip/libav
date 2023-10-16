@@ -2153,7 +2153,7 @@ endif
 
 # check for some common methods of building with pthread support
 # do this before the optional library checks as some of them require pthreads
-if conf.get('pthreads') == 0 and conf.get('w32threads') == 0 and conf.get('os2threads') == 0
+if conf.get('pthreads') == 1
   conf.set10('pthreads', cc.links('''
     #include <pthread.h>
     int main()
