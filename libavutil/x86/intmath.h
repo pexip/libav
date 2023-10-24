@@ -26,15 +26,15 @@
 #if HAVE_FAST_CLZ
 #if defined(_MSC_VER)
 #include <intrin.h>
-#elif defined(__INTEL_COMPILER)
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
 #include <immintrin.h>
 #endif
 #endif
 #include "config.h"
 
 #if HAVE_FAST_CLZ
-#if (defined(__INTEL_COMPILER) && (__INTEL_COMPILER>=1216)) || defined(_MSC_VER)
-#   if defined(__INTEL_COMPILER)
+#if (defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER) && (__INTEL_COMPILER>=1216)) || defined(_MSC_VER)
+#   if defined(__INTEL_COMPILER) || defined(__INTEL_LLVM_COMPILER)
 #       define ff_log2(x) (_bit_scan_reverse((x)|1))
 #   else
 #       define ff_log2 ff_log2_x86
@@ -62,7 +62,7 @@ static av_always_inline av_const int ff_ctzll_x86(long long v)
 #   endif
 #endif /* _MSC_VER */
 
-#endif /* __INTEL_COMPILER */
+#endif /* __INTEL_COMPILER __INTEL_LLVM_COMPILER*/
 
 #endif /* HAVE_FAST_CLZ */
 
@@ -102,7 +102,7 @@ static av_always_inline av_const unsigned av_mod_uintp2_bmi2(unsigned a, unsigne
 
 #endif /* __BMI2__ */
 
-#if defined(__SSE2__) && !defined(__INTEL_COMPILER)
+#if defined(__SSE2__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
 
 #define av_clipd av_clipd_sse2
 static av_always_inline av_const double av_clipd_sse2(double a, double amin, double amax)
@@ -118,7 +118,7 @@ static av_always_inline av_const double av_clipd_sse2(double a, double amin, dou
 
 #endif /* __SSE2__ */
 
-#if defined(__SSE__) && !defined(__INTEL_COMPILER)
+#if defined(__SSE__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
 
 #define av_clipf av_clipf_sse
 static av_always_inline av_const float av_clipf_sse(float a, float amin, float amax)
