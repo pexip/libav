@@ -31,7 +31,15 @@
 #include "libavcodec/cabac.h"
 #include "cabac.h"
 
-#if HAVE_INLINE_ASM
+/* PEXHACK: we can't have inline ASM here, since that will produce code
+            that can't be statically linked. We get the following error:
+
+ libavcodec.a(libavcodec_h264_slice.c.o): relocation R_X86_64_PC32 against symbol `ff_h264_cabac_tables'
+ can not be used when making a shared object; recompile with -fPIC
+
+ A lengthy explanation why this is here: https://stackoverflow.com/a/46515541
+ */
+#if 0 //HAVE_INLINE_ASM
 
 #if ARCH_X86_64
 #define REG64 "r"
