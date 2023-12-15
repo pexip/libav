@@ -102,13 +102,13 @@ av_cold void ff_vc1dsp_init_x86(VC1DSPContext *dsp)
 {
     int cpu_flags = av_get_cpu_flags();
 
-    if (HAVE_6REGS && INLINE_MMX(cpu_flags))
-        if (EXTERNAL_MMX(cpu_flags))
+#if HAVE_6REGS && HAVE_MMX_INLINE
+    if (INLINE_MMX(cpu_flags) && EXTERNAL_MMX(cpu_flags))
         ff_vc1dsp_init_mmx(dsp);
 
-    if (HAVE_6REGS && INLINE_MMXEXT(cpu_flags))
-        if (EXTERNAL_MMXEXT(cpu_flags))
+    if (INLINE_MMXEXT(cpu_flags) && EXTERNAL_MMXEXT(cpu_flags))
         ff_vc1dsp_init_mmxext(dsp);
+#endif
 
 #define ASSIGN_LF4(EXT) \
         dsp->vc1_v_loop_filter4  = ff_vc1_v_loop_filter4_ ## EXT; \

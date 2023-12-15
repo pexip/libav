@@ -1888,7 +1888,8 @@ static int avi_read_seek(AVFormatContext *s, int stream_index,
     av_log(s, AV_LOG_TRACE, "XX %"PRId64" %d %"PRId64"\n",
             timestamp, index, sti->index_entries[index].timestamp);
 
-    if (CONFIG_DV_DEMUXER && avi->dv_demux) {
+#if CONFIG_DV_DEMUXER
+    if (avi->dv_demux) {
         /* One and only one real stream for DV in AVI, and it has video  */
         /* offsets. Calling with other stream indexes should have failed */
         /* the av_index_search_timestamp call above.                     */
@@ -1903,6 +1904,7 @@ static int avi_read_seek(AVFormatContext *s, int stream_index,
         avi->stream_index = -1;
         return 0;
     }
+#endif
 
     pos_min = pos;
     for (i = 0; i < s->nb_streams; i++) {

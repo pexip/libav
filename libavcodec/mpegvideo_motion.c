@@ -702,11 +702,14 @@ static av_always_inline void mpv_motion_internal(MpegEncContext *s,
                         0, 0, 0,
                         ref_picture, pix_op, qpix_op,
                         s->mv[dir][0][0], s->mv[dir][0][1], 16);
-        } else if (!is_mpeg12 && (CONFIG_WMV2_DECODER || CONFIG_WMV2_ENCODER) &&
-                   s->mspel && s->codec_id == AV_CODEC_ID_WMV2) {
+
+#if CONFIG_WMV2_DECODER || CONFIG_WMV2_ENCODER
+        } else if (!is_mpeg12 &&  && s->mspel && s->codec_id == AV_CODEC_ID_WMV2) {
             ff_mspel_motion(s, dest_y, dest_cb, dest_cr,
                             ref_picture, pix_op,
                             s->mv[dir][0][0], s->mv[dir][0][1], 16);
+#endif
+
         } else {
             mpeg_motion(s, dest_y, dest_cb, dest_cr, 0,
                         ref_picture, pix_op,

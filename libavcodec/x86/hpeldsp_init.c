@@ -236,6 +236,7 @@ av_cold void ff_hpeldsp_init_x86(HpelDSPContext *c, int flags)
     if (EXTERNAL_SSSE3(cpu_flags))
         hpeldsp_init_ssse3(c, flags);
 
-    if (CONFIG_VP3_DECODER)
+#if CONFIG_VP3_DECODER
         ff_hpeldsp_vp3_init_x86(c, cpu_flags, flags);
+#endif
 }

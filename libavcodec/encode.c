@@ -302,10 +302,12 @@ static int encode_simple_internal(AVCodecContext *avctx, AVPacket *avpkt)
 
     av_assert0(codec->cb_type == FF_CODEC_CB_TYPE_ENCODE);
 
-    if (CONFIG_FRAME_THREAD_ENCODER && avci->frame_thread_encoder)
+    if (CONFIG_FRAME_THREAD_ENCODER && avci->frame_thread_encoder) {
+#if CONFIG_FRAME_THREAD_ENCODER
         /* This will unref frame. */
         ret = ff_thread_video_encode_frame(avctx, avpkt, frame, &got_packet);
-    else {
+#endif
+    } else {
         ret = ff_encode_encode_cb(avctx, avpkt, frame, &got_packet);
     }
 
@@ -717,11 +719,11 @@ int ff_encode_preinit(AVCodecContext *avctx)
             return AVERROR(ENOMEM);
     }
 
-    if (CONFIG_FRAME_THREAD_ENCODER) {
+#if CONFIG_FRAME_THREAD_ENCODER
         ret = ff_frame_thread_encoder_init(avctx);
         if (ret < 0)
             return ret;
-    }
+#endif
 
     return 0;
 }

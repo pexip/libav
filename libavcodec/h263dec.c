@@ -199,9 +199,11 @@ static int decode_slice(MpegEncContext *s)
     if (s->partitioned_frame) {
         const int qscale = s->qscale;
 
-        if (CONFIG_MPEG4_DECODER && s->codec_id == AV_CODEC_ID_MPEG4)
+#if CONFIG_MPEG4_DECODER
+        if (s->codec_id == AV_CODEC_ID_MPEG4)
             if ((ret = ff_mpeg4_decode_partitions(s->avctx->priv_data)) < 0)
                 return ret;
+#endif
 
         /* restore variables which were modified */
         s->first_slice_line = 1;
@@ -464,10 +466,15 @@ retry:
 
     /* let's go :-) */
     if (CONFIG_WMV2_DECODER && s->msmpeg4_version == 5) {
+#if CONFIG_WMV2_DECODER
         ret = ff_wmv2_decode_picture_header(s);
+#endif
     } else if (CONFIG_MSMPEG4DEC && s->msmpeg4_version) {
+#if CONFIG_MSMPEG4DEC
         ret = ff_msmpeg4_decode_picture_header(s);
+#endif
     } else if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4) {
+#if CONFIG_MPEG4_DECODER
         if (s->avctx->extradata_size && !s->extradata_parsed) {
             GetBitContext gb;
 
@@ -477,10 +484,15 @@ retry:
         }
         ret = ff_mpeg4_decode_picture_header(avctx->priv_data, &s->gb, 0, 0);
         s->skipped_last_frame = (ret == FRAME_SKIPPED);
+#endif
     } else if (CONFIG_H263I_DECODER && s->codec_id == AV_CODEC_ID_H263I) {
+#if CONFIG_H263I_DECODER
         ret = ff_intel_h263_decode_picture_header(s);
+#endif
     } else if (CONFIG_FLV_DECODER && s->h263_flv) {
+#if CONFIG_FLV_DECODER
         ret = ff_flv_decode_picture_header(s);
+#endif 
     } else {
         ret = ff_h263_decode_picture_header(s);
     }
@@ -510,7 +522,8 @@ retry:
 
     avctx->has_b_frames = !s->low_delay;
 
-    if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4) {
+#if CONFIG_MPEG4_DECODER
+    if (avctx->codec_id == AV_CODEC_ID_MPEG4) {
         if (s->pict_type != AV_PICTURE_TYPE_B && s->mb_num/2 > get_bits_left(&s->gb))
             return AVERROR_INVALIDDATA;
         if (ff_mpeg4_workaround_bugs(avctx) == 1)
@@ -518,6 +531,7 @@ retry:
         if (s->studio_profile != (s->idsp.idct == NULL))
             ff_mpv_idct_init(s);
     }
+#endif
 
     /* After H.263 & MPEG-4 header decode we have the height, width,
      * and other parameters. So then we could init the picture.
@@ -579,13 +593,15 @@ retry:
     /* the second part of the wmv2 header contains the MB skip bits which
      * are stored in current_picture->mb_type which is not available before
      * ff_mpv_frame_start() */
-    if (CONFIG_WMV2_DECODER && s->msmpeg4_version == 5) {
+#if CONFIG_WMV2_DECODER
+    if (s->msmpeg4_version == 5) {
         ret = ff_wmv2_decode_secondary_picture_header(s);
         if (ret < 0)
             return ret;
         if (ret == 1)
             goto frame_end;
     }
+#endif
 
     /* decode each macroblock */
     s->mb_x = 0;
@@ -631,8 +647,10 @@ frame_end:
 
     ff_mpv_frame_end(s);
 
-    if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4)
+#if CONFIG_MPEG4_DECODER
+    if (avctx->codec_id == AV_CODEC_ID_MPEG4)
         ff_mpeg4_frame_end(avctx, buf, buf_size);
+#endif
 
     if (!s->divx_packed && avctx->hwaccel)
         ff_thread_finish_setup(avctx);

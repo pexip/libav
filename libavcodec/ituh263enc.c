@@ -402,7 +402,9 @@ static void h263_encode_block(MpegEncContext * s, int16_t * block, int n)
                     put_sbits(&s->pb, 6, slevel>>5);
                 }
               }else{
+#if CONFIG_FLV_ENCODER
                     ff_flv2_encode_ac_esc(&s->pb, slevel, level, run, last);
+#endif
               }
             } else {
                 put_bits(&s->pb, 1, sign);

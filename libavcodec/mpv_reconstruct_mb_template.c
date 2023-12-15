@@ -225,7 +225,9 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                     }
                 } //fi gray
             } else if (CONFIG_WMV2_DECODER) {
+#if CONFIG_WMV2_DECODER
                 ff_wmv2_add_mb(s, block, dest_y, dest_cb, dest_cr);
+#endif
             }
 #endif /* !IS_ENCODER */
         } else {

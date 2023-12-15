@@ -289,8 +289,10 @@ av_cold void ff_idctdsp_init(IDCTDSPContext *c, AVCodecContext *avctx)
     c->put_signed_pixels_clamped = put_signed_pixels_clamped_c;
     c->add_pixels_clamped        = ff_add_pixels_clamped_c;
 
-    if (CONFIG_MPEG4_DECODER && avctx->idct_algo == FF_IDCT_XVID)
+#if CONFIG_MPEG4_DECODER
+    if (avctx->idct_algo == FF_IDCT_XVID)
         ff_xvid_idct_init(c, avctx);
+#endif
 
 #if ARCH_AARCH64
     ff_idctdsp_init_aarch64(c, avctx, high_bit_depth);
