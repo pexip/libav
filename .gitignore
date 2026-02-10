@@ -43,3 +43,6 @@
 /src
 /mapfile
 /tools/python/__pycache__/
+
+# Meson wraplock
+.wraplock
